@@ -14,13 +14,30 @@ function showPicker(kind, onSelect) {
 	var searchInput = E('input', {
 		'type': 'text',
 		'class': 'cbi-input-text',
-		'placeholder': _('Search category (e.g. ir, apple)...'),
-		'style': 'width: 100%; margin-bottom: 12px;'
+		'placeholder': _('Search category (e.g. ir, google)...'),
+		'style': 'flex: 1;'
 	});
 
 	var paginationInfo = E('span', { 'style': 'margin-inline-end: 10px;' });
 	var prevBtn = E('button', { 'class': 'cbi-button', 'disabled': 'true' }, [ _('Previous') ]);
 	var nextBtn = E('button', { 'class': 'cbi-button', 'disabled': 'true' }, [ _('Next') ]);
+
+	var addCustomBtn = E('button', {
+		'class': 'cbi-button cbi-button-action',
+		'style': 'white-space: nowrap;',
+		'click': function() {
+			var val = searchInput.value.trim().toLowerCase();
+			if (val) {
+				ui.hideModal();
+				if (typeof onSelect === 'function') onSelect(val);
+			}
+		}
+	}, [ _('+ Add Custom') ]);
+
+	var searchRow = E('div', { 'style': 'display: flex; gap: 8px; align-items: center; margin-bottom: 14px;' }, [
+		searchInput,
+		addCustomBtn
+	]);
 
 	function loadData() {
 		dom.content(tableBody, [
@@ -33,8 +50,24 @@ function showPicker(kind, onSelect) {
 
 			dom.content(tableBody, []);
 			if (items.length === 0) {
+				var customBtn = null;
+				if (currentQuery && currentQuery.length > 0) {
+					customBtn = E('button', {
+						'class': 'cbi-button cbi-button-action',
+						'style': 'margin-top: 8px;',
+						'click': function() {
+							ui.hideModal();
+							if (typeof onSelect === 'function') onSelect(currentQuery.toLowerCase());
+						}
+					}, [ _('+ Add as custom tag: ') + currentQuery.toLowerCase() ]);
+				}
 				dom.content(tableBody, [
-					E('tr', {}, [ E('td', { 'colspan': '4', 'style': 'text-align: center;' }, [ _('No categories found') ]) ])
+					E('tr', {}, [
+						E('td', { 'colspan': '4', 'style': 'text-align: center; padding: 18px;' }, [
+							E('p', { 'style': 'opacity: 0.7; margin-bottom: 6px;' }, [ _('No categories found in catalog.') ]),
+							customBtn
+						])
+					])
 				]);
 			} else {
 				items.forEach(function(item) {
@@ -94,8 +127,8 @@ function showPicker(kind, onSelect) {
 	});
 
 	var modalContent = E('div', {}, [
-		E('h4', {}, [ kind === 'geoip' ? _('Select GeoIP Country') : _('Select GeoSite Category') ]),
-		searchInput,
+		E('h4', { 'style': 'margin-bottom: 12px;' }, [ kind === 'geoip' ? _('Select GeoIP Country') : _('Select GeoSite Category') ]),
+		searchRow,
 		E('table', { 'class': 'table cbi-section-table', 'style': 'width: 100%; border-collapse: collapse; margin-top: 10px;' }, [
 			E('thead', {}, [
 				E('tr', { 'class': 'tr table-titles' }, [

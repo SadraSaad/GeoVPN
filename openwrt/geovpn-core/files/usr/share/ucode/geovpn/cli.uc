@@ -92,17 +92,27 @@ function load_geo_cidrs(config) {
 		for (let g in config.geoip) {
 			if (g.enabled != '0' && g.code) {
 				let code = lc(g.code);
-				let f4 = fs.open(sprintf('%s/ip/%s.v4.txt', data_dir, code), 'r');
-				if (f4) {
-					let lines = split(f4.read('all'), '\n');
-					f4.close();
-					for (let l in lines) {
-						let line = trim(l);
-						if (length(line) > 0 && substr(line, 0, 1) != '#' && (util.is_cidr4(line) || util.is_ipv4(line))) {
-							push(v4, line);
+				let v4_candidates = [
+					sprintf('%s/ip/%s.v4.txt', data_dir, code),
+					sprintf('%s/ip/%s.cidr', data_dir, code),
+					sprintf('%s/ip/%s.txt', data_dir, code)
+				];
+				for (let cand in v4_candidates) {
+					let f = fs.open(cand, 'r');
+					if (f) {
+						let lines = split(f.read('all'), '\n');
+						f.close();
+						for (let l in lines) {
+							let line = trim(l);
+							if (length(line) > 0 && substr(line, 0, 1) != '#') {
+								if (util.is_cidr4(line) || util.is_ipv4(line)) push(v4, line);
+								else if (util.is_cidr6(line) || util.is_ipv6(line)) push(v6, line);
+							}
 						}
+						break;
 					}
 				}
+
 				let f6 = fs.open(sprintf('%s/ip/%s.v6.txt', data_dir, code), 'r');
 				if (f6) {
 					let lines = split(f6.read('all'), '\n');
@@ -127,15 +137,22 @@ function load_geosite_domains(config) {
 		for (let s in config.geosite) {
 			if (s.enabled != '0' && s.name) {
 				let name = lc(s.name);
-				let f = fs.open(sprintf('%s/site/%s.txt', data_dir, name), 'r');
-				if (f) {
-					let lines = split(f.read('all'), '\n');
-					f.close();
-					for (let l in lines) {
-						let line = trim(l);
-						if (length(line) > 0 && substr(line, 0, 1) != '#' && util.is_domain(line)) {
-							push(domains, line);
+				let cand_files = [
+					sprintf('%s/site/%s.txt', data_dir, name),
+					sprintf('%s/site/%s.domains', data_dir, name)
+				];
+				for (let cand in cand_files) {
+					let f = fs.open(cand, 'r');
+					if (f) {
+						let lines = split(f.read('all'), '\n');
+						f.close();
+						for (let l in lines) {
+							let line = trim(l);
+							if (length(line) > 0 && substr(line, 0, 1) != '#' && util.is_domain(line)) {
+								push(domains, line);
+							}
 						}
+						break;
 					}
 				}
 			}

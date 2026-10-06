@@ -3,7 +3,6 @@
 'require ui';
 'require uci';
 'require dom';
-'require poll';
 'require geovpn.api as api';
 'require geovpn.widgets as widgets';
 
@@ -358,7 +357,8 @@ return view.extend({
 										ui.addNotification(null, E('p', {}, [ _('Profile updated successfully.') ]), 'info');
 										location.reload();
 									} else {
-										ui.addNotification(null, E('p', {}, [ _('Error saving profile: ') + (sRes.message || 'Unknown error') ]), 'error');
+										var msg = (sRes && (sRes.message || sRes.error)) ? (sRes.message || sRes.error) : _('Unknown error');
+										ui.addNotification(null, E('p', {}, [ _('Error saving profile: ') + msg ]), 'error');
 									}
 								}).catch(function(err) {
 									ui.hideIndicator();

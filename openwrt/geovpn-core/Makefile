@@ -8,7 +8,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=geovpn-core
 PKG_VERSION:=1.0.0
-PKG_RELEASE:=2
+PKG_RELEASE:=3
 PKG_LICENSE:=Apache-2.0
 PKG_LICENSE_FILES:=LICENSE
 PKG_MAINTAINER:=GeoVPN Developers <geovpn@example.org>
@@ -51,6 +51,7 @@ define Package/geovpn-core/install
 	$(INSTALL_DIR) $(1)/etc/geovpn/profiles $(1)/etc/geovpn/data $(1)/etc/geovpn/keys $(1)/etc/geovpn/backup
 	chmod 0700 $(1)/etc/geovpn/profiles $(1)/etc/geovpn/backup
 	chmod 0755 $(1)/etc/init.d/geovpn $(1)/usr/bin/geovpn $(1)/usr/bin/geovpn-update \
+	  $(1)/usr/bin/geovpn-import-rules \
 	  $(1)/usr/libexec/geovpn/ovpn-hook $(1)/usr/libexec/geovpn/spawn \
 	  $(1)/etc/uci-defaults/90-geovpn $(1)/etc/hotplug.d/iface/50-geovpn
 	chmod 0600 $(1)/etc/config/geovpn

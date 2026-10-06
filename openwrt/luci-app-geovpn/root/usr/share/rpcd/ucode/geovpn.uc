@@ -141,6 +141,13 @@ return {
 				let pdir = cfg.PROFILES_DIR + '/' + id;
 				if (!fs.stat(pdir)) fs.mkdir(pdir, 0o700);
 
+				let cursor = uci.cursor();
+				cursor.load('geovpn');
+
+				if (name && length(name) > 0) {
+					cursor.set('geovpn', id, 'name', name);
+				}
+
 				if (ovpn && length(ovpn) > 0) {
 					let of = fs.open(pdir + '/profile.ovpn', 'w', 0o600);
 					if (of) {
@@ -149,12 +156,8 @@ return {
 					}
 					let parse_res = parse.parse_ovpn(ovpn, name || p.name);
 					if (parse_res.ok && parse_res.profile) {
-						let cursor = uci.cursor();
-						cursor.load('geovpn');
-						if (name && length(name) > 0) cursor.set('geovpn', id, 'name', name);
 						if (parse_res.profile.remotes) cursor.set('geovpn', id, 'remote', parse_res.profile.remotes);
 						if (parse_res.profile.cipher) cursor.set('geovpn', id, 'cipher', parse_res.profile.cipher);
-						cursor.commit('geovpn');
 					}
 				}
 
@@ -164,12 +167,10 @@ return {
 						af.write(auth);
 						af.close();
 					}
-					let cursor = uci.cursor();
-					cursor.load('geovpn');
 					cursor.set('geovpn', id, 'auth_user_pass', (length(trim(auth)) > 0) ? '1' : '0');
-					cursor.commit('geovpn');
 				}
 
+				cursor.commit('geovpn');
 				return { ok: true };
 			}
 		},

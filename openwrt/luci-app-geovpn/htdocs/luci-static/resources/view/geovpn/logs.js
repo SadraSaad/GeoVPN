@@ -2,7 +2,6 @@
 'require view';
 'require ui';
 'require dom';
-'require poll';
 'require geovpn.api as api';
 'require geovpn.widgets as widgets';
 

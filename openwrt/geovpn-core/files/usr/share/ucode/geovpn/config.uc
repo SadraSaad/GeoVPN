@@ -11,6 +11,9 @@ import * as util from './util.uc';
 const PROFILES_DIR = '/etc/geovpn/profiles';
 
 function ensure_profiles_dir() {
+	if (!fs.stat('/etc/geovpn')) {
+		fs.mkdir('/etc/geovpn', 0o755);
+	}
 	if (!fs.stat(PROFILES_DIR)) {
 		fs.mkdir(PROFILES_DIR, 0o700);
 	}
@@ -79,7 +82,7 @@ function generate_profile_id() {
 function get_profile(id) {
 	if (!util.is_profile_id(id)) return null;
 	let cursor = get_cursor();
-	let p = cursor.get('geovpn', id);
+	let p = cursor.get_all('geovpn', id);
 	if (!p || p['.type'] != 'profile') return null;
 
 	let pdir = PROFILES_DIR + '/' + id;

@@ -1,0 +1,82 @@
+#!/bin/sh
+#
+# GeoVPN: Import rules from URL or local text files (e.g. Chocolate4U Iran-v2ray-rules)
+#
+set -e
+
+GEOIP_SRC="${1:-https://raw.githubusercontent.com/Chocolate4U/Iran-v2ray-rules/release/geoip.txt}"
+GEOSITE_SRC="${2:-https://raw.githubusercontent.com/Chocolate4U/Iran-v2ray-rules/release/geosite.txt}"
+
+DATA_DIR="/etc/geovpn/data"
+mkdir -p "$DATA_DIR/ip" "$DATA_DIR/site" "$DATA_DIR/catalog"
+
+echo "==> GeoVPN Rule Importer"
+
+# 1. Import GeoIP CIDRs
+if [ -n "$GEOIP_SRC" ]; then
+	echo "--> Processing GeoIP: $GEOIP_SRC"
+	TMP_IP="/tmp/geovpn_import_ip.tmp"
+	if echo "$GEOIP_SRC" | grep -qE '^https?://'; then
+		uclient-fetch -q -T 30 -O "$TMP_IP" "$GEOIP_SRC" 2>/dev/null || wget -q -T 30 -O "$TMP_IP" "$GEOIP_SRC"
+	elif [ -f "$GEOIP_SRC" ]; then
+		cp -f "$GEOIP_SRC" "$TMP_IP"
+	else
+		echo "ERROR: GeoIP source not found: $GEOIP_SRC" >&2
+		exit 1
+	fi
+
+	# Separate IPv4 and IPv6, ignore comments and non-IPs
+	grep -E '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+(/[0-9]+)?' "$TMP_IP" | tr -d '\r' > "$DATA_DIR/ip/ir.v4.txt" || true
+	grep -E '^[0-9a-fA-F:]+(/[0-9]+)?' "$TMP_IP" | grep ':' | tr -d '\r' > "$DATA_DIR/ip/ir.v6.txt" || true
+	rm -f "$TMP_IP"
+
+	COUNT_V4=$(wc -l < "$DATA_DIR/ip/ir.v4.txt" 2>/dev/null || echo 0)
+	COUNT_V6=$(wc -l < "$DATA_DIR/ip/ir.v6.txt" 2>/dev/null || echo 0)
+	echo "    Imported $COUNT_V4 IPv4 and $COUNT_V6 IPv6 CIDRs for 'ir'"
+
+	# Ensure ir in catalog
+	if ! grep -q '^ir[[:space:]]' "$DATA_DIR/catalog/geoip.tsv" 2>/dev/null; then
+		printf "ir\t%s\t%s\t48 KB\t48\tIran (Islamic Republic of)\n" "$COUNT_V4" "$COUNT_V6" >> "$DATA_DIR/catalog/geoip.tsv"
+	fi
+fi
+
+# 2. Import GeoSite Domains
+if [ -n "$GEOSITE_SRC" ]; then
+	echo "--> Processing GeoSite: $GEOSITE_SRC"
+	TMP_SITE="/tmp/geovpn_import_site.tmp"
+	if echo "$GEOSITE_SRC" | grep -qE '^https?://'; then
+		uclient-fetch -q -T 30 -O "$TMP_SITE" "$GEOSITE_SRC" 2>/dev/null || wget -q -T 30 -O "$TMP_SITE" "$GEOSITE_SRC"
+	elif [ -f "$GEOSITE_SRC" ]; then
+		cp -f "$GEOSITE_SRC" "$TMP_SITE"
+	else
+		echo "ERROR: GeoSite source not found: $GEOSITE_SRC" >&2
+		exit 1
+	fi
+
+	# Clean domain lines
+	grep -v '^[[:space:]]*#' "$TMP_SITE" | grep -v '^[[:space:]]*$' | tr -d '\r' | awk '{print $1}' > "$DATA_DIR/site/ir.txt" || true
+	rm -f "$TMP_SITE"
+
+	COUNT_DOM=$(wc -l < "$DATA_DIR/site/ir.txt" 2>/dev/null || echo 0)
+	echo "    Imported $COUNT_DOM domains for 'ir'"
+
+	# Ensure ir in catalog
+	if ! grep -q '^ir[[:space:]]' "$DATA_DIR/catalog/geosite.tsv" 2>/dev/null; then
+		printf "ir\t%s\t0\t1.8 MB\t1800\tIran top domains & national services\n" "$COUNT_DOM" >> "$DATA_DIR/catalog/geosite.tsv"
+	fi
+fi
+
+# Update state record
+cat << EOF > "$DATA_DIR/STATE"
+build_id=custom-import-$(date +%Y%m%d%H%M)
+build_time=$(date +%s)
+source=custom-url
+EOF
+
+echo "==> GeoVPN rules imported successfully!"
+
+# If service enabled and running, reload
+if uci -q get geovpn.main.enabled | grep -q '1'; then
+	echo "==> Reloading GeoVPN routing sets..."
+	/usr/bin/geovpn reload 2>/dev/null || true
+fi
