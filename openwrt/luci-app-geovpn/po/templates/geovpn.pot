@@ -1,0 +1,825 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Project-Id-Version: luci-app-geovpn 1.0\n"
+"Language-Team: GeoVPN Team\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid " — Only selected countries/domains use VPN; all other traffic uses direct WAN."
+msgstr ""
+
+msgid " — Pure embedded OpenVPN client with geo-based split tunneling, policy routing, and zero resident daemon footprint."
+msgstr ""
+
+msgid " — Selected countries/domains bypass VPN to direct WAN; all other traffic uses VPN."
+msgstr ""
+
+msgid "+ Add Category (GeoSite)…"
+msgstr ""
+
+msgid "+ Add Client Policy"
+msgstr ""
+
+msgid "+ Add Country (GeoIP)…"
+msgstr ""
+
+msgid "+ Add Custom Rule"
+msgstr ""
+
+msgid "+ Import .ovpn Profile"
+msgstr ""
+
+msgid "100 Lines"
+msgstr ""
+
+msgid "200 Lines"
+msgstr ""
+
+msgid "500 Lines"
+msgstr ""
+
+msgid "About GeoVPN"
+msgstr ""
+
+msgid "Action"
+msgstr ""
+
+msgid "Actions"
+msgstr ""
+
+msgid "Active"
+msgstr ""
+
+msgid "Active Profile"
+msgstr ""
+
+msgid "Active ✔"
+msgstr ""
+
+msgid "Add"
+msgstr ""
+
+msgid "Add Client Policy"
+msgstr ""
+
+msgid "Add Custom Rule"
+msgstr ""
+
+msgid "Address"
+msgstr ""
+
+msgid "Address cannot be empty."
+msgstr ""
+
+msgid "Advanced Routing & System Limits"
+msgstr ""
+
+msgid "All GeoVPN Logs"
+msgstr ""
+
+msgid "All Systems OK ✔"
+msgstr ""
+
+msgid "All logs are automatically scrubbed on the router to remove certificates, private keys, and passwords before display."
+msgstr ""
+
+msgid "Allow large data packs on devices with < 512MB RAM"
+msgstr ""
+
+msgid "Always Direct WAN DNS"
+msgstr ""
+
+msgid "Always VPN DNS"
+msgstr ""
+
+msgid "Always direct WAN"
+msgstr ""
+
+msgid "Assigned IP"
+msgstr ""
+
+msgid "Auth"
+msgstr ""
+
+msgid "Auto"
+msgstr ""
+
+msgid "Auto routes IPv6 if VPN provides an IPv6 endpoint; otherwise keeps direct or blocks."
+msgstr ""
+
+msgid "Auto-Update"
+msgstr ""
+
+msgid "Auto-refresh (3s)"
+msgstr ""
+
+msgid "Bit shift for packet and connmark (bits [shift..shift+3]). Shift 24 avoids mwan3 (bits 0..15)."
+msgstr ""
+
+msgid "Block (prevent leaks)"
+msgstr ""
+
+msgid "Block DNS-over-HTTPS (DoH)"
+msgstr ""
+
+msgid "Block DNS-over-TLS (DoT)"
+msgstr ""
+
+msgid "Block VPN traffic when tunnel is down"
+msgstr ""
+
+msgid "Bypass listed"
+msgstr ""
+
+msgid "Cancel"
+msgstr ""
+
+msgid "Capacity Limits"
+msgstr ""
+
+msgid "Category Picker"
+msgstr ""
+
+msgid "Certificate"
+msgstr ""
+
+msgid "Client Device Policies"
+msgstr ""
+
+msgid "Client Policy"
+msgstr ""
+
+msgid "Component Check"
+msgstr ""
+
+msgid "Configured Profiles"
+msgstr ""
+
+msgid "Connections"
+msgstr ""
+
+msgid "Copy Logs"
+msgstr ""
+
+msgid "Credentials"
+msgstr ""
+
+msgid "Credentials are stored securely with 0600 root-only permissions."
+msgstr ""
+
+msgid "Credentials for "
+msgstr ""
+
+msgid "Credentials updated."
+msgstr ""
+
+msgid "Cryptographic Verification"
+msgstr ""
+
+msgid "Custom Rule"
+msgstr ""
+
+msgid "Custom Target Rules"
+msgstr ""
+
+msgid "DIRECT"
+msgstr ""
+
+msgid "DNS & Leak Protection"
+msgstr ""
+
+msgid "DNS Path: "
+msgstr ""
+
+msgid "DNS Steering Mode"
+msgstr ""
+
+msgid "DNS queries for domains in these categories are dynamically added to the policy routing set."
+msgstr ""
+
+msgid "Data Sources & Verification"
+msgstr ""
+
+msgid "Data cache refreshed."
+msgstr ""
+
+msgid "Data pack build: "
+msgstr ""
+
+msgid "Debug"
+msgstr ""
+
+msgid "Delete"
+msgstr ""
+
+msgid "Delete profile \"%s\"?"
+msgstr ""
+
+msgid "Details & Recommendations"
+msgstr ""
+
+msgid "Device Name"
+msgstr ""
+
+msgid "Direct"
+msgstr ""
+
+msgid "Direct (WAN)"
+msgstr ""
+
+msgid "Direct DNS Servers"
+msgstr ""
+
+msgid "Direct Only"
+msgstr ""
+
+msgid "Direct Only (Bypass VPN completely)"
+msgstr ""
+
+msgid "Direct traffic continues unimpeded. Router management and LAN access are always preserved."
+msgstr ""
+
+msgid "Directs domain queries to appropriate resolvers and populates nftables sets."
+msgstr ""
+
+msgid "Disabled (Do not touch dnsmasq)"
+msgstr ""
+
+msgid "DoH Canary Signal"
+msgstr ""
+
+msgid "Domain"
+msgstr ""
+
+msgid "Download Diagnostics (JSON)"
+msgstr ""
+
+msgid "Dynamic Set Timeout"
+msgstr ""
+
+msgid "Edit"
+msgstr ""
+
+msgid "Edit Client Policy"
+msgstr ""
+
+msgid "Edit Custom Rule"
+msgstr ""
+
+msgid "Emergency Stop (Panic)"
+msgstr ""
+
+msgid "Emergency stop: tear down all rules and disable GeoVPN?"
+msgstr ""
+
+msgid "Enable"
+msgstr ""
+
+msgid "Enable Split Tunneling"
+msgstr ""
+
+msgid "Enable automatic scheduled updates"
+msgstr ""
+
+msgid "Enable policy-based routing and DNS steering"
+msgstr ""
+
+msgid "Entries"
+msgstr ""
+
+msgid "Error"
+msgstr ""
+
+msgid "Error exporting diagnostics: "
+msgstr ""
+
+msgid "Error loading catalog: "
+msgstr ""
+
+msgid "Error simulating route: "
+msgstr ""
+
+msgid "Est. RAM"
+msgstr ""
+
+msgid "Estimated RAM: ~%s MB"
+msgstr ""
+
+msgid "Export Diagnostics Bundle (JSON)"
+msgstr ""
+
+msgid "Export comprehensive diagnostic details with all credentials and private keys scrubbed for safe sharing, or purge data caches."
+msgstr ""
+
+msgid "Failed to apply configuration: "
+msgstr ""
+
+msgid "Failed to copy to clipboard."
+msgstr ""
+
+msgid "Firewall Mark Shift"
+msgstr ""
+
+msgid "Flush Conntrack"
+msgstr ""
+
+msgid "Flush connection tracking table on tunnel state changes"
+msgstr ""
+
+msgid "Follow Route (Steer by category)"
+msgstr ""
+
+msgid "Geo-Data Pack"
+msgstr ""
+
+msgid "GeoIP Countries"
+msgstr ""
+
+msgid "GeoSite Domain Categories"
+msgstr ""
+
+msgid "GeoVPN"
+msgstr ""
+
+msgid "GeoVPN System Events"
+msgstr ""
+
+msgid "GeoVPN for OpenWrt 25.12"
+msgstr ""
+
+msgid "GeoVPN — Logs & Diagnostics"
+msgstr ""
+
+msgid "GeoVPN — OpenVPN Connections"
+msgstr ""
+
+msgid "GeoVPN — Settings"
+msgstr ""
+
+msgid "GeoVPN — Split Tunneling"
+msgstr ""
+
+msgid "HTTPS mirror hosting MANIFEST and catalog data."
+msgstr ""
+
+msgid "Hijack DNS (Port 53)"
+msgstr ""
+
+msgid "Hint: "
+msgstr ""
+
+msgid "How long dynamically resolved IP addresses remain in the nftables routing sets (default: 6h)."
+msgstr ""
+
+msgid "How traffic originating directly from the router itself is handled."
+msgstr ""
+
+msgid "IP / CIDR"
+msgstr ""
+
+msgid "IP / Subnet"
+msgstr ""
+
+msgid "IP Address / CIDR"
+msgstr ""
+
+msgid "IP Rule Priority"
+msgstr ""
+
+msgid "IPv6 Handling"
+msgstr ""
+
+msgid "Idle"
+msgstr ""
+
+msgid "Import"
+msgstr ""
+
+msgid "Import OpenVPN Profile"
+msgstr ""
+
+msgid "Import Profile"
+msgstr ""
+
+msgid "Import error: "
+msgstr ""
+
+msgid "Import failed: "
+msgstr ""
+
+msgid "Info"
+msgstr ""
+
+msgid "Intercept port 53 UDP/TCP and redirect to router dnsmasq"
+msgstr ""
+
+msgid "Kill Switch"
+msgstr ""
+
+msgid "LAN Firewall Zones"
+msgstr ""
+
+msgid "LAN Interfaces"
+msgstr ""
+
+msgid "Leak Testing & Export"
+msgstr ""
+
+msgid "License: Apache-2.0. Data packs: CC0-1.0 / MIT. No proprietary components."
+msgstr ""
+
+msgid "Lines:"
+msgstr ""
+
+msgid "Linux policy routing table used for VPN traffic (default: 4200)."
+msgstr ""
+
+msgid "Loading..."
+msgstr ""
+
+msgid "Logging Level"
+msgstr ""
+
+msgid "Logs & Diagnostics"
+msgstr ""
+
+msgid "Logs copied to clipboard."
+msgstr ""
+
+msgid "MAC"
+msgstr ""
+
+msgid "MAC / IP Address"
+msgstr ""
+
+msgid "MAC Address"
+msgstr ""
+
+msgid "Maintenance & Diagnostics"
+msgstr ""
+
+msgid "Make Active"
+msgstr ""
+
+msgid "Match By"
+msgstr ""
+
+msgid "Match Criterion"
+msgstr ""
+
+msgid "Match Type"
+msgstr ""
+
+msgid "Matched by: "
+msgstr ""
+
+msgid "Max CIDRs:"
+msgstr ""
+
+msgid "Max Domains:"
+msgstr ""
+
+msgid "Name"
+msgstr ""
+
+msgid "Network Settings"
+msgstr ""
+
+msgid "Next"
+msgstr ""
+
+msgid "No OpenVPN profiles configured. Import an .ovpn file to get started."
+msgstr ""
+
+msgid "No categories found"
+msgstr ""
+
+msgid "No countries selected."
+msgstr ""
+
+msgid "No custom rules configured."
+msgstr ""
+
+msgid "No diagnostic checks available."
+msgstr ""
+
+msgid "No domain categories selected."
+msgstr ""
+
+msgid "No log entries found."
+msgstr ""
+
+msgid "No per-client policies configured."
+msgstr ""
+
+msgid "None"
+msgstr ""
+
+msgid "Only listed via VPN"
+msgstr ""
+
+msgid "Only marked DNS queries"
+msgstr ""
+
+msgid "OpenVPN Process"
+msgstr ""
+
+msgid "Or Paste Config"
+msgstr ""
+
+msgid "Pack Repository URL"
+msgstr ""
+
+msgid "Password"
+msgstr ""
+
+msgid "Paste .ovpn content here..."
+msgstr ""
+
+msgid "Please upload a file or paste config content."
+msgstr ""
+
+msgid "Policy"
+msgstr ""
+
+msgid "Preflight verification checks kernel modules, binaries, firewall rules, and coexistence with other packages."
+msgstr ""
+
+msgid "Previous"
+msgstr ""
+
+msgid "Priority for policy routing lookup rules (default: 700)."
+msgstr ""
+
+msgid "Private Networks"
+msgstr ""
+
+msgid "Profile Name"
+msgstr ""
+
+msgid "Profile imported successfully: "
+msgstr ""
+
+msgid "Public Key File"
+msgstr ""
+
+msgid "Purge Data Cache"
+msgstr ""
+
+msgid "Purge downloaded data cache? Categories will be re-downloaded on next update."
+msgstr ""
+
+msgid "Ready"
+msgstr ""
+
+msgid "Refresh"
+msgstr ""
+
+msgid "Reject connections to known public DoH resolvers"
+msgstr ""
+
+msgid "Reject port 853 to prevent client bypass"
+msgstr ""
+
+msgid "Remove"
+msgstr ""
+
+msgid "Require valid usign signature on pack MANIFEST"
+msgstr ""
+
+msgid "Resolved IPs: "
+msgstr ""
+
+msgid "Respond NXDOMAIN for use-application-dns.net (disables browser auto-DoH)"
+msgstr ""
+
+msgid "Restart"
+msgstr ""
+
+msgid "Retain previous data pack for instant rollback if update fails"
+msgstr ""
+
+msgid "Rollback Backup"
+msgstr ""
+
+msgid "Route"
+msgstr ""
+
+msgid "Route Simulator & Live Sets"
+msgstr ""
+
+msgid "Route through VPN"
+msgstr ""
+
+msgid "Router Self-Generated Traffic"
+msgstr ""
+
+msgid "Routing Decision:"
+msgstr ""
+
+msgid "Routing Mode"
+msgstr ""
+
+msgid "Routing Policy"
+msgstr ""
+
+msgid "Routing Table ID"
+msgstr ""
+
+msgid "Rule Name"
+msgstr ""
+
+msgid "Run Leak Self-Test"
+msgstr ""
+
+msgid "Run simulated destination verification to test split-tunnel routing decisions, or export a safe, scrubbed diagnostics bundle for troubleshooting."
+msgstr ""
+
+msgid "Save"
+msgstr ""
+
+msgid "Save & Apply"
+msgstr ""
+
+msgid "Schedule (Cron):"
+msgstr ""
+
+msgid "Search category (e.g. ir, apple)..."
+msgstr ""
+
+msgid "Select GeoIP Country"
+msgstr ""
+
+msgid "Select GeoSite Category"
+msgstr ""
+
+msgid "Server Endpoint"
+msgstr ""
+
+msgid "Service Status"
+msgstr ""
+
+msgid "Settings"
+msgstr ""
+
+msgid "Settings applied successfully."
+msgstr ""
+
+msgid "Signature Verified ✔"
+msgstr ""
+
+msgid "Simulate how incoming network and DNS requests for an IP or domain are routed."
+msgstr ""
+
+msgid "Source:"
+msgstr ""
+
+msgid "Source: "
+msgstr ""
+
+msgid "Space-separated IP addresses or \"auto\" for WAN DHCP servers."
+msgstr ""
+
+msgid "Space-separated IP addresses or \"pushed\" to use server-pushed resolvers."
+msgstr ""
+
+msgid "Space-separated list of firewall zones allowed forwarding into geovpn zone (default: lan)."
+msgstr ""
+
+msgid "Space-separated list of inbound LAN interfaces subject to split-tunneling (default: br-lan)."
+msgstr ""
+
+msgid "Specific CIDRs or domain names to override default split-tunnel decisions."
+msgstr ""
+
+msgid "Specific LAN clients forced to always bypass or always use the VPN."
+msgstr ""
+
+msgid "Split Tunneling"
+msgstr ""
+
+msgid "Split Tunneling Configuration"
+msgstr ""
+
+msgid "Split tunneling settings applied."
+msgstr ""
+
+msgid "Start"
+msgstr ""
+
+msgid "Status"
+msgstr ""
+
+msgid "Status: "
+msgstr ""
+
+msgid "Stop"
+msgstr ""
+
+msgid "System & OpenVPN Logs"
+msgstr ""
+
+msgid "System Diagnostics Checklist"
+msgstr ""
+
+msgid "Target / CIDR"
+msgstr ""
+
+msgid "Target Route"
+msgstr ""
+
+msgid "Target Value"
+msgstr ""
+
+msgid "Target value cannot be empty."
+msgstr ""
+
+msgid "Test Route"
+msgstr ""
+
+msgid "Test failed: "
+msgstr ""
+
+msgid "Testing route simulator on sample targets…"
+msgstr ""
+
+msgid "Traffic (RX / TX)"
+msgstr ""
+
+msgid "Traffic destined for IP subnets belonging to these countries will match the policy."
+msgstr ""
+
+msgid "Treat RFC1918 / private networks as direct (recommended)"
+msgstr ""
+
+msgid "Tunnel Device"
+msgstr ""
+
+msgid "Type"
+msgstr ""
+
+msgid "Update Now"
+msgstr ""
+
+msgid "Update Via:"
+msgstr ""
+
+msgid "Update started in background. Polling progress…"
+msgstr ""
+
+msgid "Update successful ✔"
+msgstr ""
+
+msgid "Updating: "
+msgstr ""
+
+msgid "Upload File"
+msgstr ""
+
+msgid "Uptime"
+msgstr ""
+
+msgid "User/Pass"
+msgstr ""
+
+msgid "Username"
+msgstr ""
+
+msgid "VPN"
+msgstr ""
+
+msgid "VPN Credentials"
+msgstr ""
+
+msgid "VPN DNS Servers"
+msgstr ""
+
+msgid "VPN Only"
+msgstr ""
+
+msgid "VPN Only (Tunnel all traffic)"
+msgstr ""
+
+msgid "Warning"
+msgstr ""
+
+msgid "Warnings Detected"
+msgstr ""
+
+msgid "e.g. Corp Wiki or NAS"
+msgstr ""
+
+msgid "e.g. Living-room TV or Laptop"
+msgstr ""
+
+msgid "e.g. aa:bb:cc:dd:ee:ff or 192.168.1.20"
+msgstr ""
+
+msgid "e.g. digikala.com or 1.1.1.1"
+msgstr ""
+
+msgid "e.g. wiki.corp.example or 203.0.113.0/24"
+msgstr ""
+

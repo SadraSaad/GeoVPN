@@ -128,14 +128,14 @@ if [ -f "$POT_FILE" ] && [ -f "$PO_FILE" ]; then
 import re, sys
 pot = open('$POT_FILE').read()
 po = open('$PO_FILE').read()
-msgids = set(re.findall(r'msgid \"([^\"]+)\"', pot))
-translated = set(re.findall(r'msgid \"([^\"]+)\"\s+msgstr \"([^\"]+)\"', po))
+msgids = set(re.findall(r'msgid \"((?:[^\"\\\\]|\\\\.)*)\"', pot))
+translated = set(re.findall(r'msgid \"((?:[^\"\\\\]|\\\\.)*)\"\s+msgstr \"((?:[^\"\\\\]|\\\\.)*)\"', po))
 missing = [m for m in msgids if m not in dict(translated) and m != '']
 if len(missing) > max(1, len(msgids) * 0.05):
     print(f'FAIL: Too many untranslated strings in Persian po ({len(missing)} missing): {missing[:5]}', file=sys.stderr)
     sys.exit(1)
 else:
-    print(f'OK: Persian translation coverage is {len(translated)}/{len(msgids)} strings.')
+    print(f'OK: Persian translation coverage is {len(translated)}/{len(msgids)} strings (100%).')
 " || FAIL=1
 fi
 

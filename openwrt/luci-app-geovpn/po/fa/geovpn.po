@@ -1,0 +1,826 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Project-Id-Version: luci-app-geovpn 1.0\n"
+"Language-Team: Persian\n"
+"Language: fa\n"
+"MIME-Version: 1.0\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+msgid " — Only selected countries/domains use VPN; all other traffic uses direct WAN."
+msgstr " — فقط ترافیک کشورها/دامنه‌های انتخابی از VPN عبور کرده و باقی ترافیک مستقیماً (WAN) ارسال می‌شود."
+
+msgid " — Pure embedded OpenVPN client with geo-based split tunneling, policy routing, and zero resident daemon footprint."
+msgstr " — کلاینت تمام‌عیار OpenVPN برای سیستم‌های تعبیه‌شده با تونل‌بندی انتخابی جغرافیایی، مسیریابی هوشمند و بدون فرآیند پس‌زمینه اضافی."
+
+msgid " — Selected countries/domains bypass VPN to direct WAN; all other traffic uses VPN."
+msgstr " — ترافیک کشورها/دامنه‌های انتخابی به صورت مستقیم (WAN) عبور کرده و باقی ترافیک از VPN می‌گذرد."
+
+msgid "+ Add Category (GeoSite)…"
+msgstr "+ افزودن دسته‌بندی (GeoSite)…"
+
+msgid "+ Add Client Policy"
+msgstr "+ افزودن خط‌مشی کلاینت"
+
+msgid "+ Add Country (GeoIP)…"
+msgstr "+ افزودن کشور (GeoIP)…"
+
+msgid "+ Add Custom Rule"
+msgstr "+ افزودن قانون سفارشی"
+
+msgid "+ Import .ovpn Profile"
+msgstr "+ وارد کردن پروفایل .ovpn"
+
+msgid "100 Lines"
+msgstr "۱۰۰ خط"
+
+msgid "200 Lines"
+msgstr "۲۰۰ خط"
+
+msgid "500 Lines"
+msgstr "۵۰۰ خط"
+
+msgid "About GeoVPN"
+msgstr "درباره GeoVPN"
+
+msgid "Action"
+msgstr "عملیات"
+
+msgid "Actions"
+msgstr "عملیات"
+
+msgid "Active"
+msgstr "فعال"
+
+msgid "Active Profile"
+msgstr "پروفایل فعال"
+
+msgid "Active ✔"
+msgstr "فعال ✔"
+
+msgid "Add"
+msgstr "افزودن"
+
+msgid "Add Client Policy"
+msgstr "افزودن خط‌مشی کلاینت"
+
+msgid "Add Custom Rule"
+msgstr "افزودن قانون سفارشی"
+
+msgid "Address"
+msgstr "آدرس"
+
+msgid "Address cannot be empty."
+msgstr "آدرس نمی‌تواند خالی باشد."
+
+msgid "Advanced Routing & System Limits"
+msgstr "مسیریابی پیشرفته و محدودیت‌های سیستم"
+
+msgid "All GeoVPN Logs"
+msgstr "کلیه گزارش‌های GeoVPN"
+
+msgid "All Systems OK ✔"
+msgstr "کلیه بخش‌ها سالم هستند ✔"
+
+msgid "All logs are automatically scrubbed on the router to remove certificates, private keys, and passwords before display."
+msgstr "کلیه گزارش‌ها پیش از نمایش، به صورت خودکار پالایش شده تا کلیدهای خصوصی، گواهی‌ها و رمزهای عبور حذف شوند."
+
+msgid "Allow large data packs on devices with < 512MB RAM"
+msgstr "اجازه بارگذاری بسته‌های داده حجیم در دستگاه‌های با رم کمتر از ۵۱۲ مگابایت"
+
+msgid "Always Direct WAN DNS"
+msgstr "همیشه DNS اتصال مستقیم WAN"
+
+msgid "Always VPN DNS"
+msgstr "همیشه DNS اتصال VPN"
+
+msgid "Always direct WAN"
+msgstr "همیشه مستقیم از WAN"
+
+msgid "Assigned IP"
+msgstr "آدرس IP تخصیص‌یافته"
+
+msgid "Auth"
+msgstr "احراز هویت"
+
+msgid "Auto"
+msgstr "خودکار"
+
+msgid "Auto routes IPv6 if VPN provides an IPv6 endpoint; otherwise keeps direct or blocks."
+msgstr "در صورت ارائه IPv6 توسط سرور VPN ترافیک مسیریابی می‌شود؛ در غیر این صورت مستقیم مانده یا مسدود می‌گردد."
+
+msgid "Auto-Update"
+msgstr "به‌روزرسانی خودکار"
+
+msgid "Auto-refresh (3s)"
+msgstr "تازه‌سازی خودکار (۳ ثانیه)"
+
+msgid "Bit shift for packet and connmark (bits [shift..shift+3]). Shift 24 avoids mwan3 (bits 0..15)."
+msgstr "میزان شیفت بیتی برای علامت‌گذاری بسته‌ها و اتصالات (بیت‌های [shift..shift+3]). مقدار ۲۴ از تداخل با mwan3 جلوگیری می‌کند."
+
+msgid "Block (prevent leaks)"
+msgstr "مسدودسازی (جلوگیری از نشت)"
+
+msgid "Block DNS-over-HTTPS (DoH)"
+msgstr "مسدودسازی پروتکل DoH"
+
+msgid "Block DNS-over-TLS (DoT)"
+msgstr "مسدودسازی پروتکل DoT (پورت ۸۵۳)"
+
+msgid "Block VPN traffic when tunnel is down"
+msgstr "مسدودسازی ترافیک VPN هنگام قطع بودن تونل"
+
+msgid "Bypass listed"
+msgstr "عبور مستقیم موارد انتخابی (Bypass)"
+
+msgid "Cancel"
+msgstr "لغو"
+
+msgid "Capacity Limits"
+msgstr "محدودیت‌های ظرفیت"
+
+msgid "Category Picker"
+msgstr "انتخابگر دسته‌بندی"
+
+msgid "Certificate"
+msgstr "گواهی دیجیتال"
+
+msgid "Client Device Policies"
+msgstr "خط‌مشی دستگاه‌های کلاینت"
+
+msgid "Client Policy"
+msgstr "خط‌مشی کلاینت"
+
+msgid "Component Check"
+msgstr "بررسی مولفه"
+
+msgid "Configured Profiles"
+msgstr "پروفایل‌های پیکربندی‌شده"
+
+msgid "Connections"
+msgstr "اتصال‌ها"
+
+msgid "Copy Logs"
+msgstr "کپی کردن گزارش‌ها"
+
+msgid "Credentials"
+msgstr "اطلاعات ورود"
+
+msgid "Credentials are stored securely with 0600 root-only permissions."
+msgstr "اطلاعات ورود با سطح دسترسی امن 0600 (فقط root) ذخیره می‌شوند."
+
+msgid "Credentials for "
+msgstr "اطلاعات ورود برای "
+
+msgid "Credentials updated."
+msgstr "اطلاعات ورود ذخیره شد."
+
+msgid "Cryptographic Verification"
+msgstr "اعتبارسنجی با امضای دیجیتال"
+
+msgid "Custom Rule"
+msgstr "قانون سفارشی"
+
+msgid "Custom Target Rules"
+msgstr "قوانین سفارشی مقاصد"
+
+msgid "DIRECT"
+msgstr "مستقیم (DIRECT)"
+
+msgid "DNS & Leak Protection"
+msgstr "مدیریت DNS و حفاظت از نشت داده"
+
+msgid "DNS Path: "
+msgstr "مسیر DNS: "
+
+msgid "DNS Steering Mode"
+msgstr "حالت هدایت پرس‌وجوهای DNS"
+
+msgid "DNS queries for domains in these categories are dynamically added to the policy routing set."
+msgstr "پرس‌وجوهای DNS برای دامنه‌های این دسته‌بندی‌ها به طور پویا به مجموعه مسیریابی nftables افزوده می‌شوند."
+
+msgid "Data Sources & Verification"
+msgstr "منابع داده و اعتبارسنجی"
+
+msgid "Data cache refreshed."
+msgstr "حافظه کش داده‌ها تازه‌سازی شد."
+
+msgid "Data pack build: "
+msgstr "نسخه ساخت بسته داده: "
+
+msgid "Debug"
+msgstr "اشکال‌زدایی (Debug)"
+
+msgid "Delete"
+msgstr "حذف"
+
+msgid "Delete profile \"%s\"?"
+msgstr "آیا از حذف پروفایل \"%s\" اطمینان دارید؟"
+
+msgid "Details & Recommendations"
+msgstr "جزئیات و توصیه‌ها"
+
+msgid "Device Name"
+msgstr "نام دستگاه"
+
+msgid "Direct"
+msgstr "مستقیم"
+
+msgid "Direct (WAN)"
+msgstr "مستقیم (WAN)"
+
+msgid "Direct DNS Servers"
+msgstr "سرورهای DNS اتصال مستقیم"
+
+msgid "Direct Only"
+msgstr "فقط مستقیم"
+
+msgid "Direct Only (Bypass VPN completely)"
+msgstr "فقط مستقیم (عدم استفاده از VPN برای کلیه ترافیک)"
+
+msgid "Direct traffic continues unimpeded. Router management and LAN access are always preserved."
+msgstr "ترافیک مستقیم بدون اختلال ادامه می‌یابد. دسترسی مدیریتی به روتر و شبکه محلی LAN همواره تضمین شده است."
+
+msgid "Directs domain queries to appropriate resolvers and populates nftables sets."
+msgstr "پرس‌وجوهای دامنه را به سمت سرورهای مناسب هدایت کرده و مجموعه‌های nftables را تکمیل می‌کند."
+
+msgid "Disabled (Do not touch dnsmasq)"
+msgstr "غیرفعال (عدم تغییر در تنظیمات dnsmasq)"
+
+msgid "DoH Canary Signal"
+msgstr "سیگنال قناری برای غیرفعال‌سازی خودکار DoH"
+
+msgid "Domain"
+msgstr "دامنه"
+
+msgid "Download Diagnostics (JSON)"
+msgstr "دانلود گزارش عیب‌یابی (JSON)"
+
+msgid "Dynamic Set Timeout"
+msgstr "مدت اعتبار مجموعه‌های پویا"
+
+msgid "Edit"
+msgstr "ویرایش"
+
+msgid "Edit Client Policy"
+msgstr "ویرایش خط‌مشی کلاینت"
+
+msgid "Edit Custom Rule"
+msgstr "ویرایش قانون سفارشی"
+
+msgid "Emergency Stop (Panic)"
+msgstr "توقف اضطراری (Panic)"
+
+msgid "Emergency stop: tear down all rules and disable GeoVPN?"
+msgstr "توقف اضطراری: حذف کلیه قوانین مسیریابی و غیرفعال‌سازی GeoVPN؟"
+
+msgid "Enable"
+msgstr "فعال"
+
+msgid "Enable Split Tunneling"
+msgstr "فعال‌سازی تونل‌بندی انتخابی"
+
+msgid "Enable automatic scheduled updates"
+msgstr "فعال‌سازی به‌روزرسانی زمان‌بندی‌شده خودکار"
+
+msgid "Enable policy-based routing and DNS steering"
+msgstr "فعال‌سازی مسیریابی مبتنی بر خط‌مشی و هدایت هوشمند DNS"
+
+msgid "Entries"
+msgstr "تعداد مدخل‌ها"
+
+msgid "Error"
+msgstr "خطا"
+
+msgid "Error exporting diagnostics: "
+msgstr "خطا در خروجی گزارش عیب‌یابی: "
+
+msgid "Error loading catalog: "
+msgstr "خطا در بارگذاری فهرست دسته‌بندی‌ها: "
+
+msgid "Error simulating route: "
+msgstr "خطا در شبیه‌سازی مسیر: "
+
+msgid "Est. RAM"
+msgstr "RAM تقریبی"
+
+msgid "Estimated RAM: ~%s MB"
+msgstr "حافظه RAM تقریبی: ~%s مگابایت"
+
+msgid "Export Diagnostics Bundle (JSON)"
+msgstr "دریافت فایل گزارش عیب‌یابی (JSON)"
+
+msgid "Export comprehensive diagnostic details with all credentials and private keys scrubbed for safe sharing, or purge data caches."
+msgstr "خروجی گزارش کامل عیب‌یابی با پالایش خودکار کلیدهای خصوصی و اطلاعات ورود جهت اشتراک‌گذاری امن، یا پاک‌سازی حافظه کش داده‌ها."
+
+msgid "Failed to apply configuration: "
+msgstr "خطا در اعمال پیکربندی: "
+
+msgid "Failed to copy to clipboard."
+msgstr "کپی در کلیپ‌بورد ناموفق بود."
+
+msgid "Firewall Mark Shift"
+msgstr "شیفت نشانه‌گذاری فایروال (fwmark)"
+
+msgid "Flush Conntrack"
+msgstr "پاک‌سازی جدول ردیابی اتصالات (conntrack)"
+
+msgid "Flush connection tracking table on tunnel state changes"
+msgstr "تخلیه جدول ردیابی اتصالات در زمان تغییر وضعیت اتصال تونل"
+
+msgid "Follow Route (Steer by category)"
+msgstr "پیروی از مسیر (هدایت بر اساس دسته‌بندی)"
+
+msgid "Geo-Data Pack"
+msgstr "بسته داده‌های جغرافیایی"
+
+msgid "GeoIP Countries"
+msgstr "کشورهای GeoIP"
+
+msgid "GeoSite Domain Categories"
+msgstr "دسته‌بندی دامنه‌ها (GeoSite)"
+
+msgid "GeoVPN"
+msgstr "GeoVPN"
+
+msgid "GeoVPN System Events"
+msgstr "رویدادهای سیستمی GeoVPN"
+
+msgid "GeoVPN for OpenWrt 25.12"
+msgstr "GeoVPN برای OpenWrt 25.12"
+
+msgid "GeoVPN — Logs & Diagnostics"
+msgstr "GeoVPN — گزارش‌ها و عیب‌یابی"
+
+msgid "GeoVPN — OpenVPN Connections"
+msgstr "GeoVPN — اتصال‌های OpenVPN"
+
+msgid "GeoVPN — Settings"
+msgstr "GeoVPN — تنظیمات"
+
+msgid "GeoVPN — Split Tunneling"
+msgstr "GeoVPN — تونل‌بندی انتخابی"
+
+msgid "HTTPS mirror hosting MANIFEST and catalog data."
+msgstr "آینه HTTPS میزبان فایل MANIFEST و کاتالوگ داده‌ها."
+
+msgid "Hijack DNS (Port 53)"
+msgstr "رهگیری پورت ۵۳ (DNS Hijack)"
+
+msgid "Hint: "
+msgstr "راهنما: "
+
+msgid "How long dynamically resolved IP addresses remain in the nftables routing sets (default: 6h)."
+msgstr "مدت زمانی که آدرس‌های IP حل‌شده در مجموعه‌های nftables باقی می‌مانند (پیش‌فرض: 6h)."
+
+msgid "How traffic originating directly from the router itself is handled."
+msgstr "نحوه مدیریت بسته‌های داده‌ای که مستقیماً از خود روتر منشا می‌گیرند."
+
+msgid "IP / CIDR"
+msgstr "IP / CIDR"
+
+msgid "IP / Subnet"
+msgstr "IP / زیرشبکه"
+
+msgid "IP Address / CIDR"
+msgstr "آدرس IP / CIDR"
+
+msgid "IP Rule Priority"
+msgstr "اولویت قانون مسیریابی (Rule Priority)"
+
+msgid "IPv6 Handling"
+msgstr "مدیریت ترافیک IPv6"
+
+msgid "Idle"
+msgstr "آماده‌به‌کار"
+
+msgid "Import"
+msgstr "وارد کردن"
+
+msgid "Import OpenVPN Profile"
+msgstr "وارد کردن پروفایل OpenVPN"
+
+msgid "Import Profile"
+msgstr "وارد کردن پروفایل"
+
+msgid "Import error: "
+msgstr "خطای وارد کردن: "
+
+msgid "Import failed: "
+msgstr "عملیات وارد کردن ناموفق بود: "
+
+msgid "Info"
+msgstr "اطلاعات (Info)"
+
+msgid "Intercept port 53 UDP/TCP and redirect to router dnsmasq"
+msgstr "رهگیری بسته‌های UDP/TCP روی پورت ۵۳ و هدایت به dnsmasq روتر"
+
+msgid "Kill Switch"
+msgstr "قطع اضطراری اینترنت (Kill Switch)"
+
+msgid "LAN Firewall Zones"
+msgstr "زون‌های فایروال محلی (LAN)"
+
+msgid "LAN Interfaces"
+msgstr "اینترفیس‌های شبکه محلی (LAN)"
+
+msgid "Leak Testing & Export"
+msgstr "آزمایش نشت و خروجی عیب‌یابی"
+
+msgid "License: Apache-2.0. Data packs: CC0-1.0 / MIT. No proprietary components."
+msgstr "مجوز: Apache-2.0. بسته‌های داده: CC0-1.0 / MIT. بدون هرگونه مولفه انحصاری."
+
+msgid "Lines:"
+msgstr "تعداد خطوط:"
+
+msgid "Linux policy routing table used for VPN traffic (default: 4200)."
+msgstr "جدول مسیریابی هسته لینوکس برای ترافیک VPN (پیش‌فرض: 4200)."
+
+msgid "Loading..."
+msgstr "در حال بارگذاری..."
+
+msgid "Logging Level"
+msgstr "سطح ثبت وقایع"
+
+msgid "Logs & Diagnostics"
+msgstr "گزارش‌ها و عیب‌یابی"
+
+msgid "Logs copied to clipboard."
+msgstr "گزارش‌ها در کلیپ‌بورد کپی شدند."
+
+msgid "MAC"
+msgstr "آدرس MAC"
+
+msgid "MAC / IP Address"
+msgstr "آدرس MAC / IP"
+
+msgid "MAC Address"
+msgstr "آدرس MAC"
+
+msgid "Maintenance & Diagnostics"
+msgstr "نگهداری و عیب‌یابی"
+
+msgid "Make Active"
+msgstr "فعال‌سازی"
+
+msgid "Match By"
+msgstr "تطابق بر اساس"
+
+msgid "Match Criterion"
+msgstr "معیار تطابق"
+
+msgid "Match Type"
+msgstr "نوع تطابق"
+
+msgid "Matched by: "
+msgstr "تطابق با: "
+
+msgid "Max CIDRs:"
+msgstr "حداکثر رنج‌های CIDR:"
+
+msgid "Max Domains:"
+msgstr "حداکثر دامنه‌ها:"
+
+msgid "Name"
+msgstr "نام"
+
+msgid "Network Settings"
+msgstr "تنظیمات شبکه"
+
+msgid "Next"
+msgstr "بعدی"
+
+msgid "No OpenVPN profiles configured. Import an .ovpn file to get started."
+msgstr "هیچ پروفایل OpenVPN پیکربندی نشده است. برای شروع یک فایل .ovpn وارد کنید."
+
+msgid "No categories found"
+msgstr "دسته‌بندی یافت نشد"
+
+msgid "No countries selected."
+msgstr "هیچ کشوری انتخاب نشده است."
+
+msgid "No custom rules configured."
+msgstr "هیچ قانون سفارشی ثبت نشده است."
+
+msgid "No diagnostic checks available."
+msgstr "هیچ موردی برای عیب‌یابی یافت نشد."
+
+msgid "No domain categories selected."
+msgstr "هیچ دسته‌بندی دامنه‌ای انتخاب نشده است."
+
+msgid "No log entries found."
+msgstr "هیچ موردی در گزارش ثبت نشده است."
+
+msgid "No per-client policies configured."
+msgstr "هیچ خط‌مشی برای کلاینت‌ها ثبت نشده است."
+
+msgid "None"
+msgstr "هیچ‌کدام"
+
+msgid "Only listed via VPN"
+msgstr "فقط موارد انتخابی از طریق VPN"
+
+msgid "Only marked DNS queries"
+msgstr "فقط پرس‌وجوهای DNS نشانه‌گذاری‌شده"
+
+msgid "OpenVPN Process"
+msgstr "فرایند OpenVPN"
+
+msgid "Or Paste Config"
+msgstr "یا جای‌گذاری متن پیکربندی"
+
+msgid "Pack Repository URL"
+msgstr "آدرس مخزن بسته‌های داده"
+
+msgid "Password"
+msgstr "گذرواژه"
+
+msgid "Paste .ovpn content here..."
+msgstr "محتوای .ovpn را اینجا جای‌گذاری کنید..."
+
+msgid "Please upload a file or paste config content."
+msgstr "لطفاً یک فایل بارگذاری کنید یا متن پیکربندی را وارد نمایید."
+
+msgid "Policy"
+msgstr "خط‌مشی"
+
+msgid "Preflight verification checks kernel modules, binaries, firewall rules, and coexistence with other packages."
+msgstr "بررسی‌های پیش‌پرواز ماژول‌های هسته، فایل‌های اجرایی، قوانین فایروال و عدم تداخل با بسته‌های دیگر را ارزیابی می‌کند."
+
+msgid "Previous"
+msgstr "قبلی"
+
+msgid "Priority for policy routing lookup rules (default: 700)."
+msgstr "اولویت قوانین بررسی مسیر در هسته لینوکس (پیش‌فرض: 700)."
+
+msgid "Private Networks"
+msgstr "شبکه‌های خصوصی"
+
+msgid "Profile Name"
+msgstr "نام پروفایل"
+
+msgid "Profile imported successfully: "
+msgstr "پروفایل با موفقیت وارد شد: "
+
+msgid "Public Key File"
+msgstr "فایل کلید عمومی"
+
+msgid "Purge Data Cache"
+msgstr "پاک‌سازی حافظه کش داده‌ها"
+
+msgid "Purge downloaded data cache? Categories will be re-downloaded on next update."
+msgstr "حافظه کش داده‌ها پاک شود؟ دسته‌بندی‌ها در به‌روزرسانی بعدی مجدداً بارگیری خواهند شد."
+
+msgid "Ready"
+msgstr "آماده"
+
+msgid "Refresh"
+msgstr "تازه‌سازی"
+
+msgid "Reject connections to known public DoH resolvers"
+msgstr "مسدودسازی اتصال به سرورهای شناخته‌شده عمومی DoH"
+
+msgid "Reject port 853 to prevent client bypass"
+msgstr "رد درخواست‌های پورت ۸۵۳ برای جلوگیری از دور زدن قوانین توسط دستگاه‌ها"
+
+msgid "Remove"
+msgstr "حذف"
+
+msgid "Require valid usign signature on pack MANIFEST"
+msgstr "الزام وجود امضای دیجیتال معتبر usign برای فایل MANIFEST"
+
+msgid "Resolved IPs: "
+msgstr "آدرس‌های IP حل‌شده: "
+
+msgid "Respond NXDOMAIN for use-application-dns.net (disables browser auto-DoH)"
+msgstr "پاسخ NXDOMAIN به دامنه use-application-dns.net جهت غیرفعال‌سازی DoH خودکار در مرورگرها"
+
+msgid "Restart"
+msgstr "راه‌اندازی مجدد"
+
+msgid "Retain previous data pack for instant rollback if update fails"
+msgstr "نگهداری بسته قبلی جهت بازگشت سریع در صورت بروز خطا در به‌روزرسانی"
+
+msgid "Rollback Backup"
+msgstr "پشتیبان‌گیری برای بازگشت به نسخه قبل"
+
+msgid "Route"
+msgstr "مسیر"
+
+msgid "Route Simulator & Live Sets"
+msgstr "شبیه‌ساز مسیر و مجموعه‌های زنده"
+
+msgid "Route through VPN"
+msgstr "مسیریابی از طریق VPN"
+
+msgid "Router Self-Generated Traffic"
+msgstr "ترافیک ایجادشده توسط خود روتر"
+
+msgid "Routing Decision:"
+msgstr "تصمیم مسیریابی:"
+
+msgid "Routing Mode"
+msgstr "حالت مسیریابی"
+
+msgid "Routing Policy"
+msgstr "خط‌مشی مسیریابی"
+
+msgid "Routing Table ID"
+msgstr "شناسه جدول مسیریابی (Table ID)"
+
+msgid "Rule Name"
+msgstr "نام قانون"
+
+msgid "Run Leak Self-Test"
+msgstr "اجرای خودآزمایی نشت ترافیک"
+
+msgid "Run simulated destination verification to test split-tunnel routing decisions, or export a safe, scrubbed diagnostics bundle for troubleshooting."
+msgstr "اجرای آزمایش شبیه‌سازی برای ارزیابی تصمیمات مسیریابی تونل، یا خروجی گرفتن از بسته عیب‌یابی پالایش‌شده جهت بررسی مشکلات."
+
+msgid "Save"
+msgstr "ذخیره"
+
+msgid "Save & Apply"
+msgstr "ذخیره و اعمال"
+
+msgid "Schedule (Cron):"
+msgstr "زمان‌بندی (Cron):"
+
+msgid "Search category (e.g. ir, apple)..."
+msgstr "جستجوی دسته‌بندی (مانند ir یا apple)..."
+
+msgid "Select GeoIP Country"
+msgstr "انتخاب کشور (GeoIP)"
+
+msgid "Select GeoSite Category"
+msgstr "انتخاب دسته‌بندی دامنه (GeoSite)"
+
+msgid "Server Endpoint"
+msgstr "سرور مقصد"
+
+msgid "Service Status"
+msgstr "وضعیت سرویس"
+
+msgid "Settings"
+msgstr "تنظیمات"
+
+msgid "Settings applied successfully."
+msgstr "تنظیمات با موفقیت اعمال گردید."
+
+msgid "Signature Verified ✔"
+msgstr "امضای دیجیتال تایید شد ✔"
+
+msgid "Simulate how incoming network and DNS requests for an IP or domain are routed."
+msgstr "شبیه‌سازی نحوه مسیریابی درخواست‌های شبکه و پرس‌وجوهای DNS برای یک IP یا دامنه خاص."
+
+msgid "Source:"
+msgstr "منبع:"
+
+msgid "Source: "
+msgstr "منبع: "
+
+msgid "Space-separated IP addresses or \"auto\" for WAN DHCP servers."
+msgstr "آدرس‌های IP که با فاصله جدا شده‌اند یا عبارت \"auto\" برای دریافت خودکار از DHCP اتصال WAN."
+
+msgid "Space-separated IP addresses or \"pushed\" to use server-pushed resolvers."
+msgstr "آدرس‌های IP که با فاصله جدا شده‌اند یا عبارت \"pushed\" برای استفاده از سرورهای اعلام‌شده توسط VPN."
+
+msgid "Space-separated list of firewall zones allowed forwarding into geovpn zone (default: lan)."
+msgstr "لیست زون‌های فایروال مجاز برای ارسال ترافیک به زون geovpn (پیش‌فرض: lan)."
+
+msgid "Space-separated list of inbound LAN interfaces subject to split-tunneling (default: br-lan)."
+msgstr "لیست اینترفیس‌های ورودی LAN برای تونل‌بندی که با فاصله جدا شده‌اند (پیش‌فرض: br-lan)."
+
+msgid "Specific CIDRs or domain names to override default split-tunnel decisions."
+msgstr "رنج‌های CIDR یا دامنه‌های خاص برای تغییر قوانین پیش‌فرض تونل‌بندی انتخابی."
+
+msgid "Specific LAN clients forced to always bypass or always use the VPN."
+msgstr "دستگاه‌های محلی خاص که ترافیک آنها همیشه مستقیم یا همیشه از طریق VPN هدایت می‌شود."
+
+msgid "Split Tunneling"
+msgstr "تونل‌بندی انتخابی (Split Tunneling)"
+
+msgid "Split Tunneling Configuration"
+msgstr "پیکربندی تونل‌بندی انتخابی"
+
+msgid "Split tunneling settings applied."
+msgstr "تنظیمات تونل‌بندی انتخابی اعمال گردید."
+
+msgid "Start"
+msgstr "شروع"
+
+msgid "Status"
+msgstr "وضعیت"
+
+msgid "Status: "
+msgstr "وضعیت: "
+
+msgid "Stop"
+msgstr "توقف"
+
+msgid "System & OpenVPN Logs"
+msgstr "گزارش‌های سیستم و OpenVPN"
+
+msgid "System Diagnostics Checklist"
+msgstr "چک‌لیست عیب‌یابی سیستم"
+
+msgid "Target / CIDR"
+msgstr "مقصد / CIDR"
+
+msgid "Target Route"
+msgstr "مسیر خروجی"
+
+msgid "Target Value"
+msgstr "مقدار هدف"
+
+msgid "Target value cannot be empty."
+msgstr "مقدار هدف نمی‌تواند خالی باشد."
+
+msgid "Test Route"
+msgstr "آزمایش مسیر"
+
+msgid "Test failed: "
+msgstr "آزمایش ناموفق بود: "
+
+msgid "Testing route simulator on sample targets…"
+msgstr "در حال آزمایش شبیه‌ساز مسیر با مقاصد نمونه…"
+
+msgid "Traffic (RX / TX)"
+msgstr "ترافیک (دریافت / ارسال)"
+
+msgid "Traffic destined for IP subnets belonging to these countries will match the policy."
+msgstr "ترافیک مقصدهای مربوط به زیرشبکه‌های IP این کشورها با این خط‌مشی مطابقت داده می‌شود."
+
+msgid "Treat RFC1918 / private networks as direct (recommended)"
+msgstr "عبور مستقیم رنج‌های خصوصی و محلی RFC1918 (پیشنهادی)"
+
+msgid "Tunnel Device"
+msgstr "دستگاه تونل"
+
+msgid "Type"
+msgstr "نوع"
+
+msgid "Update Now"
+msgstr "به‌روزرسانی فوری"
+
+msgid "Update Via:"
+msgstr "به‌روزرسانی از طریق:"
+
+msgid "Update started in background. Polling progress…"
+msgstr "به‌روزرسانی در پس‌زمینه آغاز شد. دریافت وضعیت…"
+
+msgid "Update successful ✔"
+msgstr "به‌روزرسانی با موفقیت انجام شد ✔"
+
+msgid "Updating: "
+msgstr "در حال به‌روزرسانی: "
+
+msgid "Upload File"
+msgstr "بارگذاری فایل"
+
+msgid "Uptime"
+msgstr "مدت زمان اتصال"
+
+msgid "User/Pass"
+msgstr "نام‌کاربری/گذرواژه"
+
+msgid "Username"
+msgstr "نام کاربری"
+
+msgid "VPN"
+msgstr "VPN"
+
+msgid "VPN Credentials"
+msgstr "اطلاعات ورود VPN"
+
+msgid "VPN DNS Servers"
+msgstr "سرورهای DNS اتصال VPN"
+
+msgid "VPN Only"
+msgstr "فقط VPN"
+
+msgid "VPN Only (Tunnel all traffic)"
+msgstr "فقط VPN (ارسال کلیه ترافیک از طریق تونل)"
+
+msgid "Warning"
+msgstr "هشدار (Warning)"
+
+msgid "Warnings Detected"
+msgstr "هشدارهایی شناسایی شد"
+
+msgid "e.g. Corp Wiki or NAS"
+msgstr "مثلاً سامانه سازمانی یا NAS"
+
+msgid "e.g. Living-room TV or Laptop"
+msgstr "مثلاً تلویزیون هوشمند یا لپ‌تاپ"
+
+msgid "e.g. aa:bb:cc:dd:ee:ff or 192.168.1.20"
+msgstr "مثلاً aa:bb:cc:dd:ee:ff یا 192.168.1.20"
+
+msgid "e.g. digikala.com or 1.1.1.1"
+msgstr "مثلاً digikala.com یا 1.1.1.1"
+
+msgid "e.g. wiki.corp.example or 203.0.113.0/24"
+msgstr "مثلاً wiki.corp.example یا 203.0.113.0/24"
+
