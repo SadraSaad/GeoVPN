@@ -22,45 +22,72 @@ return view.extend({
 		var activeProfileId = uci.get('geovpn', 'main', 'active_profile') || '';
 
 		// 1. Status Card
-		var statusCard = E('div', { 'class': 'cbi-section gv-card' }, [
-			E('div', { 'class': 'gv-card-title' }, [
+		var statusCard = E('div', {
+			'class': 'cbi-section gv-card',
+			'style': 'background: var(--cbi-section-background, rgba(127, 127, 127, 0.05)); border: 1px solid var(--cbi-border-color, rgba(127, 127, 127, 0.2)); border-radius: 8px; padding: 18px 20px; margin-bottom: 24px;'
+		}, [
+			E('div', {
+				'class': 'gv-card-title',
+				'style': 'font-size: 1.2rem; font-weight: 600; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--cbi-border-color, rgba(127, 127, 127, 0.15)); padding-bottom: 10px;'
+			}, [
 				E('span', {}, [ _('Service Status') ]),
 				widgets.renderBadge(statusData.service ? statusData.service.state : 'disabled')
 			]),
-			E('div', { 'class': 'gv-grid' }, [
-				E('div', { 'class': 'gv-metric' }, [
-					E('div', { 'class': 'gv-metric-label' }, [ _('Active Profile') ]),
-					E('div', { 'class': 'gv-metric-value' }, [
+			E('div', {
+				'class': 'gv-grid',
+				'style': 'display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin: 14px 0;'
+			}, [
+				E('div', {
+					'class': 'gv-metric',
+					'style': 'padding: 12px 14px; background: var(--cbi-input-background, rgba(127, 127, 127, 0.08)); border: 1px solid var(--cbi-border-color, rgba(127, 127, 127, 0.15)); border-radius: 6px; display: flex; flex-direction: column;'
+				}, [
+					E('div', { 'class': 'gv-metric-label', 'style': 'font-size: 0.78rem; opacity: 0.75; text-transform: uppercase; font-weight: 600;' }, [ _('Active Profile') ]),
+					E('div', { 'class': 'gv-metric-value', 'style': 'font-size: 1.15rem; font-weight: 700; margin-top: 6px; word-break: break-all;' }, [
 						widgets.renderLtr((statusData.tunnel && statusData.tunnel.name) || activeProfileId || _('None'))
 					])
 				]),
-				E('div', { 'class': 'gv-metric' }, [
-					E('div', { 'class': 'gv-metric-label' }, [ _('Tunnel Device') ]),
-					E('div', { 'class': 'gv-metric-value' }, [
+				E('div', {
+					'class': 'gv-metric',
+					'style': 'padding: 12px 14px; background: var(--cbi-input-background, rgba(127, 127, 127, 0.08)); border: 1px solid var(--cbi-border-color, rgba(127, 127, 127, 0.15)); border-radius: 6px; display: flex; flex-direction: column;'
+				}, [
+					E('div', { 'class': 'gv-metric-label', 'style': 'font-size: 0.78rem; opacity: 0.75; text-transform: uppercase; font-weight: 600;' }, [ _('Tunnel Device') ]),
+					E('div', { 'class': 'gv-metric-value', 'style': 'font-size: 1.15rem; font-weight: 700; margin-top: 6px; word-break: break-all;' }, [
 						widgets.renderLtr((statusData.tunnel && statusData.tunnel.device) || 'geovpn0')
 					])
 				]),
-				E('div', { 'class': 'gv-metric' }, [
-					E('div', { 'class': 'gv-metric-label' }, [ _('Assigned IP') ]),
-					E('div', { 'class': 'gv-metric-value' }, [
+				E('div', {
+					'class': 'gv-metric',
+					'style': 'padding: 12px 14px; background: var(--cbi-input-background, rgba(127, 127, 127, 0.08)); border: 1px solid var(--cbi-border-color, rgba(127, 127, 127, 0.15)); border-radius: 6px; display: flex; flex-direction: column;'
+				}, [
+					E('div', { 'class': 'gv-metric-label', 'style': 'font-size: 0.78rem; opacity: 0.75; text-transform: uppercase; font-weight: 600;' }, [ _('Assigned IP') ]),
+					E('div', { 'class': 'gv-metric-value', 'style': 'font-size: 1.15rem; font-weight: 700; margin-top: 6px; word-break: break-all;' }, [
 						widgets.renderLtr((statusData.tunnel && statusData.tunnel.local_ip) || '-')
 					])
 				]),
-				E('div', { 'class': 'gv-metric' }, [
-					E('div', { 'class': 'gv-metric-label' }, [ _('Uptime') ]),
-					E('div', { 'class': 'gv-metric-value' }, [
+				E('div', {
+					'class': 'gv-metric',
+					'style': 'padding: 12px 14px; background: var(--cbi-input-background, rgba(127, 127, 127, 0.08)); border: 1px solid var(--cbi-border-color, rgba(127, 127, 127, 0.15)); border-radius: 6px; display: flex; flex-direction: column;'
+				}, [
+					E('div', { 'class': 'gv-metric-label', 'style': 'font-size: 0.78rem; opacity: 0.75; text-transform: uppercase; font-weight: 600;' }, [ _('Uptime') ]),
+					E('div', { 'class': 'gv-metric-value', 'style': 'font-size: 1.15rem; font-weight: 700; margin-top: 6px; word-break: break-all;' }, [
 						widgets.formatUptime(statusData.tunnel ? statusData.tunnel.uptime : 0)
 					])
 				]),
-				E('div', { 'class': 'gv-metric' }, [
-					E('div', { 'class': 'gv-metric-label' }, [ _('Traffic (RX / TX)') ]),
-					E('div', { 'class': 'gv-metric-value' }, [
+				E('div', {
+					'class': 'gv-metric',
+					'style': 'padding: 12px 14px; background: var(--cbi-input-background, rgba(127, 127, 127, 0.08)); border: 1px solid var(--cbi-border-color, rgba(127, 127, 127, 0.15)); border-radius: 6px; display: flex; flex-direction: column;'
+				}, [
+					E('div', { 'class': 'gv-metric-label', 'style': 'font-size: 0.78rem; opacity: 0.75; text-transform: uppercase; font-weight: 600;' }, [ _('Traffic (RX / TX)') ]),
+					E('div', { 'class': 'gv-metric-value', 'style': 'font-size: 1.15rem; font-weight: 700; margin-top: 6px; word-break: break-all;' }, [
 						widgets.formatBytes((statusData.tunnel && statusData.tunnel.rx_bytes) || 0) + ' / ' +
 						widgets.formatBytes((statusData.tunnel && statusData.tunnel.tx_bytes) || 0)
 					])
 				])
 			]),
-			E('div', { 'class': 'gv-actions' }, [
+			E('div', {
+				'class': 'gv-actions',
+				'style': 'display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; align-items: center;'
+			}, [
 				E('button', {
 					'class': 'cbi-button cbi-button-action',
 					'click': function() {
@@ -108,14 +135,17 @@ return view.extend({
 		]);
 
 		// 2. Profiles Table
-		var profilesTable = E('table', { 'class': 'table cbi-section-table' }, [
+		var profilesTable = E('table', {
+			'class': 'table cbi-section-table',
+			'style': 'width: 100%; border-collapse: collapse; margin-top: 8px;'
+		}, [
 			E('thead', {}, [
 				E('tr', { 'class': 'tr table-titles' }, [
-					E('th', { 'class': 'th' }, [ _('Name') ]),
-					E('th', { 'class': 'th' }, [ _('Server Endpoint') ]),
-					E('th', { 'class': 'th' }, [ _('Auth') ]),
-					E('th', { 'class': 'th' }, [ _('Status') ]),
-					E('th', { 'class': 'th', 'style': 'text-align: right;' }, [ _('Actions') ])
+					E('th', { 'class': 'th', 'style': 'padding: 8px 12px; text-align: start;' }, [ _('Name') ]),
+					E('th', { 'class': 'th', 'style': 'padding: 8px 12px; text-align: start;' }, [ _('Server Endpoint') ]),
+					E('th', { 'class': 'th', 'style': 'padding: 8px 12px; text-align: start;' }, [ _('Auth') ]),
+					E('th', { 'class': 'th', 'style': 'padding: 8px 12px; text-align: center;' }, [ _('Status') ]),
+					E('th', { 'class': 'th', 'style': 'padding: 8px 12px; text-align: end;' }, [ _('Actions') ])
 				])
 			]),
 			E('tbody')
@@ -175,12 +205,15 @@ return view.extend({
 					}, [ _('Delete') ])
 				];
 
-				dom.append(tbody, E('tr', { 'class': 'tr cbi-rowstyle-' + (idx % 2 + 1) }, [
-					E('td', { 'class': 'td', 'style': 'font-weight: 600;' }, [ p.name || p['.name'] ]),
-					E('td', { 'class': 'td' }, [ widgets.renderLtr(remotes[0] || '-') ]),
-					E('td', { 'class': 'td' }, [ (p.auth_user_pass === '1') ? _('User/Pass') : _('Certificate') ]),
-					E('td', { 'class': 'td' }, [ isActive ? E('span', { 'class': 'gv-badge gv-badge-connected' }, [ _('Active') ]) : E('span', { 'class': 'gv-badge gv-badge-disabled' }, [ _('Idle') ]) ]),
-					E('td', { 'class': 'td', 'style': 'text-align: right;' }, actionBtns)
+				dom.append(tbody, E('tr', {
+					'class': 'tr cbi-rowstyle-' + (idx % 2 + 1),
+					'style': 'border-bottom: 1px solid var(--cbi-border-color, rgba(127, 127, 127, 0.15));'
+				}, [
+					E('td', { 'class': 'td', 'style': 'padding: 10px 12px; font-weight: 600;' }, [ p.name || p['.name'] ]),
+					E('td', { 'class': 'td', 'style': 'padding: 10px 12px;' }, [ widgets.renderLtr(remotes[0] || '-') ]),
+					E('td', { 'class': 'td', 'style': 'padding: 10px 12px;' }, [ (p.auth_user_pass === '1') ? _('User/Pass') : _('Certificate') ]),
+					E('td', { 'class': 'td', 'style': 'padding: 10px 12px; text-align: center;' }, [ isActive ? widgets.renderBadge('connected') : widgets.renderBadge('disabled') ]),
+					E('td', { 'class': 'td', 'style': 'padding: 10px 12px; text-align: end;' }, actionBtns)
 				]));
 			});
 		}
@@ -378,8 +411,14 @@ return view.extend({
 		return E('div', { 'class': 'cbi-map' }, [
 			E('h2', {}, [ _('GeoVPN — OpenVPN Connections') ]),
 			statusCard,
-			E('div', { 'class': 'cbi-section gv-card' }, [
-				E('div', { 'class': 'gv-card-title' }, [
+			E('div', {
+				'class': 'cbi-section gv-card',
+				'style': 'background: var(--cbi-section-background, rgba(127, 127, 127, 0.05)); border: 1px solid var(--cbi-border-color, rgba(127, 127, 127, 0.2)); border-radius: 8px; padding: 18px 20px; margin-bottom: 24px;'
+			}, [
+				E('div', {
+					'class': 'gv-card-title',
+					'style': 'font-size: 1.2rem; font-weight: 600; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--cbi-border-color, rgba(127, 127, 127, 0.15)); padding-bottom: 10px;'
+				}, [
 					E('span', {}, [ _('Configured Profiles') ]),
 					importBtn
 				]),

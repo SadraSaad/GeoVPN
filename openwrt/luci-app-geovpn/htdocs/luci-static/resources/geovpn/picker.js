@@ -96,13 +96,13 @@ function showPicker(kind, onSelect) {
 	var modalContent = E('div', {}, [
 		E('h4', {}, [ kind === 'geoip' ? _('Select GeoIP Country') : _('Select GeoSite Category') ]),
 		searchInput,
-		E('table', { 'class': 'table' }, [
+		E('table', { 'class': 'table cbi-section-table', 'style': 'width: 100%; border-collapse: collapse; margin-top: 10px;' }, [
 			E('thead', {}, [
-				E('tr', {}, [
-					E('th', {}, [ _('Name') ]),
-					E('th', {}, [ _('Entries') ]),
-					E('th', {}, [ _('Est. RAM') ]),
-					E('th', { 'style': 'text-align: right;' }, [ _('Action') ])
+				E('tr', { 'class': 'tr table-titles' }, [
+					E('th', { 'class': 'th', 'style': 'padding: 8px 12px; text-align: start;' }, [ _('Name') ]),
+					E('th', { 'class': 'th', 'style': 'padding: 8px 12px; text-align: start;' }, [ _('Entries') ]),
+					E('th', { 'class': 'th', 'style': 'padding: 8px 12px; text-align: start;' }, [ _('Est. RAM') ]),
+					E('th', { 'class': 'th', 'style': 'padding: 8px 12px; text-align: end;' }, [ _('Action') ])
 				])
 			]),
 			tableBody

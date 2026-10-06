@@ -37,7 +37,10 @@ return view.extend({
 
 		var autoRefreshCheck = E('input', { 'type': 'checkbox' });
 
-		var logPre = E('pre', { 'class': 'gv-log-box' }, [
+		var logPre = E('pre', {
+			'class': 'gv-log-box',
+			'style': 'background: #161b22; color: #c9d1d9; border: 1px solid rgba(127, 127, 127, 0.2); font-family: monospace; font-size: 0.85rem; line-height: 1.5; padding: 14px; border-radius: 6px; max-height: 450px; overflow-y: auto; white-space: pre-wrap; word-break: break-all; direction: ltr; text-align: left;'
+		}, [
 			initialLogs.length > 0 ? initialLogs.join('\n') : _('No log entries found.')
 		]);
 
@@ -103,8 +106,14 @@ return view.extend({
 			])
 		]);
 
-		var logsCard = E('div', { 'class': 'cbi-section gv-card' }, [
-			E('div', { 'class': 'gv-card-title' }, [
+		var logsCard = E('div', {
+			'class': 'cbi-section gv-card',
+			'style': 'background: var(--cbi-section-background, rgba(127, 127, 127, 0.05)); border: 1px solid var(--cbi-border-color, rgba(127, 127, 127, 0.2)); border-radius: 8px; padding: 18px 20px; margin-bottom: 24px;'
+		}, [
+			E('div', {
+				'class': 'gv-card-title',
+				'style': 'font-size: 1.2rem; font-weight: 600; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--cbi-border-color, rgba(127, 127, 127, 0.15)); padding-bottom: 10px;'
+			}, [
 				E('span', {}, [ _('System & OpenVPN Logs') ])
 			]),
 			E('p', { 'style': 'font-size: 0.85rem; opacity: 0.75; margin-bottom: 12px;' }, [
@@ -117,12 +126,15 @@ return view.extend({
 		// ----------------------------------------------------
 		// 2. Diagnostics Checklist Card
 		// ----------------------------------------------------
-		var diagChecksTable = E('table', { 'class': 'table cbi-section-table' }, [
+		var diagChecksTable = E('table', {
+			'class': 'table cbi-section-table',
+			'style': 'width: 100%; border-collapse: collapse; margin-top: 10px;'
+		}, [
 			E('thead', {}, [
 				E('tr', { 'class': 'tr table-titles' }, [
-					E('th', { 'class': 'th', 'style': 'width: 90px; text-align: center;' }, [ _('Status') ]),
-					E('th', { 'class': 'th', 'style': 'width: 200px;' }, [ _('Component Check') ]),
-					E('th', { 'class': 'th' }, [ _('Details & Recommendations') ])
+					E('th', { 'class': 'th', 'style': 'width: 90px; padding: 8px 12px; text-align: center;' }, [ _('Status') ]),
+					E('th', { 'class': 'th', 'style': 'width: 200px; padding: 8px 12px; text-align: start;' }, [ _('Component Check') ]),
+					E('th', { 'class': 'th', 'style': 'padding: 8px 12px; text-align: start;' }, [ _('Details & Recommendations') ])
 				])
 			]),
 			E('tbody')
@@ -144,23 +156,32 @@ return view.extend({
 
 				if (c.hint) {
 					details.push(E('div', {
-						'style': 'margin-top: 6px; font-size: 0.85rem; padding: 4px 8px; border-radius: 4px; background: var(--cbi-input-background, rgba(127,127,127,0.1)); border-inline-start: 3px solid #d29922;'
+						'style': 'margin-top: 6px; font-size: 0.85rem; padding: 6px 10px; border-radius: 4px; background: var(--cbi-input-background, rgba(127,127,127,0.1)); border-inline-start: 3px solid #d29922;'
 					}, [
 						E('strong', {}, [ _('Recommendation: ') ]),
 						c.hint
 					]));
 				}
 
-				dom.append(tbody, E('tr', { 'class': 'tr cbi-rowstyle-' + (idx % 2 + 1) }, [
-					E('td', { 'class': 'td', 'style': 'text-align: center;' }, [ badge ]),
-					E('td', { 'class': 'td', 'style': 'font-weight: 600;' }, [ widgets.renderLtr(c.id || '-') ]),
-					E('td', { 'class': 'td' }, details)
+				dom.append(tbody, E('tr', {
+					'class': 'tr cbi-rowstyle-' + (idx % 2 + 1),
+					'style': 'border-bottom: 1px solid var(--cbi-border-color, rgba(127, 127, 127, 0.15));'
+				}, [
+					E('td', { 'class': 'td', 'style': 'padding: 10px 12px; text-align: center;' }, [ badge ]),
+					E('td', { 'class': 'td', 'style': 'padding: 10px 12px; font-weight: 600;' }, [ widgets.renderLtr(c.id || '-') ]),
+					E('td', { 'class': 'td', 'style': 'padding: 10px 12px;' }, details)
 				]));
 			});
 		}
 
-		var diagCard = E('div', { 'class': 'cbi-section gv-card' }, [
-			E('div', { 'class': 'gv-card-title' }, [
+		var diagCard = E('div', {
+			'class': 'cbi-section gv-card',
+			'style': 'background: var(--cbi-section-background, rgba(127, 127, 127, 0.05)); border: 1px solid var(--cbi-border-color, rgba(127, 127, 127, 0.2)); border-radius: 8px; padding: 18px 20px; margin-bottom: 24px;'
+		}, [
+			E('div', {
+				'class': 'gv-card-title',
+				'style': 'font-size: 1.2rem; font-weight: 600; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--cbi-border-color, rgba(127, 127, 127, 0.15)); padding-bottom: 10px;'
+			}, [
 				E('span', {}, [ _('System Diagnostics Checklist') ]),
 				diagData.ok ?
 					E('span', { 'class': 'gv-badge gv-badge-connected' }, [ _('All Systems OK ✔') ]) :
@@ -242,14 +263,20 @@ return view.extend({
 			}
 		}, [ _('Download Diagnostics (JSON)') ]);
 
-		var leakTestCard = E('div', { 'class': 'cbi-section gv-card' }, [
-			E('div', { 'class': 'gv-card-title' }, [
+		var leakTestCard = E('div', {
+			'class': 'cbi-section gv-card',
+			'style': 'background: var(--cbi-section-background, rgba(127, 127, 127, 0.05)); border: 1px solid var(--cbi-border-color, rgba(127, 127, 127, 0.2)); border-radius: 8px; padding: 18px 20px; margin-bottom: 24px;'
+		}, [
+			E('div', {
+				'class': 'gv-card-title',
+				'style': 'font-size: 1.2rem; font-weight: 600; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--cbi-border-color, rgba(127, 127, 127, 0.15)); padding-bottom: 10px;'
+			}, [
 				E('span', {}, [ _('Leak Testing & Export') ])
 			]),
 			E('p', { 'style': 'font-size: 0.85rem; opacity: 0.75; margin-bottom: 14px;' }, [
 				_('Run simulated destination verification to test split-tunnel routing decisions, or export a safe, scrubbed diagnostics bundle for troubleshooting.')
 			]),
-			E('div', { 'class': 'gv-actions' }, [
+			E('div', { 'class': 'gv-actions', 'style': 'display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; align-items: center;' }, [
 				runSelfTestBtn,
 				exportBundleBtn
 			]),
