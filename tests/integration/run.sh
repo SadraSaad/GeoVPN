@@ -1,4 +1,5 @@
 #!/bin/sh
+# shellcheck disable=SC2317,SC2329
 #
 # GeoVPN Integration Test Runner (netns topology)
 #
@@ -22,7 +23,7 @@ ip netns del gv_router 2>/dev/null || true
 ip netns del gv_inet 2>/dev/null || true
 ip netns del gv_vpn 2>/dev/null || true
 
-# shellcheck disable=SC2329
+# shellcheck disable=SC2317,SC2329
 cleanup() {
 	echo "--> Cleaning up network namespaces..."
 	ip netns del gv_lan 2>/dev/null || true
@@ -83,4 +84,5 @@ ip netns exec gv_router ping -c 1 -W 1 192.0.2.1 >/dev/null 2>&1 || {
 
 echo "--> Integration harness initialized successfully."
 echo "==> Integration tests completed."
+cleanup
 exit 0
