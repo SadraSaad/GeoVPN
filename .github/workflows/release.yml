@@ -1,0 +1,44 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    name: Build & Publish Release
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build packages with SDK
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential zstd libncurses-dev gawk git subversion libssl-dev cmp bzip2 wget file python3
+          ./tools/build-sdk.sh 25.12.5
+
+      - name: Sign and generate APK repository
+        env:
+          APK_SIGN_KEY: ${{ secrets.APK_SIGN_KEY }}
+        run: |
+          if [ -n "$APK_SIGN_KEY" ]; then
+            mkdir -p keys
+            echo "$APK_SIGN_KEY" > keys/geovpn.pem
+          fi
+          ./tools/mk-feed.sh out feed/25.12
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            out/*.apk
+            feed/25.12/packages.adb
+            feed/25.12/SHA256SUMS
+
+      - name: Deploy Feed to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./feed

@@ -1,0 +1,67 @@
+name: Build
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  lint:
+    name: Lint & Static Analysis
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y shellcheck nodejs npm jq
+
+      - name: Run linter
+        run: ./tools/lint.sh
+
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-24.04
+    needs: lint
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run unit test suite
+        run: |
+          python3 -m unittest discover -s tests/unit -p "test_*.py" -v
+
+  sdk-build:
+    name: OpenWrt SDK Build (25.12.5)
+    runs-on: ubuntu-24.04
+    needs: unit-tests
+    strategy:
+      matrix:
+        version: ["25.12.5"]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install SDK build prerequisites
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential zstd libncurses-dev gawk git subversion libssl-dev cmp bzip2 wget file python3
+
+      - name: Build packages with SDK
+        run: ./tools/build-sdk.sh ${{ matrix.version }}
+
+      - name: Upload APK artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: geovpn-apk-${{ matrix.version }}
+          path: out/*.apk
+          if-no-files-found: ignore

@@ -1,0 +1,44 @@
+name: Data Pack Build
+
+on:
+  schedule:
+    - cron: '17 2 * * *'  # Daily 02:17 UTC
+  workflow_dispatch:
+
+jobs:
+  build-data-pack:
+    name: Build and Sign Data Pack
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          pip install -r data-pack/requirements.txt
+
+      - name: Compile Data Pack
+        run: |
+          python3 data-pack/build_pack.py --out-dir dist/v1
+
+      - name: Sign Manifest
+        env:
+          PACK_SIGN_KEY: ${{ secrets.PACK_SIGN_KEY }}
+        run: |
+          if [ -n "$PACK_SIGN_KEY" ]; then
+            echo "$PACK_SIGN_KEY" > /tmp/pack_key.sec
+            usign -S -m dist/v1/MANIFEST -s /tmp/pack_key.sec -x dist/v1/MANIFEST.sig
+            rm -f /tmp/pack_key.sec
+          fi
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
