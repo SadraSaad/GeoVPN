@@ -16,7 +16,7 @@ jobs:
       - name: Build packages with SDK
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential zstd libncurses-dev gawk git subversion libssl-dev cmp bzip2 wget file python3
+          sudo apt-get install -y build-essential zstd libncurses-dev gawk git subversion libssl-dev diffutils bzip2 wget file python3
           ./tools/build-sdk.sh 25.12.5
 
       - name: Sign and generate APK repository
