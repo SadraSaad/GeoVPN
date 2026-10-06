@@ -59,6 +59,12 @@ return {
 				}
 
 				let id = cfg.create_profile(res.profile);
+				let pdir = cfg.PROFILES_DIR + '/' + id;
+				let f = fs.open(pdir + '/profile.ovpn', 'w', 0o600);
+				if (f) {
+					f.write(content);
+					f.close();
+				}
 				return {
 					ok: true,
 					id: id,
@@ -67,6 +73,104 @@ return {
 					ignored: res.profile.ignored,
 					incomplete: res.profile.incomplete
 				};
+			}
+		},
+
+		profile_get: {
+			args: { id: '' },
+			call: function(req) {
+				let id = (req && req.args) ? req.args.id : null;
+				if (!util.is_profile_id(id)) {
+					return { error: 'INVALID_ID', message: 'Invalid profile ID' };
+				}
+				let p = cfg.get_profile(id);
+				if (!p) {
+					return { error: 'NOT_FOUND', message: 'Profile not found' };
+				}
+				let pdir = cfg.PROFILES_DIR + '/' + id;
+				let ovpn_content = '';
+				let ovpn_file = pdir + '/profile.ovpn';
+				if (fs.stat(ovpn_file)) {
+					let f = fs.open(ovpn_file, 'r');
+					if (f) {
+						ovpn_content = f.read('all') || '';
+						f.close();
+					}
+				}
+				if (!ovpn_content || length(ovpn_content) == 0) {
+					let c = cfg.load_config();
+					ovpn_content = render.render_ovpn(p, pdir, c.main) || '';
+				}
+
+				let auth_content = '';
+				let auth_file = pdir + '/auth';
+				if (fs.stat(auth_file)) {
+					let af = fs.open(auth_file, 'r');
+					if (af) {
+						auth_content = af.read('all') || '';
+						af.close();
+					}
+				}
+
+				return {
+					ok: true,
+					id: id,
+					name: p.name || id,
+					ovpn: ovpn_content,
+					auth: auth_content
+				};
+			}
+		},
+
+		profile_save_raw: {
+			args: { id: '', name: '', ovpn: '', auth: '' },
+			call: function(req) {
+				let id = (req && req.args) ? req.args.id : null;
+				let name = (req && req.args && req.args.name) ? req.args.name : '';
+				let ovpn = (req && req.args) ? req.args.ovpn : '';
+				let auth = (req && req.args) ? req.args.auth : null;
+
+				if (!util.is_profile_id(id)) {
+					return { error: 'INVALID_ID', message: 'Invalid profile ID' };
+				}
+				let p = cfg.get_profile(id);
+				if (!p) {
+					return { error: 'NOT_FOUND', message: 'Profile not found' };
+				}
+
+				let pdir = cfg.PROFILES_DIR + '/' + id;
+				if (!fs.stat(pdir)) fs.mkdir(pdir, 0o700);
+
+				if (ovpn && length(ovpn) > 0) {
+					let of = fs.open(pdir + '/profile.ovpn', 'w', 0o600);
+					if (of) {
+						of.write(ovpn);
+						of.close();
+					}
+					let parse_res = parse.parse_ovpn(ovpn, name || p.name);
+					if (parse_res.ok && parse_res.profile) {
+						let cursor = uci.cursor();
+						cursor.load('geovpn');
+						if (name && length(name) > 0) cursor.set('geovpn', id, 'name', name);
+						if (parse_res.profile.remotes) cursor.set('geovpn', id, 'remote', parse_res.profile.remotes);
+						if (parse_res.profile.cipher) cursor.set('geovpn', id, 'cipher', parse_res.profile.cipher);
+						cursor.commit('geovpn');
+					}
+				}
+
+				if (auth != null) {
+					let af = fs.open(pdir + '/auth', 'w', 0o600);
+					if (af) {
+						af.write(auth);
+						af.close();
+					}
+					let cursor = uci.cursor();
+					cursor.load('geovpn');
+					cursor.set('geovpn', id, 'auth_user_pass', (length(trim(auth)) > 0) ? '1' : '0');
+					cursor.commit('geovpn');
+				}
+
+				return { ok: true };
 			}
 		},
 

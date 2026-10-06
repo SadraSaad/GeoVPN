@@ -154,9 +154,31 @@ function scrub_secrets(text) {
 	return scrubbed;
 }
 
+function argv_to_cmd(argv) {
+	if (type(argv) == 'string') return argv;
+	if (type(argv) != 'array') return '';
+	let cmd = [];
+	for (let arg in argv) {
+		let s = '' + arg;
+		if (match(s, /^[a-zA-Z0-9_.\/=+-]+$/)) {
+			push(cmd, s);
+		} else {
+			push(cmd, "'" + replace(s, /'/g, "'\\''") + "'");
+		}
+	}
+	return join(' ', cmd);
+}
+
 function safe_exec(argv, input_data) {
-	if (type(argv) != 'array' || length(argv) == 0) return { code: -1, stdout: '', stderr: 'Invalid argv' };
-	let proc = fs.popen(argv, 'r+');
+	if (type(argv) != 'array' && type(argv) != 'string') {
+		return { code: -1, stdout: '', stderr: 'Invalid argv' };
+	}
+	let cmd_str = (type(argv) == 'array') ? argv_to_cmd(argv) : argv;
+	if (length(cmd_str) == 0) {
+		return { code: -1, stdout: '', stderr: 'Empty command' };
+	}
+
+	let proc = fs.popen(cmd_str, input_data ? 'r+' : 'r');
 	if (!proc) return { code: -1, stdout: '', stderr: 'Failed to spawn process' };
 	if (input_data) {
 		proc.write(input_data);

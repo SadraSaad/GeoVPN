@@ -7,9 +7,10 @@ import json
 import os
 
 EXPECTED_METHODS = {
-    'status', 'logs', 'import_ovpn', 'profile_set_credentials',
-    'profile_put_material', 'profile_delete', 'service', 'panic',
-    'geo_catalog', 'geo_update', 'geo_update_status', 'test_target', 'diag'
+    'status', 'logs', 'import_ovpn', 'profile_get', 'profile_save_raw',
+    'profile_set_credentials', 'profile_put_material', 'profile_delete',
+    'service', 'panic', 'geo_catalog', 'geo_update', 'geo_update_status',
+    'test_target', 'diag'
 }
 
 class TestRpcdApi(unittest.TestCase):

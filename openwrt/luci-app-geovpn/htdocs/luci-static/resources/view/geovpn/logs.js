@@ -15,6 +15,8 @@ return view.extend({
 	},
 
 	render: function(data) {
+		widgets.loadStylesheet();
+
 		var initialLogs = (data && data[0] && data[0].lines) ? data[0].lines : [];
 		var diagData = (data && data[1]) || {};
 
@@ -81,11 +83,17 @@ return view.extend({
 		});
 
 		var logControls = E('div', {
-			'style': 'display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 12px;'
+			'style': 'display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-bottom: 14px;'
 		}, [
-			E('label', {}, [ _('Source:'), E('span', { 'style': 'margin-inline-start: 4px;' }), sourceSelect ]),
-			E('label', {}, [ _('Lines:'), E('span', { 'style': 'margin-inline-start: 4px;' }), linesSelect ]),
-			E('label', { 'style': 'cursor: pointer; display: flex; align-items: center; gap: 4px;' }, [
+			E('label', { 'style': 'display: flex; align-items: center; gap: 6px;' }, [
+				E('span', { 'style': 'font-weight: 500;' }, [ _('Source:') ]),
+				sourceSelect
+			]),
+			E('label', { 'style': 'display: flex; align-items: center; gap: 6px;' }, [
+				E('span', { 'style': 'font-weight: 500;' }, [ _('Lines:') ]),
+				linesSelect
+			]),
+			E('label', { 'style': 'cursor: pointer; display: flex; align-items: center; gap: 6px;' }, [
 				autoRefreshCheck,
 				_('Auto-refresh (3s)')
 			]),
@@ -95,11 +103,11 @@ return view.extend({
 			])
 		]);
 
-		var logsCard = E('div', { 'class': 'gv-card' }, [
+		var logsCard = E('div', { 'class': 'cbi-section gv-card' }, [
 			E('div', { 'class': 'gv-card-title' }, [
 				E('span', {}, [ _('System & OpenVPN Logs') ])
 			]),
-			E('p', { 'style': 'color: #57606a; margin-bottom: 8px;' }, [
+			E('p', { 'style': 'font-size: 0.85rem; opacity: 0.75; margin-bottom: 12px;' }, [
 				_('All logs are automatically scrubbed on the router to remove certificates, private keys, and passwords before display.')
 			]),
 			logControls,
@@ -109,12 +117,12 @@ return view.extend({
 		// ----------------------------------------------------
 		// 2. Diagnostics Checklist Card
 		// ----------------------------------------------------
-		var diagChecksTable = E('table', { 'class': 'table' }, [
+		var diagChecksTable = E('table', { 'class': 'table cbi-section-table' }, [
 			E('thead', {}, [
-				E('tr', {}, [
-					E('th', { 'style': 'width: 100px;' }, [ _('Status') ]),
-					E('th', {}, [ _('Component Check') ]),
-					E('th', {}, [ _('Details & Recommendations') ])
+				E('tr', { 'class': 'tr table-titles' }, [
+					E('th', { 'class': 'th', 'style': 'width: 90px; text-align: center;' }, [ _('Status') ]),
+					E('th', { 'class': 'th', 'style': 'width: 200px;' }, [ _('Component Check') ]),
+					E('th', { 'class': 'th' }, [ _('Details & Recommendations') ])
 				])
 			]),
 			E('tbody')
@@ -124,49 +132,41 @@ return view.extend({
 		var checks = diagData.checks || [];
 
 		if (checks.length === 0) {
-			dom.append(tbody, E('tr', {}, [
-				E('td', { 'colspan': '3', 'style': 'text-align: center; color: #57606a;' }, [
+			dom.append(tbody, E('tr', { 'class': 'tr' }, [
+				E('td', { 'class': 'td', 'colspan': '3', 'style': 'text-align: center; padding: 20px; opacity: 0.7;' }, [
 					_('No diagnostic checks available.')
 				])
 			]));
 		} else {
-			checks.forEach(function(c) {
-				var badgeCls = 'gv-badge-disabled';
-				var badgeText = c.level ? c.level.toUpperCase() : 'INFO';
+			checks.forEach(function(c, idx) {
+				var badge = widgets.renderCheckBadge(c.level);
+				var details = [ E('span', { 'style': 'font-size: 0.95rem;' }, [ c.msg || '' ]) ];
 
-				if (c.level === 'ok') {
-					badgeCls = 'gv-badge-connected';
-				} else if (c.level === 'warn') {
-					badgeCls = 'gv-badge-connecting';
-				} else if (c.level === 'fail') {
-					badgeCls = 'gv-badge-error';
-				}
-
-				var badge = E('span', { 'class': 'gv-badge ' + badgeCls }, [ badgeText ]);
-
-				var details = [ E('span', {}, [ c.msg || '' ]) ];
 				if (c.hint) {
-					details.push(E('div', { 'style': 'margin-top: 4px; font-size: 0.85rem; color: #57606a;' }, [
-						_('Hint: ') + c.hint
+					details.push(E('div', {
+						'style': 'margin-top: 6px; font-size: 0.85rem; padding: 4px 8px; border-radius: 4px; background: var(--cbi-input-background, rgba(127,127,127,0.1)); border-inline-start: 3px solid #d29922;'
+					}, [
+						E('strong', {}, [ _('Recommendation: ') ]),
+						c.hint
 					]));
 				}
 
-				dom.append(tbody, E('tr', {}, [
-					E('td', {}, [ badge ]),
-					E('td', { 'style': 'font-weight: 600;' }, [ widgets.renderLtr(c.id || '-') ]),
-					E('td', {}, details)
+				dom.append(tbody, E('tr', { 'class': 'tr cbi-rowstyle-' + (idx % 2 + 1) }, [
+					E('td', { 'class': 'td', 'style': 'text-align: center;' }, [ badge ]),
+					E('td', { 'class': 'td', 'style': 'font-weight: 600;' }, [ widgets.renderLtr(c.id || '-') ]),
+					E('td', { 'class': 'td' }, details)
 				]));
 			});
 		}
 
-		var diagCard = E('div', { 'class': 'gv-card' }, [
+		var diagCard = E('div', { 'class': 'cbi-section gv-card' }, [
 			E('div', { 'class': 'gv-card-title' }, [
 				E('span', {}, [ _('System Diagnostics Checklist') ]),
 				diagData.ok ?
 					E('span', { 'class': 'gv-badge gv-badge-connected' }, [ _('All Systems OK ✔') ]) :
-					E('span', { 'class': 'gv-badge gv-badge-connecting' }, [ _('Warnings Detected') ])
+					E('span', { 'class': 'gv-badge gv-badge-connecting' }, [ _('Action Needed') ])
 			]),
-			E('p', { 'style': 'color: #57606a; margin-bottom: 8px;' }, [
+			E('p', { 'style': 'font-size: 0.85rem; opacity: 0.75; margin-bottom: 12px;' }, [
 				_('Preflight verification checks kernel modules, binaries, firewall rules, and coexistence with other packages.')
 			]),
 			diagChecksTable
@@ -176,7 +176,7 @@ return view.extend({
 		// 3. Leak Self-Test & Diagnostic Export Card
 		// ----------------------------------------------------
 		var selfTestResults = E('div', {
-			'style': 'margin-top: 12px; padding: 12px; border-radius: 6px; background: #f6f8fa; border: 1px solid #d0d7de; display: none;'
+			'style': 'margin-top: 14px; padding: 14px; border-radius: 6px; background: var(--cbi-input-background, rgba(127,127,127,0.08)); border: 1px solid var(--cbi-border-color, rgba(127,127,127,0.2)); display: none;'
 		});
 
 		var runSelfTestBtn = E('button', {
@@ -194,16 +194,16 @@ return view.extend({
 					results.forEach(function(r, idx) {
 						var verdictBadge = (r.verdict === 'direct')
 							? E('span', { 'class': 'gv-badge gv-badge-connected' }, [ _('DIRECT') ])
-							: E('span', { 'class': 'gv-badge', 'style': 'background-color: #ddf4ff; color: #0969da; border: 1px solid #54aeff;' }, [ _('VPN') ]);
+							: E('span', { 'class': 'gv-badge', 'style': 'background-color: rgba(9,105,218,0.2); color: #58a6ff; border: 1px solid #58a6ff;' }, [ _('VPN') ]);
 
 						var reason = (r.reason && r.reason.layer) ? (r.reason.layer + ' / ' + (r.reason.rule || '')) : 'default';
 
 						dom.append(selfTestResults, E('div', {
-							'style': 'display: flex; align-items: center; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #e1e4e8;'
+							'style': 'display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--cbi-border-color, rgba(127,127,127,0.15));'
 						}, [
 							E('span', { 'style': 'font-weight: 600;' }, [ widgets.renderLtr(testTargets[idx]) ]),
-							E('div', { 'style': 'display: flex; gap: 10px; align-items: center;' }, [
-								E('span', { 'style': 'font-size: 0.85rem; color: #57606a;' }, [ reason ]),
+							E('div', { 'style': 'display: flex; gap: 12px; align-items: center;' }, [
+								E('span', { 'style': 'font-size: 0.85rem; opacity: 0.75;' }, [ reason ]),
 								verdictBadge
 							])
 						]));
@@ -211,7 +211,7 @@ return view.extend({
 				}).catch(function(err) {
 					ui.hideIndicator();
 					dom.content(selfTestResults, [
-						E('span', { 'style': 'color: red;' }, [ _('Test failed: ') + err ])
+						E('span', { 'style': 'color: #f85149;' }, [ _('Test failed: ') + err ])
 					]);
 				});
 			}
@@ -242,11 +242,11 @@ return view.extend({
 			}
 		}, [ _('Download Diagnostics (JSON)') ]);
 
-		var leakTestCard = E('div', { 'class': 'gv-card' }, [
+		var leakTestCard = E('div', { 'class': 'cbi-section gv-card' }, [
 			E('div', { 'class': 'gv-card-title' }, [
 				E('span', {}, [ _('Leak Testing & Export') ])
 			]),
-			E('p', { 'style': 'color: #57606a; margin-bottom: 12px;' }, [
+			E('p', { 'style': 'font-size: 0.85rem; opacity: 0.75; margin-bottom: 14px;' }, [
 				_('Run simulated destination verification to test split-tunnel routing decisions, or export a safe, scrubbed diagnostics bundle for troubleshooting.')
 			]),
 			E('div', { 'class': 'gv-actions' }, [

@@ -2,6 +2,17 @@
 'require baseclass';
 'require dom';
 
+function loadStylesheet() {
+	if (typeof document !== 'undefined' && document.head && !document.querySelector('link[href*="geovpn.css"]')) {
+		var link = E('link', {
+			'rel': 'stylesheet',
+			'type': 'text/css',
+			'href': L.resource('geovpn/geovpn.css')
+		});
+		document.head.appendChild(link);
+	}
+}
+
 function renderBadge(stateName) {
 	var cls = 'gv-badge-disabled';
 	var label = stateName || 'unknown';
@@ -15,6 +26,22 @@ function renderBadge(stateName) {
 	}
 
 	return E('span', { 'class': 'gv-badge ' + cls }, [ label ]);
+}
+
+function renderCheckBadge(level) {
+	var lvl = (level || '').toLowerCase();
+	var cls = 'gv-badge-disabled';
+	var text = lvl.toUpperCase();
+
+	if (lvl === 'ok') {
+		cls = 'gv-badge-connected';
+	} else if (lvl === 'warn') {
+		cls = 'gv-badge-connecting';
+	} else if (lvl === 'fail') {
+		cls = 'gv-badge-error';
+	}
+
+	return E('span', { 'class': 'gv-badge ' + cls }, [ text ]);
 }
 
 function renderLtr(text) {
@@ -46,7 +73,9 @@ function formatUptime(seconds) {
 }
 
 return baseclass.extend({
+	loadStylesheet: loadStylesheet,
 	renderBadge: renderBadge,
+	renderCheckBadge: renderCheckBadge,
 	renderLtr: renderLtr,
 	formatBytes: formatBytes,
 	formatUptime: formatUptime

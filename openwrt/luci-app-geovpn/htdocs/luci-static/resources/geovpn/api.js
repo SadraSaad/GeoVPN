@@ -89,10 +89,26 @@ var callDiag = rpc.declare({
 	expect: { '': {} }
 });
 
+var callProfileGet = rpc.declare({
+	object: 'luci.geovpn',
+	method: 'profile_get',
+	params: [ 'id' ],
+	expect: { '': {} }
+});
+
+var callProfileSaveRaw = rpc.declare({
+	object: 'luci.geovpn',
+	method: 'profile_save_raw',
+	params: [ 'id', 'name', 'ovpn', 'auth' ],
+	expect: { '': {} }
+});
+
 return baseclass.extend({
 	getStatus: callStatus,
 	getLogs: callLogs,
 	importOvpn: callImportOvpn,
+	getProfile: callProfileGet,
+	saveProfileRaw: callProfileSaveRaw,
 	setCredentials: callSetCredentials,
 	putMaterial: callPutMaterial,
 	deleteProfile: callDeleteProfile,

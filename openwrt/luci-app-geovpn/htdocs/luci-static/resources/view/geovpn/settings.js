@@ -16,6 +16,8 @@ return view.extend({
 	},
 
 	render: function(data) {
+		widgets.loadStylesheet();
+
 		var statusData = (data && data[1]) || {};
 		var diagData = (data && data[2]) || {};
 

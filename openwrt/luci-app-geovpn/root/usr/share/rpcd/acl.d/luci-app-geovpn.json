@@ -9,6 +9,7 @@
         "luci.geovpn": [
           "status",
           "logs",
+          "profile_get",
           "geo_catalog",
           "geo_update_status",
           "test_target",
@@ -23,6 +24,7 @@
       "ubus": {
         "luci.geovpn": [
           "import_ovpn",
+          "profile_save_raw",
           "profile_set_credentials",
           "profile_put_material",
           "profile_delete",
