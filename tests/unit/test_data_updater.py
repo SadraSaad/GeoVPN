@@ -68,8 +68,11 @@ class TestDataUpdater(unittest.TestCase):
         repo_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
         ucode_bin = os.path.join(repo_root, 'tools', 'bin', 'ucode')
         lib_path = os.path.join(repo_root, 'openwrt', 'geovpn-core', 'files', 'usr', 'share', 'ucode')
-        if not os.path.exists(ucode_bin):
-            return
+        try:
+            if not os.path.exists(ucode_bin) or subprocess.run([ucode_bin, '-e', '1'], capture_output=True, timeout=2).returncode != 0:
+                self.skipTest("ucode runtime not available")
+        except Exception:
+            self.skipTest("ucode runtime not available")
 
         script = """
         import * as data from 'geovpn.data';

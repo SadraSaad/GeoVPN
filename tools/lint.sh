@@ -6,7 +6,9 @@ set -e
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
-export PATH="$REPO_ROOT/tools/bin:$PATH"
+if [ -x "$REPO_ROOT/tools/bin/ucode" ] && "$REPO_ROOT/tools/bin/ucode" -e '1' >/dev/null 2>&1; then
+	export PATH="$REPO_ROOT/tools/bin:$PATH"
+fi
 
 echo "==> Running GeoVPN static checks..."
 
@@ -90,7 +92,7 @@ UC_FILES=$(find "$REPO_ROOT/openwrt" -name "*.uc" 2>/dev/null || true)
 UCODE_LIB="$REPO_ROOT/openwrt/geovpn-core/files/usr/share/ucode"
 for f in $UC_FILES; do
 	if [ -f "$f" ]; then
-		if command -v ucode >/dev/null 2>&1; then
+		if command -v ucode >/dev/null 2>&1 && ucode -e '1' >/dev/null 2>&1; then
 			if grep -q 'export {' "$f"; then
 				if ! ucode -L "$UCODE_LIB" -e "import * as _ from '$f';" >/dev/null 2>&1; then
 					echo "FAIL: ucode module import failed: $f"

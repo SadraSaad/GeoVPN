@@ -1,2 +1,11 @@
 #!/bin/sh
-exec /tmp/ow-rootfs/lib/ld-musl-x86_64.so.1 --library-path /tmp/ow-rootfs/lib:/tmp/ow-rootfs/usr/lib /tmp/ow-rootfs/usr/bin/ucode -L /tmp/ow-rootfs/usr/lib/ucode -L /tmp/ow-rootfs/usr/share/ucode -L /home/sadra/GeoVPN/openwrt/geovpn-core/files/usr/share/ucode "$@"
+ROOTFS="${OW_ROOTFS:-/tmp/ow-rootfs}"
+if [ -x "$ROOTFS/lib/ld-musl-x86_64.so.1" ] && [ -x "$ROOTFS/usr/bin/ucode" ]; then
+	SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+	REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+	exec "$ROOTFS/lib/ld-musl-x86_64.so.1" --library-path "$ROOTFS/lib:$ROOTFS/usr/lib" "$ROOTFS/usr/bin/ucode" -L "$ROOTFS/usr/lib/ucode" -L "$ROOTFS/usr/share/ucode" -L "$REPO_ROOT/openwrt/geovpn-core/files/usr/share/ucode" "$@"
+fi
+if command -v ucode.bin >/dev/null 2>&1; then
+	exec ucode.bin "$@"
+fi
+exit 127

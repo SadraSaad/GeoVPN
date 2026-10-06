@@ -1,2 +1,12 @@
 #!/bin/sh
-exec /tmp/ow-rootfs/lib/ld-musl-x86_64.so.1 --library-path /tmp/ow-rootfs/lib:/tmp/ow-rootfs/usr/lib /tmp/ow-rootfs/usr/sbin/nft "$@"
+ROOTFS="${OW_ROOTFS:-/tmp/ow-rootfs}"
+if [ -x "$ROOTFS/lib/ld-musl-x86_64.so.1" ] && [ -x "$ROOTFS/usr/sbin/nft" ]; then
+	exec "$ROOTFS/lib/ld-musl-x86_64.so.1" --library-path "$ROOTFS/lib:$ROOTFS/usr/lib" "$ROOTFS/usr/sbin/nft" "$@"
+fi
+if [ -x /usr/sbin/nft ]; then
+	exec /usr/sbin/nft "$@"
+fi
+if command -v nft.bin >/dev/null 2>&1; then
+	exec nft.bin "$@"
+fi
+exit 127

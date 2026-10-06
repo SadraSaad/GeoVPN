@@ -22,6 +22,7 @@ ip netns del gv_router 2>/dev/null || true
 ip netns del gv_inet 2>/dev/null || true
 ip netns del gv_vpn 2>/dev/null || true
 
+# shellcheck disable=SC2329
 cleanup() {
 	echo "--> Cleaning up network namespaces..."
 	ip netns del gv_lan 2>/dev/null || true

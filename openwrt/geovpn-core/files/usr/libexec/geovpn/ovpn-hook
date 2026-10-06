@@ -5,6 +5,7 @@
 set -e
 
 # Only handle 'up' and 'down' triggers
+script_type="${script_type:-}"
 if [ "$script_type" != "up" ] && [ "$script_type" != "down" ]; then
 	exit 0
 fi

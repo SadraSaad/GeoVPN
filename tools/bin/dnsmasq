@@ -1,2 +1,9 @@
 #!/bin/sh
-exec /tmp/ow-rootfs/lib/ld-musl-x86_64.so.1 --library-path /tmp/ow-rootfs/lib:/tmp/ow-rootfs/usr/lib /tmp/ow-rootfs/usr/sbin/dnsmasq "$@"
+ROOTFS="${OW_ROOTFS:-/tmp/ow-rootfs}"
+if [ -x "$ROOTFS/lib/ld-musl-x86_64.so.1" ] && [ -x "$ROOTFS/usr/sbin/dnsmasq" ]; then
+	exec "$ROOTFS/lib/ld-musl-x86_64.so.1" --library-path "$ROOTFS/lib:$ROOTFS/usr/lib" "$ROOTFS/usr/sbin/dnsmasq" "$@"
+fi
+if command -v dnsmasq.bin >/dev/null 2>&1; then
+	exec dnsmasq.bin "$@"
+fi
+exit 127

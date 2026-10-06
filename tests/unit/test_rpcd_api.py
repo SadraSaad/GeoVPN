@@ -45,8 +45,11 @@ class TestRpcdApi(unittest.TestCase):
         ucode_bin = os.path.join(repo_root, 'tools', 'bin', 'ucode')
         lib_path = os.path.join(repo_root, 'openwrt', 'geovpn-core', 'files', 'usr', 'share', 'ucode')
         plugin_path = os.path.join(repo_root, 'openwrt', 'luci-app-geovpn', 'root', 'usr', 'share', 'rpcd', 'ucode', 'geovpn.uc')
-        if not os.path.exists(ucode_bin):
-            return
+        try:
+            if not os.path.exists(ucode_bin) or subprocess.run([ucode_bin, '-e', '1'], capture_output=True, timeout=2).returncode != 0:
+                self.skipTest("ucode runtime not available")
+        except Exception:
+            self.skipTest("ucode runtime not available")
 
         script = f"""
         let plugin = loadfile('{plugin_path}')();

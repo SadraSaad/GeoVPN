@@ -36,6 +36,11 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Fetch OpenWrt rootfs for ucode runtime (optional)
+        run: |
+          mkdir -p /tmp/ow-rootfs
+          wget -qO- https://downloads.openwrt.org/releases/25.12.5/targets/x86/64/openwrt-25.12.5-x86-64-rootfs.tar.gz | tar -xz -C /tmp/ow-rootfs 2>/dev/null || true
+
       - name: Run unit test suite
         run: |
           python3 -m unittest discover -s tests/unit -p "test_*.py" -v
