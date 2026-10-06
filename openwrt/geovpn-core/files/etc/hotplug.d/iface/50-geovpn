@@ -1,0 +1,17 @@
+#!/bin/sh
+#
+# GeoVPN WAN hotplug script
+#
+set -e
+
+[ "$ACTION" = "ifup" ] || exit 0
+
+# Check if interface is WAN
+case "$INTERFACE" in
+	wan|wan6)
+		# Trigger asynchronous debounced WAN event
+		/usr/libexec/geovpn/spawn /usr/bin/geovpn _wan_event
+		;;
+esac
+
+exit 0
