@@ -60,7 +60,7 @@ Devices that use their own DNS-over-HTTPS bypass the router's DNS — see *Secur
   apk update
   apk fetch dnsmasq-full                 # downloads dnsmasq-full-*.apk into /tmp
   apk del dnsmasq
-  apk add ./dnsmasq-full-*.apk
+  apk add --allow-untrusted ./dnsmasq-full-*.apk
   /etc/init.d/dnsmasq restart
   ```
   Verify: `dnsmasq --version | head -3` must list `nftset`.

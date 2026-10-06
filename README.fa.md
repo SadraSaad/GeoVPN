@@ -59,7 +59,7 @@ cd /tmp
 apk update
 apk fetch dnsmasq-full
 apk del dnsmasq
-apk add ./dnsmasq-full-*.apk
+apk add --allow-untrusted ./dnsmasq-full-*.apk
 /etc/init.d/dnsmasq restart
 dnsmasq --version | head -3      # باید nftset را نشان دهد
 ```
