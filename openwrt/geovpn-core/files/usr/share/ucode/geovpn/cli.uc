@@ -243,6 +243,7 @@ function main(args) {
 		print('  update [--force]  Update geo data packs\n');
 		print('  diag              Run system diagnostics\n');
 		print('  panic             Emergency reset and shutdown\n');
+		print('  purge             Complete reset (removes all rules, profiles, and configs)\n');
 		print('  version           Display version\n');
 		return 1;
 	}
@@ -267,6 +268,20 @@ function main(args) {
 		return 0;
 	}
 	if (cmd == 'panic') return cmd_panic();
+	if (cmd == 'purge') {
+		cmd_teardown();
+		util.safe_exec(['/etc/init.d/geovpn', 'stop']);
+		try {
+			let fwzone = require('./fwzone.uc');
+			fwzone.remove_geovpn_zone();
+		} catch (e) {}
+		util.safe_exec(['rm', '-rf', '/etc/geovpn', '/var/run/geovpn']);
+		let cursor = uci.cursor();
+		cursor.delete('geovpn');
+		cursor.commit('geovpn');
+		print('GeoVPN purge complete: all rules, profiles, caches, and configs removed.\n');
+		return 0;
+	}
 	if (cmd == 'import') return cmd_import(args[1], args[2]);
 	if (cmd == '_prepare') return cmd_prepare();
 	if (cmd == '_teardown') return cmd_teardown();

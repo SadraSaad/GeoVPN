@@ -77,4 +77,13 @@ define Package/geovpn-core/prerm
 exit 0
 endef
 
+define Package/geovpn-core/postrm
+#!/bin/sh
+[ -n "$${IPKG_INSTROOT}" ] || {
+	rm -f /tmp/dnsmasq.d/geovpn.conf /tmp/dnsmasq.*.d/geovpn.conf 2>/dev/null || true
+	/etc/init.d/rpcd reload 2>/dev/null || true
+}
+exit 0
+endef
+
 $(eval $(call BuildPackage,geovpn-core))
