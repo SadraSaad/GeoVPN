@@ -1,0 +1,27 @@
+#!/bin/sh
+#
+# GeoVPN initial setup and migration uci-defaults script
+#
+set -e
+
+# Ensure directories exist with secure permissions
+mkdir -p /etc/geovpn/profiles /etc/geovpn/backup
+chmod 0700 /etc/geovpn/profiles /etc/geovpn/backup
+
+mkdir -p /etc/geovpn/data /etc/geovpn/keys
+chmod 0755 /etc/geovpn/data /etc/geovpn/keys
+
+if [ -f /etc/config/geovpn ]; then
+	chmod 0600 /etc/config/geovpn
+fi
+
+# Migration check
+if command -v uci >/dev/null 2>&1 && [ -f /etc/config/geovpn ]; then
+	VER=$(uci -q get geovpn.main.config_version || echo 0)
+	if [ "$VER" -lt 1 ]; then
+		uci set geovpn.main.config_version='1'
+		uci commit geovpn
+	fi
+fi
+
+exit 0

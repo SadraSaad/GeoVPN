@@ -95,41 +95,15 @@ for f in $UC_FILES; do
 			else
 				echo "OK: ucode -c passed: $(basename "$f")"
 			fi
+		elif command -v node >/dev/null 2>&1; then
+			if ! node --input-type=module --check < "$f" 2>/dev/null; then
+				echo "FAIL: Syntax error in $f"
+				FAIL=1
+			else
+				echo "OK: Syntax valid: $(basename "$f") (checked via node)"
+			fi
 		else
-			# Fallback: check basic parenthesis/bracket/brace balance and non-empty
-			python3 -c "
-import sys
-content = open('$f').read()
-stack = []
-pairs = {')': '(', ']': '[', '}': '{'}
-in_str = None
-escape = False
-for idx, ch in enumerate(content):
-    if escape:
-        escape = False
-        continue
-    if ch == '\\\\':
-        escape = True
-        continue
-    if in_str:
-        if ch == in_str:
-            in_str = None
-        continue
-    if ch in ('\"', \"'\"):
-        in_str = ch
-        continue
-    if ch in '([{':
-        stack.append((ch, idx))
-    elif ch in ')]}':
-        if not stack or stack[-1][0] != pairs[ch]:
-            print(f'Mismatched bracket {ch} at index {idx} in $f', file=sys.stderr)
-            sys.exit(1)
-        stack.pop()
-if stack:
-    print(f'Unclosed {stack[-1][0]} at index {stack[-1][1]} in $f', file=sys.stderr)
-    sys.exit(1)
-" || { echo "FAIL: Structural syntax check failed for $f"; FAIL=1; }
-			echo "OK: Structural syntax check passed: $(basename "$f") (ucode binary not installed)"
+			echo "NOTICE: Neither ucode nor node found to syntax-check $(basename "$f")"
 		fi
 	fi
 done

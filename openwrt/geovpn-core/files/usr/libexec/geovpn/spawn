@@ -1,0 +1,37 @@
+#!/bin/sh
+#
+# GeoVPN double-fork launcher for asynchronous background operations
+#
+set -e
+
+if [ "$#" -lt 1 ]; then
+	echo "Usage: $0 <command> [args...]" >&2
+	exit 1
+fi
+
+ACTION="$1"
+shift
+
+case "$ACTION" in
+	update)
+		(
+			# Detach fully from controlling terminal / parent descriptors
+			trap '' HUP
+			exec 0</dev/null
+			exec 1>>/var/log/geovpn-update.log
+			exec 2>&1
+			/usr/bin/geovpn-update "$@"
+		) &
+		exit 0
+		;;
+	*)
+		(
+			trap '' HUP
+			exec 0</dev/null
+			exec 1>/dev/null
+			exec 2>/dev/null
+			"$ACTION" "$@"
+		) &
+		exit 0
+		;;
+esac
