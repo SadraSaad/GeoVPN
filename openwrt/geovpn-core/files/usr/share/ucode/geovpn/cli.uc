@@ -53,12 +53,12 @@ function cmd_status(json_output) {
 
 function cmd_import(file_path, name) {
 	if (!file_path) {
-		fs.stderr().write('Error: input file required\n');
+		fs.stderr.write('Error: input file required\n');
 		return 1;
 	}
 	let f = fs.open(file_path, 'r');
 	if (!f) {
-		fs.stderr().write(sprintf('Error: cannot open %s\n', file_path));
+		fs.stderr.write(sprintf('Error: cannot open %s\n', file_path));
 		return 1;
 	}
 	let content = f.read('all');
@@ -66,7 +66,7 @@ function cmd_import(file_path, name) {
 
 	let res = parse.parse_ovpn(content, name);
 	if (!res.ok) {
-		fs.stderr().write(sprintf('Import failed: %s\n', res.error));
+		fs.stderr.write(sprintf('Import failed: %s\n', res.error));
 		return 1;
 	}
 
@@ -372,7 +372,7 @@ function main(args) {
 		return data.run_update(length(args) > 1 && args[1] == '--force');
 	}
 
-	fs.stderr().write(sprintf('Unknown command: %s\n', cmd));
+	fs.stderr.write(sprintf('Unknown command: %s\n', cmd));
 	return 1;
 }
 

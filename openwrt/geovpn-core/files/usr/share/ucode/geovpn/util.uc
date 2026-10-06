@@ -169,7 +169,7 @@ function safe_exec(argv, input_data) {
 function log(level, msg) {
 	let tag = '[geovpn]';
 	let line = sprintf('%s %s: %s\n', tag, uc(level), scrub_secrets(msg));
-	fs.stderr().write(line);
+	fs.stderr.write(line);
 }
 
 export {
