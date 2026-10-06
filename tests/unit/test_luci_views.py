@@ -65,5 +65,26 @@ class TestLuciViews(unittest.TestCase):
             self.assertIn('unicode-bidi', css)
             self.assertIn('margin-inline-start', css)
 
+    def test_all_js_return_baseclass_or_view_subclass(self):
+        js_files = [
+            'htdocs/luci-static/resources/geovpn/api.js',
+            'htdocs/luci-static/resources/geovpn/widgets.js',
+            'htdocs/luci-static/resources/geovpn/picker.js',
+            'htdocs/luci-static/resources/view/geovpn/profiles.js',
+            'htdocs/luci-static/resources/view/geovpn/split.js',
+            'htdocs/luci-static/resources/view/geovpn/settings.js',
+            'htdocs/luci-static/resources/view/geovpn/logs.js'
+        ]
+        for rel in js_files:
+            full = os.path.join(LUCI_APP, rel)
+            with open(full, 'r', encoding='utf-8') as f:
+                content = f.read()
+            self.assertRegex(
+                content,
+                r'return\s+(baseclass|view)\.extend\(',
+                f"{rel} must return baseclass.extend or view.extend to be a valid LuCI constructor"
+            )
+
 if __name__ == '__main__':
     unittest.main()
+

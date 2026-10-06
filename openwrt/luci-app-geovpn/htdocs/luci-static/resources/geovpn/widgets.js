@@ -1,4 +1,5 @@
 'use strict';
+'require baseclass';
 'require dom';
 
 function renderBadge(stateName) {
@@ -44,9 +45,9 @@ function formatUptime(seconds) {
 	return parts.join(' ');
 }
 
-return {
+return baseclass.extend({
 	renderBadge: renderBadge,
 	renderLtr: renderLtr,
 	formatBytes: formatBytes,
 	formatUptime: formatUptime
-};
+});

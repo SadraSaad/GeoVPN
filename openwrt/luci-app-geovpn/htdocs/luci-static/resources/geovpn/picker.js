@@ -1,4 +1,5 @@
 'use strict';
+'require baseclass';
 'require ui';
 'require dom';
 'require geovpn.api as api';
@@ -123,6 +124,6 @@ function showPicker(kind, onSelect) {
 	loadData();
 }
 
-return {
+return baseclass.extend({
 	showPicker: showPicker
-};
+});

@@ -1,4 +1,5 @@
 'use strict';
+'require baseclass';
 'require rpc';
 
 var callStatus = rpc.declare({
@@ -88,7 +89,7 @@ var callDiag = rpc.declare({
 	expect: { '': {} }
 });
 
-return {
+return baseclass.extend({
 	getStatus: callStatus,
 	getLogs: callLogs,
 	importOvpn: callImportOvpn,
@@ -102,4 +103,4 @@ return {
 	getUpdateStatus: callUpdateStatus,
 	testTarget: callTestTarget,
 	getDiag: callDiag
-};
+});
