@@ -1,0 +1,2 @@
+# Python dependencies for GeoVPN data pack compiler
+# Standard library only (urllib, hashlib, json, argparse, ipaddress)

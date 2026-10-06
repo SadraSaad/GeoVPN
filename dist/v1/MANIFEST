@@ -1,0 +1,7 @@
+schema=1
+build_id=2026.10.06.1
+build_time=1791248690
+geoip_catalog_sha256=bdb53b9273d24f34623a1fd35b69558b82dd6eaa325dedc7097cb97a841f05bc
+geosite_catalog_sha256=8b48030cfb8bfacb38b9226f359cac96aedc9d68a2b3b44c2e1afbdded99a0a5
+sources=ipverse:cc0,v2fly:mit
+licenses=CC0-1.0,MIT

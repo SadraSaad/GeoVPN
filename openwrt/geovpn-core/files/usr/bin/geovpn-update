@@ -1,0 +1,7 @@
+#!/bin/sh
+#
+# GeoVPN automated / standalone data update runner
+#
+set -e
+
+exec /usr/bin/geovpn update "$@"
