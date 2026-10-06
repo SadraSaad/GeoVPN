@@ -5,11 +5,11 @@
 
 import * as fs from 'fs';
 import * as uci from 'uci';
-import * as util from '/usr/share/ucode/geovpn/util.uc';
-import * as cfg from '/usr/share/ucode/geovpn/config.uc';
-import * as state from '/usr/share/ucode/geovpn/state.uc';
-import * as parse from '/usr/share/ucode/geovpn/ovpn_parse.uc';
-import * as diag from '/usr/share/ucode/geovpn/diag.uc';
+import * as util from 'geovpn.util';
+import * as cfg from 'geovpn.config';
+import * as state from 'geovpn.state';
+import * as parse from 'geovpn.ovpn_parse';
+import * as diag from 'geovpn.diag';
 
 return {
 	'luci.geovpn': {
@@ -96,7 +96,7 @@ return {
 				if (!util.is_profile_id(id)) {
 					return { error: 'INVALID_ID', message: 'Invalid profile ID' };
 				}
-				let allowed_roles = ['ca', 'cert', 'key', 'tls-auth', 'tls-crypt', 'tls-crypt-v2', 'extra-certs'];
+				let allowed_roles = ['ca', 'cert', 'key', 'tls-auth', 'tls-crypt', 'tls-crypt-v2', 'extra-certs', 'crl-verify'];
 				let found = false;
 				for (let r in allowed_roles) {
 					if (r == role) { found = true; break; }
@@ -169,31 +169,66 @@ return {
 				if (limit > 100) limit = 100;
 
 				let cat_file = sprintf('/etc/geovpn/data/catalog/%s.tsv', kind);
+				let pack_info = { build_id: 'none', time: 0 };
+				let st_f = fs.open('/etc/geovpn/data/STATE', 'r');
+				if (st_f) {
+					let st_lines = split(st_f.read('all'), '\n');
+					st_f.close();
+					for (let sl in st_lines) {
+						let sp = split(sl, '=');
+						if (length(sp) >= 2) {
+							if (trim(sp[0]) == 'build_id') pack_info.build_id = trim(sp[1]);
+							if (trim(sp[0]) == 'build_time') pack_info.time = +trim(sp[1]);
+						}
+					}
+				}
+
 				let f = fs.open(cat_file, 'r');
 				if (!f) {
-					return { total: 0, items: [], pack: { build_id: 'none' } };
+					return { total: 0, items: [], pack: pack_info };
 				}
 				let content = f.read('all') || '';
 				f.close();
+
+				let cursor = uci.cursor();
+				cursor.load('geovpn');
+				let selected_map = {};
+				let sections = cursor.get_all('geovpn');
+				if (sections) {
+					for (let sname in sections) {
+						let s = sections[sname];
+						if (kind == 'geoip' && s['.type'] == 'geoip' && s.enabled != '0' && s.code) {
+							selected_map[lc(s.code)] = true;
+						} else if (kind == 'geosite' && s['.type'] == 'geosite' && s.enabled != '0' && s.name) {
+							selected_map[lc(s.name)] = true;
+						}
+					}
+				}
 
 				let lines = split(content, '\n');
 				let matched = [];
 
 				for (let line in lines) {
 					let l = trim(line);
-					if (length(l) == 0 || l[0] == '#') continue;
+					if (length(l) == 0 || substr(l, 0, 1) == '#') continue;
 					let parts = split(l, '\t');
 					let name = parts[0];
 					if (length(q) > 0 && index(name, q) == -1) continue;
 
 					let count = (length(parts) > 1) ? +parts[1] : 0;
+					let count_v6 = (kind == 'geoip' && length(parts) > 2) ? +parts[2] : 0;
+					let est_ram_kb = (kind == 'geoip') ? int((count * 64) / 1024) : int((count * 150) / 1024);
 					let est_ram = (kind == 'geoip') ? sprintf('%.1f MB', (count * 64) / 1048576) : sprintf('%.1f MB', (count * 150) / 1048576);
+					let note = (length(parts) > 3) ? parts[3] : '';
 
 					push(matched, {
 						name: name,
 						count: count,
-						count_v6: (kind == 'geoip' && length(parts) > 2) ? +parts[2] : 0,
-						est_ram: est_ram
+						count_v6: count_v6,
+						selected: (selected_map[lc(name)] == true),
+						est_ram_kb: est_ram_kb,
+						est_ram: est_ram,
+						note: note
 					});
 				}
 
@@ -204,7 +239,8 @@ return {
 					total: total,
 					offset: offset,
 					limit: limit,
-					items: paged
+					items: paged,
+					pack: pack_info
 				};
 			}
 		},

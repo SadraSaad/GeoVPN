@@ -6,6 +6,7 @@ set -e
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+export PATH="$REPO_ROOT/tools/bin:$PATH"
 
 echo "==> Running GeoVPN static checks..."
 
@@ -85,15 +86,25 @@ done
 
 # 4. ucode syntax check
 echo "[4/5] Checking ucode files..."
-UC_FILES=$(find "$REPO_ROOT" -name "*.uc" 2>/dev/null || true)
+UC_FILES=$(find "$REPO_ROOT/openwrt" -name "*.uc" 2>/dev/null || true)
+UCODE_LIB="$REPO_ROOT/openwrt/geovpn-core/files/usr/share/ucode"
 for f in $UC_FILES; do
 	if [ -f "$f" ]; then
 		if command -v ucode >/dev/null 2>&1; then
-			if ! ucode -c "$f"; then
-				echo "FAIL: ucode -c failed on $f"
-				FAIL=1
+			if grep -q 'export {' "$f"; then
+				if ! ucode -L "$UCODE_LIB" -e "import * as _ from '$f';" >/dev/null 2>&1; then
+					echo "FAIL: ucode module import failed: $f"
+					FAIL=1
+				else
+					echo "OK: ucode module valid: $(basename "$f")"
+				fi
 			else
-				echo "OK: ucode -c passed: $(basename "$f")"
+				if ! ucode -L "$UCODE_LIB" -c -o /dev/null "$f" >/dev/null 2>&1; then
+					echo "FAIL: ucode -c failed on $f"
+					FAIL=1
+				else
+					echo "OK: ucode -c passed: $(basename "$f")"
+				fi
 			fi
 		elif command -v node >/dev/null 2>&1; then
 			if ! python3 -c "

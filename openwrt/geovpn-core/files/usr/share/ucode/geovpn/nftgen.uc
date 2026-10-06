@@ -40,6 +40,13 @@ function render_ruleset(config, geo_cidrs, active_profile) {
 	if (length(if_elements) == 0) push(if_elements, '"br-lan"');
 	push(lines, sprintf('  set lan_ifs { type ifname; elements = { %s }; }', join(', ', if_elements)));
 
+	function set_def(name, set_type, flags_str, elems) {
+		let parts = [sprintf('type %s;', set_type)];
+		if (flags_str && length(flags_str) > 0) push(parts, flags_str);
+		if (elems && length(elems) > 0) push(parts, sprintf('elements = { %s };', join(', ', elems)));
+		return sprintf('  set %s { %s }', name, join(' ', parts));
+	}
+
 	// Always direct sets (VPN servers)
 	let always4_elems = [];
 	let always6_elems = [];
@@ -50,10 +57,8 @@ function render_ruleset(config, geo_cidrs, active_profile) {
 			else if (util.is_ipv6(host)) push(always6_elems, host);
 		}
 	}
-	push(lines, sprintf('  set always4 { type ipv4_addr; flags interval; auto-merge; elements = { %s }; }',
-		join(', ', always4_elems)));
-	push(lines, sprintf('  set always6 { type ipv6_addr; flags interval; auto-merge; elements = { %s }; }',
-		join(', ', always6_elems)));
+	push(lines, set_def('always4', 'ipv4_addr', 'flags interval; auto-merge;', always4_elems));
+	push(lines, set_def('always6', 'ipv6_addr', 'flags interval; auto-merge;', always6_elems));
 
 	push(lines, sprintf('  set always4_dyn { type ipv4_addr; flags timeout; timeout %s; size 1024; }', dyn_timeout));
 	push(lines, sprintf('  set always6_dyn { type ipv6_addr; flags timeout; timeout %s; size 1024; }', dyn_timeout));
@@ -65,8 +70,8 @@ function render_ruleset(config, geo_cidrs, active_profile) {
 	// GeoIP CIDR sets
 	let geo4_elems = (geo_cidrs && geo_cidrs.v4) ? geo_cidrs.v4 : [];
 	let geo6_elems = (geo_cidrs && geo_cidrs.v6) ? geo_cidrs.v6 : [];
-	push(lines, sprintf('  set geo4 { type ipv4_addr; flags interval; auto-merge; elements = { %s }; }', join(', ', geo4_elems)));
-	push(lines, sprintf('  set geo6 { type ipv6_addr; flags interval; auto-merge; elements = { %s }; }', join(', ', geo6_elems)));
+	push(lines, set_def('geo4', 'ipv4_addr', 'flags interval; auto-merge;', geo4_elems));
+	push(lines, set_def('geo6', 'ipv6_addr', 'flags interval; auto-merge;', geo6_elems));
 
 	// GeoSite dynamic sets (populated by dnsmasq nftset)
 	push(lines, sprintf('  set geo4_dyn { type ipv4_addr; flags timeout; timeout %s; size 65536; }', dyn_timeout));
@@ -91,10 +96,10 @@ function render_ruleset(config, geo_cidrs, active_profile) {
 			}
 		}
 	}
-	push(lines, sprintf('  set cust_d4 { type ipv4_addr; flags interval; auto-merge; elements = { %s }; }', join(', ', cust_d4_elems)));
-	push(lines, sprintf('  set cust_v4 { type ipv4_addr; flags interval; auto-merge; elements = { %s }; }', join(', ', cust_v4_elems)));
-	push(lines, sprintf('  set cust_d6 { type ipv6_addr; flags interval; auto-merge; elements = { %s }; }', join(', ', cust_d6_elems)));
-	push(lines, sprintf('  set cust_v6 { type ipv6_addr; flags interval; auto-merge; elements = { %s }; }', join(', ', cust_v6_elems)));
+	push(lines, set_def('cust_d4', 'ipv4_addr', 'flags interval; auto-merge;', cust_d4_elems));
+	push(lines, set_def('cust_v4', 'ipv4_addr', 'flags interval; auto-merge;', cust_v4_elems));
+	push(lines, set_def('cust_d6', 'ipv6_addr', 'flags interval; auto-merge;', cust_d6_elems));
+	push(lines, set_def('cust_v6', 'ipv6_addr', 'flags interval; auto-merge;', cust_v6_elems));
 	push(lines, sprintf('  set cust_d4_dyn { type ipv4_addr; flags timeout; timeout %s; size 8192; }', dyn_timeout));
 	push(lines, sprintf('  set cust_v4_dyn { type ipv4_addr; flags timeout; timeout %s; size 8192; }', dyn_timeout));
 	push(lines, sprintf('  set cust_d6_dyn { type ipv6_addr; flags timeout; timeout %s; size 8192; }', dyn_timeout));
@@ -125,12 +130,12 @@ function render_ruleset(config, geo_cidrs, active_profile) {
 			}
 		}
 	}
-	push(lines, sprintf('  set cli_v_mac { type ether_addr; elements = { %s }; }', join(', ', cli_v_mac_elems)));
-	push(lines, sprintf('  set cli_d_mac { type ether_addr; elements = { %s }; }', join(', ', cli_d_mac_elems)));
-	push(lines, sprintf('  set cli_v_ip4 { type ipv4_addr; flags interval; auto-merge; elements = { %s }; }', join(', ', cli_v_ip4_elems)));
-	push(lines, sprintf('  set cli_d_ip4 { type ipv4_addr; flags interval; auto-merge; elements = { %s }; }', join(', ', cli_d_ip4_elems)));
-	push(lines, sprintf('  set cli_v_ip6 { type ipv6_addr; flags interval; auto-merge; elements = { %s }; }', join(', ', cli_v_ip6_elems)));
-	push(lines, sprintf('  set cli_d_ip6 { type ipv6_addr; flags interval; auto-merge; elements = { %s }; }', join(', ', cli_d_ip6_elems)));
+	push(lines, set_def('cli_v_mac', 'ether_addr', '', cli_v_mac_elems));
+	push(lines, set_def('cli_d_mac', 'ether_addr', '', cli_d_mac_elems));
+	push(lines, set_def('cli_v_ip4', 'ipv4_addr', 'flags interval; auto-merge;', cli_v_ip4_elems));
+	push(lines, set_def('cli_d_ip4', 'ipv4_addr', 'flags interval; auto-merge;', cli_d_ip4_elems));
+	push(lines, set_def('cli_v_ip6', 'ipv6_addr', 'flags interval; auto-merge;', cli_v_ip6_elems));
+	push(lines, set_def('cli_d_ip6', 'ipv6_addr', 'flags interval; auto-merge;', cli_d_ip6_elems));
 
 	// Upstream DNS sets for marked router queries
 	let dns_vpn4_elems = [];
@@ -141,15 +146,15 @@ function render_ruleset(config, geo_cidrs, active_profile) {
 		if (util.is_ipv4(s)) push(dns_vpn4_elems, s);
 		else if (util.is_ipv6(s)) push(dns_vpn6_elems, s);
 	}
-	push(lines, sprintf('  set dns_vpn4 { type ipv4_addr; flags interval; elements = { %s }; }', join(', ', dns_vpn4_elems)));
-	push(lines, sprintf('  set dns_vpn6 { type ipv6_addr; flags interval; elements = { %s }; }', join(', ', dns_vpn6_elems)));
+	push(lines, set_def('dns_vpn4', 'ipv4_addr', 'flags interval;', dns_vpn4_elems));
+	push(lines, set_def('dns_vpn6', 'ipv6_addr', 'flags interval;', dns_vpn6_elems));
 	push(lines, '  set fetch_vpn4 { type ipv4_addr; flags timeout; timeout 10m; }');
 	push(lines, '  set fetch_vpn6 { type ipv6_addr; flags timeout; timeout 10m; }');
 	push(lines, '');
 
 	// --- Verdict Helper Chains ---
-	push(lines, sprintf('  chain set_direct { ct mark set ct mark & %s | %s accept }', clear_mask, direct_mark));
-	push(lines, sprintf('  chain set_vpn    { ct mark set ct mark & %s | %s meta mark set meta mark & %s | %s accept }',
+	push(lines, sprintf('  chain set_direct { ct mark set ct mark & %s | %s; accept; }', clear_mask, direct_mark));
+	push(lines, sprintf('  chain set_vpn    { ct mark set ct mark & %s | %s; meta mark set meta mark & %s | %s; accept; }',
 		clear_mask, vpn_mark, clear_mask, vpn_mark));
 	push(lines, '');
 

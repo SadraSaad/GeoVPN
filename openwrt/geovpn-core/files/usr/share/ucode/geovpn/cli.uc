@@ -10,6 +10,12 @@ import * as cfg from './config.uc';
 import * as state from './state.uc';
 import * as parse from './ovpn_parse.uc';
 import * as render from './ovpn_render.uc';
+import * as nftgen from './nftgen.uc';
+import * as route from './route.uc';
+import * as dnsgen from './dnsgen.uc';
+import * as fwzone from './fwzone.uc';
+import * as diag from './diag.uc';
+import * as data from './data.uc';
 
 function cmd_version() {
 	print('GeoVPN 1.0.0 (OpenWrt 25.12)\n');
@@ -78,6 +84,66 @@ function cmd_import(file_path, name) {
 	return 0;
 }
 
+function load_geo_cidrs(config) {
+	let v4 = [];
+	let v6 = [];
+	let data_dir = '/etc/geovpn/data';
+	if (config && config.geoip) {
+		for (let g in config.geoip) {
+			if (g.enabled != '0' && g.code) {
+				let code = lc(g.code);
+				let f4 = fs.open(sprintf('%s/ip/%s.v4.txt', data_dir, code), 'r');
+				if (f4) {
+					let lines = split(f4.read('all'), '\n');
+					f4.close();
+					for (let l in lines) {
+						let line = trim(l);
+						if (length(line) > 0 && substr(line, 0, 1) != '#' && (util.is_cidr4(line) || util.is_ipv4(line))) {
+							push(v4, line);
+						}
+					}
+				}
+				let f6 = fs.open(sprintf('%s/ip/%s.v6.txt', data_dir, code), 'r');
+				if (f6) {
+					let lines = split(f6.read('all'), '\n');
+					f6.close();
+					for (let l in lines) {
+						let line = trim(l);
+						if (length(line) > 0 && substr(line, 0, 1) != '#' && (util.is_cidr6(line) || util.is_ipv6(line))) {
+							push(v6, line);
+						}
+					}
+				}
+			}
+		}
+	}
+	return { v4: v4, v6: v6 };
+}
+
+function load_geosite_domains(config) {
+	let domains = [];
+	let data_dir = '/etc/geovpn/data';
+	if (config && config.geosite) {
+		for (let s in config.geosite) {
+			if (s.enabled != '0' && s.name) {
+				let name = lc(s.name);
+				let f = fs.open(sprintf('%s/site/%s.txt', data_dir, name), 'r');
+				if (f) {
+					let lines = split(f.read('all'), '\n');
+					f.close();
+					for (let l in lines) {
+						let line = trim(l);
+						if (length(line) > 0 && substr(line, 0, 1) != '#' && util.is_domain(line)) {
+							push(domains, line);
+						}
+					}
+				}
+			}
+		}
+	}
+	return domains;
+}
+
 function cmd_prepare() {
 	state.ensure_run_dir();
 	state.update_state({ service: { state: 'applying' } });
@@ -115,34 +181,24 @@ function cmd_prepare() {
 	f.write(conf_text);
 	f.close();
 
-	// Render ruleset, sets, dnsmasq configs via their modules if present
-	try {
-		let nftgen = require('./nftgen.uc');
-		let route = require('./route.uc');
-		let dnsgen = require('./dnsgen.uc');
-		let fwzone = require('./fwzone.uc');
+	// Render ruleset, sets, dnsmasq configs via their modules
+	let geo_cidrs = load_geo_cidrs(config);
+	let geosite_domains = load_geosite_domains(config);
 
-		fwzone.ensure_firewall_zone(config.main);
-		nftgen.apply_ruleset(config);
-		route.apply_routes(config.main);
-		dnsgen.apply_dnsmasq(config);
-	} catch (e) {
-		util.log('warn', sprintf('Routing subsystem step notice: %s', e));
-	}
+	fwzone.ensure_firewall_zone(config.main);
+	nftgen.apply_ruleset(config, geo_cidrs, profile);
+	route.apply_routes(config.main);
+	dnsgen.apply_dnsmasq(config, geosite_domains, profile);
 
 	state.update_state({ service: { state: 'connecting' } });
 	return 0;
 }
 
 function cmd_teardown() {
-	try {
-		let route = require('./route.uc');
-		let nftgen = require('./nftgen.uc');
-		let dnsgen = require('./dnsgen.uc');
-		route.teardown_routes();
-		nftgen.teardown_ruleset();
-		dnsgen.teardown_dnsmasq();
-	} catch (e) {}
+	let config = cfg.load_config();
+	route.teardown_routes(config ? config.main : null);
+	nftgen.teardown_ruleset();
+	dnsgen.teardown_dnsmasq();
 
 	state.update_state({
 		service: { state: 'disabled' },
@@ -198,10 +254,7 @@ function cmd_hook() {
 			}
 		}
 
-		try {
-			let route = require('./route.uc');
-			route.set_tunnel_up(dev, ipv6_local && length(ipv6_local) > 0);
-		} catch (e) {}
+		route.set_tunnel_up(dev, ipv6_local && length(ipv6_local) > 0);
 
 		state.update_state({
 			service: { state: 'connected' },
@@ -215,10 +268,7 @@ function cmd_hook() {
 		});
 		util.log('info', sprintf('Tunnel up on %s (%s -> %s)', dev, local_ip, remote_ip));
 	} else if (stype == 'down') {
-		try {
-			let route = require('./route.uc');
-			route.set_tunnel_down();
-		} catch (e) {}
+		route.set_tunnel_down();
 
 		state.update_state({
 			service: { state: 'connecting' },
@@ -271,10 +321,8 @@ function main(args) {
 	if (cmd == 'purge') {
 		cmd_teardown();
 		util.safe_exec(['/etc/init.d/geovpn', 'stop']);
-		try {
-			let fwzone = require('./fwzone.uc');
-			fwzone.remove_geovpn_zone();
-		} catch (e) {}
+		let config = cfg.load_config();
+		fwzone.remove_firewall_zone(config ? config.main : null);
 		util.safe_exec(['rm', '-rf', '/etc/geovpn', '/var/run/geovpn']);
 		let cursor = uci.cursor();
 		cursor.delete('geovpn');
@@ -287,39 +335,41 @@ function main(args) {
 	if (cmd == '_teardown') return cmd_teardown();
 	if (cmd == '_reload') { cmd_teardown(); return cmd_prepare(); }
 	if (cmd == '_hook') return cmd_hook();
+	if (cmd == '_wan_event') {
+		let lock_file = '/var/run/geovpn/wan_event.lock';
+		if (fs.stat(lock_file)) return 0;
+		let lk = fs.open(lock_file, 'w');
+		if (lk) lk.close();
+		sleep(2000);
+		fs.unlink(lock_file);
+
+		let cursor = uci.cursor();
+		cursor.load('geovpn');
+		let enabled = cursor.get('geovpn', 'main', 'enabled') == '1';
+		if (!enabled) return 0;
+
+		let config = cfg.load_config();
+		let active_id = config.main.active_profile;
+		let profile = active_id ? cfg.get_profile(active_id) : null;
+		let geosite_domains = load_geosite_domains(config);
+		dnsgen.apply_dnsmasq(config, geosite_domains, profile);
+		return 0;
+	}
 
 	if (cmd == 'diag') {
-		try {
-			let diag = require('./diag.uc');
-			let res = diag.run_diag();
-			print(sprintf('%J\n', res));
-			return 0;
-		} catch (e) {
-			print('Diagnostics completed.\n');
-			return 0;
-		}
+		let res = diag.run_diag();
+		print(sprintf('%J\n', res));
+		return 0;
 	}
 
 	if (cmd == 'test') {
-		try {
-			let diag = require('./diag.uc');
-			let res = diag.test_target(args[1], args[2]);
-			print(sprintf('%J\n', res));
-			return 0;
-		} catch (e) {
-			print(sprintf('Test query: %s -> default\n', args[1] || ''));
-			return 0;
-		}
+		let res = diag.test_target(args[1], args[2]);
+		print(sprintf('%J\n', res));
+		return 0;
 	}
 
 	if (cmd == 'update') {
-		try {
-			let data = require('./data.uc');
-			return data.run_update(length(args) > 1 && args[1] == '--force');
-		} catch (e) {
-			fs.stderr().write('Update module error\n');
-			return 1;
-		}
+		return data.run_update(length(args) > 1 && args[1] == '--force');
 	}
 
 	fs.stderr().write(sprintf('Unknown command: %s\n', cmd));

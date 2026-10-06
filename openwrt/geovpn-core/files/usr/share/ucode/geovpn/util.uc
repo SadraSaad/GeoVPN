@@ -99,6 +99,7 @@ function is_cidr(s) {
 
 function is_domain(s) {
 	if (type(s) != 'string') return false;
+	if (is_ipv4(s)) return false;
 	if (length(s) < 1 || length(s) > 253) return false;
 	// Suffix normalized: strip leading '.' if present
 	if (substr(s, 0, 1) == '.') s = substr(s, 1);

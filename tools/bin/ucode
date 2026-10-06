@@ -1,0 +1,2 @@
+#!/bin/sh
+exec /tmp/ow-rootfs/lib/ld-musl-x86_64.so.1 --library-path /tmp/ow-rootfs/lib:/tmp/ow-rootfs/usr/lib /tmp/ow-rootfs/usr/bin/ucode -L /tmp/ow-rootfs/usr/lib/ucode -L /tmp/ow-rootfs/usr/share/ucode -L /home/sadra/GeoVPN/openwrt/geovpn-core/files/usr/share/ucode "$@"

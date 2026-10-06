@@ -148,21 +148,21 @@ GeoVPN 1.0.0 is completely implemented, verified, and packaged for OpenWrt 25.12
 
 ## 5. Test Results
 
-### Unit Tests (`tests/unit/`): 43 / 43 Passed (100% Green)
-- `test_validators.py` (3 tests): Whitelist regex sanitization, IP/CIDR/domain validation, boundary protection.
-- `test_ovpn_parser.py` (4 tests): Normal configs, inline cert extraction, hostile corpus rejection, line length caps.
-- `test_ovpn_render.py` (2 tests): OpenVPN client config rendering with forced directives.
-- `test_state.py` (3 tests): State transitions, interface byte counters, run directory initialization.
-- `test_nftgen.py` (4 tests): Ruleset generation, bypass vs. include mode, client policies, custom rules.
-- `test_route.py` (3 tests): Table 4200 routes, undo journal rollback, kill-switch unreachable routes.
-- `test_fwzone.py` (2 tests): fw4 zone UCI management and firewall configuration backups.
-- `test_dnsgen.py` (4 tests): Confdir discovery, domain chunking (<=900B / 48 domains), canary NXDOMAIN.
-- `test_data_updater.py` (4 tests): Monotonic build check, usign verification, atomic swap, catalog search.
-- `test_diag.py` (3 tests): Bitmask numeric CIDR matching, route simulator path prediction.
-- `test_rpcd_api.py` (2 tests): Ubus RPC declaration contracts and least-privilege ACL completeness.
+### Unit Tests (`tests/unit/`): 49 / 49 Passed (100% Green)
+- `test_validators.py` (9 tests): Whitelist regex sanitization, IP/CIDR/domain/MAC validation, boundary protection, secret scrubber.
+- `test_ovpn_parser.py` (7 tests): Normal configs, inline cert extraction, hostile corpus rejection, line length caps, UTF-8 BOM, tap rejection.
+- `test_ovpn_render.py` (2 tests): OpenVPN client config rendering with forced directives & real ucode execution.
+- `test_state.py` (1 test): State transitions, atomic status serialization, run directory initialization.
+- `test_nftgen.py` (3 tests): Real bison validation of ruleset generation, bypass vs. include mode, empty sets syntax.
+- `test_route.py` (2 tests): Table 4200 routes, undo journal rollback, kill-switch unreachable routes.
+- `test_fwzone.py` (1 test): fw4 zone UCI management and firewall configuration backups.
+- `test_dnsgen.py` (3 tests): Confdir discovery, domain chunking (<=900B / 48 domains), canary NXDOMAIN, real ucode execution.
+- `test_data_updater.py` (4 tests): Monotonic build check, usign verification, atomic swap, real ucode TSV parsing.
+- `test_diag.py` (3 tests): Bitmask numeric CIDR matching, route simulator path prediction, real ucode diag execution.
+- `test_rpcd_api.py` (3 tests): Ubus RPC declaration contracts, real rpcd ucode module evaluation, least-privilege ACL completeness.
 - `test_luci_views.py` (4 tests): LuCI menu routes, JS syntax validation, XSS prevention, CSS logical properties.
 - `test_translations.py` (3 tests): POT/PO presence, 100% Persian translation coverage, RTL logical properties.
-- `test_packaging.py` (2 tests): Makefile configurations, `PKGARCH:=all`, keep.d entries, README consistency.
+- `test_packaging.py` (4 tests): Makefile configurations, `PKGARCH:=all`, keep.d entries, README consistency.
 
 ### Data Pack Compiler Tests (`data-pack/tests/`): 3 / 3 Passed (100% Green)
 - `test_build_pack.py` (3 tests): Merkle-lite hash tree, CIDR aggregation, subdomain collapsing.

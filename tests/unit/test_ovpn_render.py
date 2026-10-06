@@ -81,6 +81,43 @@ class TestOvpnRender(unittest.TestCase):
         self.assertIn('tls-crypt /etc/geovpn/profiles/p12345678/tls.key\n', rendered)
         self.assertIn('auth-user-pass /etc/geovpn/profiles/p12345678/auth\n', rendered)
 
+    def test_real_ucode_ovpn_render(self):
+        import os, subprocess, tempfile
+        repo_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        ucode_bin = os.path.join(repo_root, 'tools', 'bin', 'ucode')
+        lib_path = os.path.join(repo_root, 'openwrt', 'geovpn-core', 'files', 'usr', 'share', 'ucode')
+        if not os.path.exists(ucode_bin):
+            return
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            for fname in ('ca.crt', 'tls.key', 'auth'):
+                with open(os.path.join(tmpdir, fname), 'w') as f:
+                    f.write('dummy')
+
+            script = f"""
+            import * as render from 'geovpn.ovpn_render';
+            let prof = {{
+                remotes: ['vpn.example.com 1194 udp'],
+                remote_cert_tls: 'server',
+                cipher: 'AES-256-GCM',
+                mssfix: 1450,
+                tls_kind: 'tls-crypt',
+                auth_user_pass: true
+            }};
+            let main = {{ tun_dev: 'geovpn0' }};
+            let out = render.render_ovpn(prof, '{tmpdir}', main);
+            print(out);
+            """
+            proc = subprocess.run([ucode_bin, '-L', lib_path, '-e', script], text=True, capture_output=True)
+            self.assertEqual(proc.returncode, 0, f"ucode error: {proc.stderr}")
+            rendered = proc.stdout
+            self.assertIn('client\n', rendered)
+            self.assertIn('dev geovpn0\n', rendered)
+            self.assertIn('remote vpn.example.com 1194 udp\n', rendered)
+            self.assertIn(f'ca {tmpdir}/ca.crt\n', rendered)
+            self.assertIn(f'tls-crypt {tmpdir}/tls.key\n', rendered)
+            self.assertIn(f'auth-user-pass {tmpdir}/auth\n', rendered)
+
 
 if __name__ == '__main__':
     unittest.main()

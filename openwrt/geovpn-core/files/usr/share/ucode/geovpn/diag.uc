@@ -116,11 +116,11 @@ function test_target(target, client_addr) {
 	let main = config.main || {};
 	let mode = main.mode || 'bypass';
 
-	let is_dom = util.is_domain(target);
 	let is_v4 = util.is_ipv4(target);
 	let is_v6 = util.is_ipv6(target);
+	let is_dom = !is_v4 && !is_v6 && util.is_domain(target);
 
-	let kind = is_dom ? 'domain' : (is_v4 ? 'ipv4' : (is_v6 ? 'ipv6' : 'unknown'));
+	let kind = is_v4 ? 'ipv4' : (is_v6 ? 'ipv6' : (is_dom ? 'domain' : 'unknown'));
 	let resolved_ips = [];
 
 	if (is_dom) {
@@ -191,7 +191,7 @@ function test_target(target, client_addr) {
 	if (config.rules) {
 		for (let rule in config.rules) {
 			if (rule.enabled != '0') {
-				if (rule.type == 'domain' && is_dom && (target == rule.value || index(target, '.' + rule.value) != -1)) {
+				if (rule.type == 'domain' && is_dom && (target == rule.value || (length(target) > length(rule.value) && substr(target, -(length(rule.value) + 1)) == ('.' + rule.value)))) {
 					verdict = rule.action;
 					reason = { layer: 'custom', rule: rule.name || rule.value, set: 'cust_' + rule.action };
 					return { kind: kind, resolved: resolved_ips, verdict: verdict, reason: reason, dns_path: verdict, notes: notes };
@@ -229,7 +229,8 @@ function test_target(target, client_addr) {
 				f.close();
 				for (let d in lines) {
 					let dom = trim(d);
-					if (dom == target || (length(dom) > 0 && index(target, '.' + dom) != -1)) {
+					let dlen = length(dom);
+					if (dom == target || (dlen > 0 && length(target) > dlen && substr(target, -(dlen + 1)) == ('.' + dom))) {
 						verdict = (mode == 'bypass') ? 'direct' : 'vpn';
 						let cname = replace(sf, /^.*\/site\/|\.txt$/g, '');
 						reason = { layer: 'geosite', rule: cname, set: 'geo4_dyn' };

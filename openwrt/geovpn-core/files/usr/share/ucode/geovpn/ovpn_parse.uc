@@ -74,39 +74,40 @@ const INLINE_TAGS = [
 ];
 
 function tokenize_line(line) {
+	let chars = split(line, '');
+	let len = length(chars);
 	let tokens = [];
-	let len = length(line);
 	let i = 0;
 	while (i < len) {
 		// Skip whitespace
-		while (i < len && (line[i] == ' ' || line[i] == '\t')) {
+		while (i < len && (chars[i] == ' ' || chars[i] == '\t')) {
 			i++;
 		}
 		if (i >= len) break;
-		if (line[i] == '#' || line[i] == ';') {
+		if (chars[i] == '#' || chars[i] == ';') {
 			break; // Comment to end of line
 		}
 		let token = '';
-		if (line[i] == '"' || line[i] == "'") {
-			let quote = line[i];
+		if (chars[i] == '"' || chars[i] == "'") {
+			let quote = chars[i];
 			i++;
-			while (i < len && line[i] != quote) {
-				if (line[i] == '\\' && i + 1 < len) {
-					token += line[i + 1];
+			while (i < len && chars[i] != quote) {
+				if (chars[i] == '\\' && i + 1 < len) {
+					token += chars[i + 1];
 					i += 2;
 				} else {
-					token += line[i];
+					token += chars[i];
 					i++;
 				}
 			}
-			if (i < len && line[i] == quote) i++;
+			if (i < len && chars[i] == quote) i++;
 		} else {
-			while (i < len && line[i] != ' ' && line[i] != '\t' && line[i] != '#' && line[i] != ';') {
-				if (line[i] == '\\' && i + 1 < len) {
-					token += line[i + 1];
+			while (i < len && chars[i] != ' ' && chars[i] != '\t' && chars[i] != '#' && chars[i] != ';') {
+				if (chars[i] == '\\' && i + 1 < len) {
+					token += chars[i + 1];
 					i += 2;
 				} else {
-					token += line[i];
+					token += chars[i];
 					i++;
 				}
 			}
@@ -210,7 +211,7 @@ function parse_ovpn(content, profile_name) {
 			}
 		}
 
-		if (length(trimmed) == 0 || trimmed[0] == '#' || trimmed[0] == ';') {
+		if (length(trimmed) == 0 || substr(trimmed, 0, 1) == '#' || substr(trimmed, 0, 1) == ';') {
 			continue;
 		}
 

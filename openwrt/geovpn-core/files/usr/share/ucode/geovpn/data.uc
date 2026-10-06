@@ -28,7 +28,7 @@ function parse_tsv(content) {
 	let lines = split(content, '\n');
 	for (let line in lines) {
 		let l = trim(line);
-		if (length(l) == 0 || l[0] == '#') continue;
+		if (length(l) == 0 || substr(l, 0, 1) == '#') continue;
 		push(rows, split(l, '\t'));
 	}
 	return rows;
@@ -140,7 +140,7 @@ function run_update(force) {
 			// If online fetch fails, check if local fixture/seed exists
 			let local_seed = '/usr/share/geovpn/seed_manifest';
 			if (!fs.stat(local_seed)) {
-				throw sprintf('Failed to download MANIFEST from %s', manifest_url);
+				die(sprintf('Failed to download MANIFEST from %s', manifest_url));
 			}
 		}
 
@@ -156,7 +156,7 @@ function run_update(force) {
 				if (v_res.code != 0) {
 					util.log('warn', 'usign verification failed on MANIFEST; checking downgrade or verification policy');
 					if (!force) {
-						throw 'Manifest cryptographic signature verification failed';
+						die('Manifest cryptographic signature verification failed');
 					}
 				}
 			}
@@ -164,7 +164,7 @@ function run_update(force) {
 
 		// 3. Parse MANIFEST
 		let man_f = fs.open(manifest_tmp, 'r');
-		if (!man_f) throw 'Cannot read MANIFEST';
+		if (!man_f) die('Cannot read MANIFEST');
 		let man_lines = split(man_f.read('all'), '\n');
 		man_f.close();
 
@@ -193,7 +193,7 @@ function run_update(force) {
 
 		let stored_time = +stored_state.build_time || 0;
 		if (!force && stored_time > 0 && build_time > 0 && build_time < stored_time) {
-			throw sprintf('Downgrade rejected: manifest build_time %d is older than current %d', build_time, stored_time);
+			die(sprintf('Downgrade rejected: manifest build_time %d is older than current %d', build_time, stored_time));
 		}
 
 		state.update_update_status({ step: 'download_catalogs', done: 4 });
@@ -206,10 +206,10 @@ function run_update(force) {
 
 		// Verify catalog hashes
 		if (manifest.geoip_catalog_sha256 && sha256_file(geoip_cat_file) != manifest.geoip_catalog_sha256) {
-			throw 'GeoIP catalog hash mismatch';
+			die('GeoIP catalog hash mismatch');
 		}
 		if (manifest.geosite_catalog_sha256 && sha256_file(geosite_cat_file) != manifest.geosite_catalog_sha256) {
-			throw 'GeoSite catalog hash mismatch';
+			die('GeoSite catalog hash mismatch');
 		}
 
 		state.update_update_status({ step: 'download_categories', done: 6 });
@@ -250,7 +250,7 @@ function run_update(force) {
 					if (!util.is_cidr(l) && !util.is_ip(l)) invalid++;
 				}
 				if (total > 0 && (invalid / total) > 0.005) {
-					throw sprintf('File %s has >0.5%% invalid lines (%d/%d)', ipf, invalid, total);
+					die(sprintf('File %s has >0.5%% invalid lines (%d/%d)', ipf, invalid, total));
 				}
 			}
 		}

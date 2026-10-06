@@ -39,6 +39,29 @@ class TestRpcdApi(unittest.TestCase):
         for m in EXPECTED_METHODS:
             self.assertIn(f"{m}:", code, f"Method {m} missing from geovpn.uc")
 
+    def test_rpcd_runtime_evaluation(self):
+        import subprocess
+        repo_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        ucode_bin = os.path.join(repo_root, 'tools', 'bin', 'ucode')
+        lib_path = os.path.join(repo_root, 'openwrt', 'geovpn-core', 'files', 'usr', 'share', 'ucode')
+        plugin_path = os.path.join(repo_root, 'openwrt', 'luci-app-geovpn', 'root', 'usr', 'share', 'rpcd', 'ucode', 'geovpn.uc')
+        if not os.path.exists(ucode_bin):
+            return
+
+        script = f"""
+        let plugin = loadfile('{plugin_path}')();
+        let obj = plugin['luci.geovpn'];
+        let methods = keys(obj);
+        let catalog = obj.geo_catalog.call();
+        print(sprintf('%J', {{ methods: methods, catalog: catalog }}));
+        """
+        proc = subprocess.run([ucode_bin, '-L', lib_path, '-e', script], text=True, capture_output=True)
+        self.assertEqual(proc.returncode, 0, f"Failed to evaluate rpcd plugin: {proc.stderr}")
+        res = json.loads(proc.stdout)
+        self.assertEqual(set(res['methods']), EXPECTED_METHODS)
+        self.assertIn('pack', res['catalog'])
+        self.assertIn('items', res['catalog'])
+
 
 if __name__ == '__main__':
     unittest.main()

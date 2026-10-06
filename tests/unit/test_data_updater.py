@@ -63,6 +63,27 @@ class TestDataUpdater(unittest.TestCase):
         self.assertNotIn("geovpn", removed)
         self.assertIn("/usr/bin/daily-task", removed)
 
+    def test_real_ucode_data_parse_tsv(self):
+        import os, subprocess, json
+        repo_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        ucode_bin = os.path.join(repo_root, 'tools', 'bin', 'ucode')
+        lib_path = os.path.join(repo_root, 'openwrt', 'geovpn-core', 'files', 'usr', 'share', 'ucode')
+        if not os.path.exists(ucode_bin):
+            return
+
+        script = """
+        import * as data from 'geovpn.data';
+        let sample = "ir\\t18\\t2\\thash1\\thash2\\t100\\t50\\nprivate\\t8\\t4\\thash3\\thash4\\t80\\t40\\n";
+        let rows = data.parse_tsv(sample);
+        print(sprintf('%J', rows));
+        """
+        proc = subprocess.run([ucode_bin, '-L', lib_path, '-e', script], text=True, capture_output=True)
+        self.assertEqual(proc.returncode, 0, f"ucode error: {proc.stderr}")
+        rows = json.loads(proc.stdout)
+        self.assertEqual(len(rows), 2)
+        self.assertEqual(rows[0][0], 'ir')
+        self.assertEqual(rows[1][0], 'private')
+
 
 if __name__ == '__main__':
     unittest.main()

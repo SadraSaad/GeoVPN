@@ -47,15 +47,14 @@ function ensure_firewall_zone(main_cfg) {
 	// 1. Configure geovpn zone
 	let zone = cursor.get('firewall', 'geovpn_zone');
 	if (!zone) {
-		cursor.section('firewall', 'zone', 'geovpn_zone', {
-			name: 'geovpn',
-			device: [tun_dev],
-			input: 'REJECT',
-			output: 'ACCEPT',
-			forward: 'REJECT',
-			masq: '1',
-			mtu_fix: '1'
-		});
+		cursor.set('firewall', 'geovpn_zone', 'zone');
+		cursor.set('firewall', 'geovpn_zone', 'name', 'geovpn');
+		cursor.set('firewall', 'geovpn_zone', 'device', [tun_dev]);
+		cursor.set('firewall', 'geovpn_zone', 'input', 'REJECT');
+		cursor.set('firewall', 'geovpn_zone', 'output', 'ACCEPT');
+		cursor.set('firewall', 'geovpn_zone', 'forward', 'REJECT');
+		cursor.set('firewall', 'geovpn_zone', 'masq', '1');
+		cursor.set('firewall', 'geovpn_zone', 'mtu_fix', '1');
 		changed = true;
 	}
 
@@ -64,10 +63,9 @@ function ensure_firewall_zone(main_cfg) {
 		let fwd_name = sprintf('geovpn_fwd_%s', lz);
 		let fwd = cursor.get('firewall', fwd_name);
 		if (!fwd) {
-			cursor.section('firewall', 'forwarding', fwd_name, {
-				src: lz,
-				dest: 'geovpn'
-			});
+			cursor.set('firewall', fwd_name, 'forwarding');
+			cursor.set('firewall', fwd_name, 'src', lz);
+			cursor.set('firewall', fwd_name, 'dest', 'geovpn');
 			changed = true;
 		}
 	}

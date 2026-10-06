@@ -5,7 +5,7 @@
 set -e
 
 if command -v ucode >/dev/null 2>&1; then
-	exec ucode -R /usr/share/ucode/geovpn -e 'import { main } from "cli.uc"; exit(main(ARGV));' -- "$@"
+	exec ucode -L /usr/share/ucode -e 'import { main } from "geovpn.cli"; exit(main(ARGV));' -- "$@"
 fi
 
 # Basic fallback commands when running headless in minimal testing environment

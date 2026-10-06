@@ -6,6 +6,7 @@ set -e
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+export PATH="$REPO_ROOT/tools/bin:$PATH"
 
 PKG_DIR="${1:-$REPO_ROOT/out}"
 FEED_DIR="${2:-$REPO_ROOT/feed/25.12}"

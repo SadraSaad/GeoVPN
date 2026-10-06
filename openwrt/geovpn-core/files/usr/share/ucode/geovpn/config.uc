@@ -5,6 +5,7 @@
 
 import * as fs from 'fs';
 import * as uci from 'uci';
+import * as math from 'math';
 import * as util from './util.uc';
 
 const PROFILES_DIR = '/etc/geovpn/profiles';
@@ -65,7 +66,8 @@ function load_config() {
 function generate_profile_id() {
 	ensure_profiles_dir();
 	for (let i = 0; i < 100; i++) {
-		let hex = sprintf('%08x', int(rand() * 4294967295));
+		let val = (math && math.rand) ? math.rand() : time();
+		let hex = sprintf('%08x', val & 0xffffffff);
 		let id = 'p' + hex;
 		if (!fs.stat(PROFILES_DIR + '/' + id)) {
 			return id;
@@ -97,7 +99,8 @@ function create_profile(parsed_profile) {
 	fs.mkdir(pdir, 0o700);
 
 	let cursor = get_cursor();
-	cursor.section('geovpn', 'profile', id, {
+	cursor.set('geovpn', id, 'profile');
+	let opts = {
 		name: parsed_profile.name || 'Imported Profile',
 		enabled: '1',
 		remote: parsed_profile.remotes || [],
@@ -118,7 +121,10 @@ function create_profile(parsed_profile) {
 		keepalive: parsed_profile.keepalive || '10 60',
 		compress: parsed_profile.compress || 'none',
 		imported_at: sprintf('%d', time())
-	});
+	};
+	for (let k in opts) {
+		cursor.set('geovpn', id, k, opts[k]);
+	}
 	cursor.commit('geovpn');
 
 	// Write inline material files
@@ -130,6 +136,8 @@ function create_profile(parsed_profile) {
 		if (m['tls-crypt']) fs.writefile(pdir + '/tls.key', m['tls-crypt'], 0o600);
 		else if (m['tls-crypt-v2']) fs.writefile(pdir + '/tls.key', m['tls-crypt-v2'], 0o600);
 		else if (m['tls-auth']) fs.writefile(pdir + '/tls.key', m['tls-auth'], 0o600);
+		if (m['crl-verify']) fs.writefile(pdir + '/crl.pem', m['crl-verify'], 0o600);
+		if (m['extra-certs']) fs.writefile(pdir + '/extra.crt', m['extra-certs'], 0o600);
 	}
 
 	return id;
@@ -139,9 +147,13 @@ function delete_profile(id) {
 	if (!util.is_profile_id(id)) return false;
 	let pdir = PROFILES_DIR + '/' + id;
 	if (fs.stat(pdir)) {
-		let files = ['ca.crt', 'cert.crt', 'key.pem', 'tls.key', 'auth', 'extra.crt'];
-		for (let f in files) {
-			fs.unlink(pdir + '/' + f);
+		let entries = fs.lsdir(pdir);
+		if (entries) {
+			for (let e in entries) {
+				if (e != '.' && e != '..') {
+					fs.unlink(pdir + '/' + e);
+				}
+			}
 		}
 		fs.rmdir(pdir);
 	}
@@ -187,6 +199,7 @@ function put_profile_material(id, role, content) {
 	else if (role == 'key') filename = 'key.pem';
 	else if (role == 'tls-auth' || role == 'tls-crypt' || role == 'tls-crypt-v2') filename = 'tls.key';
 	else if (role == 'extra-certs') filename = 'extra.crt';
+	else if (role == 'crl-verify') filename = 'crl.pem';
 
 	if (!filename) return false;
 	let target = pdir + '/' + filename;

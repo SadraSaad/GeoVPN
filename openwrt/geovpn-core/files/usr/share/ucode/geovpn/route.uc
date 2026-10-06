@@ -64,6 +64,7 @@ function rollback(undo_journal) {
 
 function set_tunnel_up(dev, has_ipv6, table_id) {
 	let table = sprintf('%d', table_id || 4200);
+	util.safe_exec(['sysctl', '-w', sprintf('net.ipv4.conf.%s.rp_filter=2', dev)]);
 	util.safe_exec(['ip', '-4', 'route', 'replace', 'default', 'dev', dev, 'table', table, 'metric', '10']);
 	if (has_ipv6) {
 		util.safe_exec(['ip', '-6', 'route', 'replace', 'default', 'dev', dev, 'table', table, 'metric', '10']);

@@ -76,6 +76,34 @@ class TestDiag(unittest.TestCase):
         res_vpn = simulate_test_target('vpn.myprovider.com', cfg, geo)
         self.assertEqual(res_vpn['verdict'], 'direct')
 
+    def test_real_ucode_diag(self):
+        import os, subprocess, json
+        repo_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        ucode_bin = os.path.join(repo_root, 'tools', 'bin', 'ucode')
+        lib_path = os.path.join(repo_root, 'openwrt', 'geovpn-core', 'files', 'usr', 'share', 'ucode')
+        if not os.path.exists(ucode_bin):
+            return
+
+        script = """
+        import * as diag from 'geovpn.diag';
+        let m1 = diag.match_cidr4('192.168.1.50', '192.168.1.0/24');
+        let m2 = diag.match_cidr4('192.168.2.50', '192.168.1.0/24');
+        let t1 = diag.test_target('10.0.0.1');
+        let t2 = diag.test_target('example.com');
+        print(sprintf('%J', { m1: m1, m2: m2, t1: t1, t2: t2 }));
+        """
+        proc = subprocess.run([ucode_bin, '-L', lib_path, '-e', script], text=True, capture_output=True)
+        self.assertEqual(proc.returncode, 0, f"ucode error: {proc.stderr}")
+        res = json.loads(proc.stdout)
+        self.assertTrue(res['m1'])
+        self.assertFalse(res['m2'])
+        # 10.0.0.1 must be recognized as IPv4 private direct, not domain
+        self.assertEqual(res['t1']['kind'], 'ipv4')
+        self.assertEqual(res['t1']['verdict'], 'direct')
+        self.assertEqual(res['t1']['reason']['layer'], 'private')
+        # example.com must be recognized as domain
+        self.assertEqual(res['t2']['kind'], 'domain')
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -4,75 +4,30 @@ Unit tests for GeoVPN OpenVPN Config Parser (.ovpn) and Hostile Corpus Defense
 """
 import unittest
 import re
+import os
+import subprocess
+import json
 
 MAX_CONFIG_SIZE = 131072
 MAX_LINE_LEN = 4096
 MAX_REMOTES = 64
 
-DENIED_DIRECTIVES = {
-    'up', 'down', 'route-up', 'route-pre-down', 'up-delay', 'tls-verify',
-    'ipchange', 'learn-address', 'client-connect', 'client-disconnect',
-    'auth-user-pass-verify', 'plugin', 'script-security', 'management',
-    'management-client', 'management-query-passwords', 'management-hold',
-    'daemon', 'log', 'log-append', 'syslog', 'writepid', 'status', 'status-version',
-    'cd', 'chroot', 'setcon', 'config', 'askpass', 'ifconfig-noexec',
-    'route-noexec', 'iproute', 'engine', 'providers', 'echo', 'lladdr',
-    'bind-dev', 'mark', 'setenv', 'dev-node', 'genkey', 'secret'
-}
-
-ROUTING_DIRECTIVES = {
-    'redirect-gateway', 'route', 'route-ipv6', 'route-metric',
-    'route-delay', 'route-gateway', 'dhcp-option', 'block-outside-dns',
-    'ifconfig', 'ifconfig-ipv6'
-}
-
-INLINE_TAGS = {
-    'ca', 'cert', 'key', 'tls-auth', 'tls-crypt', 'tls-crypt-v2',
-    'extra-certs', 'crl-verify', 'peer-fingerprint'
-}
-
-def tokenize_line(line):
-    tokens = []
-    i = 0
-    length = len(line)
-    while i < length:
-        while i < length and line[i] in ' \t':
-            i += 1
-        if i >= length or line[i] in '#;':
-            break
-        token = ''
-        if line[i] in ('"', "'"):
-            quote = line[i]
-            i += 1
-            while i < length and line[i] != quote:
-                if line[i] == '\\' and i + 1 < length:
-                    token += line[i + 1]
-                    i += 2
-                else:
-                    token += line[i]
-                    i += 1
-            if i < length and line[i] == quote:
-                i += 1
-        else:
-            while i < length and line[i] not in ' \t#;':
-                if line[i] == '\\' and i + 1 < length:
-                    token += line[i + 1]
-                    i += 2
-                else:
-                    token += line[i]
-                    i += 1
-        if token:
-            tokens.append(token)
-    return tokens
-
 def parse_ovpn(content, profile_name='Imported Profile'):
-    if not isinstance(content, str):
-        return {'ok': False, 'error': 'Content must be string'}
-    if len(content.encode('utf-8')) > MAX_CONFIG_SIZE:
-        return {'ok': False, 'error': 'Config size exceeds 128 KB limit'}
-
-    if content.startswith('\ufeff'):
-        content = content[1:]
+    repo_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    ucode_bin = os.path.join(repo_root, 'tools', 'bin', 'ucode')
+    lib_path = os.path.join(repo_root, 'openwrt', 'geovpn-core', 'files', 'usr', 'share', 'ucode')
+    if os.path.exists(ucode_bin):
+        script = """
+        import * as parser from 'geovpn.ovpn_parse';
+        import * as fs from 'fs';
+        let content = fs.readfile('/dev/stdin');
+        let res = parser.parse_ovpn(content, ARGV[0]);
+        print(sprintf('%J', res));
+        """
+        proc = subprocess.run([ucode_bin, '-L', lib_path, '-e', script, profile_name], input=content, text=True, capture_output=True)
+        if proc.returncode != 0:
+            return {'ok': False, 'error': proc.stderr.strip()}
+        return json.loads(proc.stdout)
 
     content = content.replace('\r\n', '\n').replace('\r', '\n')
     lines = content.split('\n')

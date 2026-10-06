@@ -88,6 +88,29 @@ class TestDnsGen(unittest.TestCase):
         self.assertIn('server=/vpn.server.net/192.0.2.1\n', conf)
         self.assertIn('nftset=/vpn.server.net/4#inet#geovpn#always4_dyn,6#inet#geovpn#always6_dyn\n', conf)
         self.assertIn('server=/digikala.com/varzesh3.com/192.0.2.1\n', conf)
+        self.assertIn('address=/use-application-dns.net/\n', conf)
+
+    def test_real_ucode_dnsgen(self):
+        import os, subprocess
+        repo_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        ucode_bin = os.path.join(repo_root, 'tools', 'bin', 'ucode')
+        lib_path = os.path.join(repo_root, 'openwrt', 'geovpn-core', 'files', 'usr', 'share', 'ucode')
+        if not os.path.exists(ucode_bin):
+            return
+
+        script = """
+        import * as dnsgen from 'geovpn.dnsgen';
+        let cfg = { main: { mode: 'bypass', dns_canary: '1' } };
+        let domains = ['digikala.com', 'varzesh3.com'];
+        let prof = { remotes: ['vpn.server.net 1194 udp'] };
+        let conf = dnsgen.render_dnsmasq_conf(cfg, domains, prof);
+        print(conf);
+        """
+        proc = subprocess.run([ucode_bin, '-L', lib_path, '-e', script], text=True, capture_output=True)
+        self.assertEqual(proc.returncode, 0, f"ucode error: {proc.stderr}")
+        conf = proc.stdout
+        self.assertIn('no-resolv\n', conf)
+        self.assertIn('nftset=/vpn.server.net/4#inet#geovpn#always4_dyn,6#inet#geovpn#always6_dyn\n', conf)
         self.assertIn('nftset=/digikala.com/varzesh3.com/4#inet#geovpn#geo4_dyn,6#inet#geovpn#geo6_dyn\n', conf)
         self.assertIn('address=/use-application-dns.net/\n', conf)
 
