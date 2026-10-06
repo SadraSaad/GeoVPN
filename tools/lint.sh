@@ -96,7 +96,18 @@ for f in $UC_FILES; do
 				echo "OK: ucode -c passed: $(basename "$f")"
 			fi
 		elif command -v node >/dev/null 2>&1; then
-			if ! node --input-type=module --check < "$f" 2>/dev/null; then
+			if ! python3 -c "
+import subprocess, re, sys
+code = open('$f').read()
+if 'export {' not in code and re.search(r'^return\s*\{', code, re.M):
+    test_code = re.sub(r'^return\s*\{', 'export default {', code, count=1, flags=re.M)
+else:
+    test_code = code
+proc = subprocess.run(['node', '--input-type=module', '--check'], input=test_code, text=True, capture_output=True)
+if proc.returncode != 0:
+    print(proc.stderr, file=sys.stderr)
+    sys.exit(1)
+"; then
 				echo "FAIL: Syntax error in $f"
 				FAIL=1
 			else

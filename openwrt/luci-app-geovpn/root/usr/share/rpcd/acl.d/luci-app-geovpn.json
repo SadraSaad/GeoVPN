@@ -1,0 +1,36 @@
+{
+  "luci-app-geovpn": {
+    "description": "Grant access to GeoVPN",
+    "read": {
+      "uci": [
+        "geovpn"
+      ],
+      "ubus": {
+        "luci.geovpn": [
+          "status",
+          "logs",
+          "geo_catalog",
+          "geo_update_status",
+          "test_target",
+          "diag"
+        ]
+      }
+    },
+    "write": {
+      "uci": [
+        "geovpn"
+      ],
+      "ubus": {
+        "luci.geovpn": [
+          "import_ovpn",
+          "profile_set_credentials",
+          "profile_put_material",
+          "profile_delete",
+          "service",
+          "panic",
+          "geo_update"
+        ]
+      }
+    }
+  }
+}
