@@ -28,12 +28,12 @@ cd "$FEED_DIR"
 echo "--> Generating package index (packages.adb)..."
 if command -v apk >/dev/null 2>&1; then
 	if [ -f "$KEY_PATH" ]; then
-		apk mkndx --output packages.adb *.apk
+		apk mkndx --output packages.adb ./*.apk
 		echo "--> Signing package index..."
 		apk adbsign --sign-key "$KEY_PATH" packages.adb
 	else
 		echo "NOTICE: No signing key found at $KEY_PATH. Generating unsigned index."
-		apk mkndx --output packages.adb *.apk
+		apk mkndx --output packages.adb ./*.apk
 	fi
 else
 	echo "NOTICE: apk tool not found locally. Generating SHA256SUMS."

@@ -4,7 +4,7 @@
 #
 START=95
 STOP=10
-USE_PROCD=1
+export USE_PROCD=1
 
 PROG=/usr/sbin/openvpn
 RUN_DIR=/var/run/geovpn
