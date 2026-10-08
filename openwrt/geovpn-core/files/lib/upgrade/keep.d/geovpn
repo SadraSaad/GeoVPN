@@ -1,3 +1,7 @@
 /etc/config/geovpn
 /etc/geovpn/profiles
+/etc/geovpn/credentials
+/etc/geovpn/backup
 /etc/geovpn/keys
+/etc/geovpn/data/catalog
+/etc/geovpn/data/custom

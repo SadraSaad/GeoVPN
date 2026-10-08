@@ -115,10 +115,81 @@ function formatUptime(seconds) {
 	return parts.join(' ');
 }
 
+function renderTestStatusBadge(status) {
+	var st = (status || 'unknown').toLowerCase();
+	var label = st.toUpperCase();
+	var cls = 'gv-badge-disabled';
+	var bg = 'rgba(127, 127, 127, 0.15)';
+	var color = '#8b949e';
+	var border = 'rgba(127, 127, 127, 0.4)';
+
+	if (st === 'pass') {
+		cls = 'gv-badge-pass';
+		bg = 'rgba(46, 160, 67, 0.2)';
+		color = '#2da44e';
+		border = 'rgba(46, 160, 67, 0.6)';
+	} else if (st === 'warn') {
+		cls = 'gv-badge-warn';
+		bg = 'rgba(210, 153, 34, 0.2)';
+		color = '#d29922';
+		border = 'rgba(210, 153, 34, 0.6)';
+	} else if (st === 'fail') {
+		cls = 'gv-badge-fail';
+		bg = 'rgba(248, 81, 73, 0.2)';
+		color = '#f85149';
+		border = 'rgba(248, 81, 73, 0.6)';
+	}
+
+	return E('span', {
+		'class': 'gv-badge ' + cls,
+		'style': 'display: inline-flex; align-items: center; justify-content: center; min-width: 54px; padding: 2px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; background-color: ' + bg + '; color: ' + color + '; border: 1px solid ' + border + ';'
+	}, [ label ]);
+}
+
+function renderExperimentalBadge() {
+	return E('span', {
+		'class': 'gv-badge gv-badge-experimental',
+		'style': 'display: inline-flex; align-items: center; justify-content: center; padding: 2px 6px; border-radius: 10px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; background-color: rgba(210, 153, 34, 0.2); color: #d29922; border: 1px solid rgba(210, 153, 34, 0.6); margin-inline-start: 4px;'
+	}, [ _('Experimental') ]);
+}
+
+function renderProtoBadge(proto) {
+	var p = (proto || 'openvpn').toLowerCase();
+	var label = (p === 'wireguard' || p === 'wg') ? 'WireGuard' : ((p === 'ikev2') ? 'IKEv2' : 'OpenVPN');
+	var cls = (p === 'wireguard' || p === 'wg') ? 'gv-badge-wg' : ((p === 'ikev2') ? 'gv-badge-ikev2' : 'gv-badge-ovpn');
+
+	var badge = E('span', {
+		'class': 'gv-badge ' + cls,
+		'style': 'display: inline-flex; align-items: center; justify-content: center; padding: 2px 8px; border-radius: 12px; font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;'
+	}, [ label ]);
+
+	if (p === 'ikev2') {
+		var exp = renderExperimentalBadge();
+		return E('span', { 'style': 'display: inline-flex; align-items: center;' }, [ badge, exp ]);
+	}
+	return badge;
+}
+
+function renderProviderBadge(provider) {
+	var prov = (provider || 'generic').toLowerCase();
+	var isWindscribe = (prov === 'windscribe');
+	var label = isWindscribe ? 'Windscribe' : 'Generic';
+	var cls = isWindscribe ? 'gv-badge-windscribe' : 'gv-badge-generic';
+
+	return E('span', {
+		'class': 'gv-badge ' + cls,
+		'style': 'display: inline-flex; align-items: center; justify-content: center; padding: 2px 8px; border-radius: 12px; font-size: 0.78rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;'
+	}, [ label ]);
+}
+
 return baseclass.extend({
 	loadStylesheet: loadStylesheet,
 	renderBadge: renderBadge,
 	renderCheckBadge: renderCheckBadge,
+	renderTestStatusBadge: renderTestStatusBadge,
+	renderProtoBadge: renderProtoBadge,
+	renderExperimentalBadge: renderExperimentalBadge,
+	renderProviderBadge: renderProviderBadge,
 	renderLtr: renderLtr,
 	formatBytes: formatBytes,
 	formatUptime: formatUptime

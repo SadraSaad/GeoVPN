@@ -1,0 +1,88 @@
+#!/bin/sh
+#
+# GeoVPN strongSwan IKEv2 updown lifecycle hook
+# Assigns virtual IP (VIP) to the route-based XFRM interface and triggers GeoVPN routing hooks.
+#
+set -e
+
+verb="${PLUTO_VERB:-}"
+if [ "$verb" != "up-client" ] && [ "$verb" != "up-host" ] && \
+   [ "$verb" != "down-client" ] && [ "$verb" != "down-host" ]; then
+	exit 0
+fi
+
+conn="${PLUTO_CONNECTION:-gv_active}"
+if echo "$conn" | grep -q "^gv_test_"; then
+	dev="gvt0"
+	jid=$(echo "$conn" | sed 's/^gv_test_//')
+	HOOK_DIR="/var/run/geovpn/test/$jid"
+	GV_CTX="test:$jid"
+else
+	dev="geovpn0"
+	HOOK_DIR="/var/run/geovpn"
+	GV_CTX="active"
+fi
+
+mkdir -p "$HOOK_DIR"
+chmod 0700 "$HOOK_DIR"
+ENV_FILE="$HOOK_DIR/hook.env"
+
+case "$verb" in
+	up-client|up-host)
+		# Install virtual IP(s) on the XFRM interface
+		if [ -n "${PLUTO_MY_SOURCEIP:-}" ]; then
+			ip -4 address add "${PLUTO_MY_SOURCEIP}/32" dev "$dev" 2>/dev/null || true
+		fi
+		if [ -n "${PLUTO_MY_SOURCEIP6:-}" ]; then
+			ip -6 address add "${PLUTO_MY_SOURCEIP6}/128" dev "$dev" 2>/dev/null || true
+		fi
+
+		# Record tunnel DNS if pushed via configuration payload
+		dns_entries=$(env | grep -E '^PLUTO_DNS([46]_[0-9]+)?=' | cut -d= -f2 | tr ' ' '\n' | grep -E '^([0-9]{1,3}\.){3}[0-9]{1,3}$|^[0-9a-fA-F:]+$' || true)
+		if [ -n "$dns_entries" ]; then
+			echo "$dns_entries" > "$HOOK_DIR/pushed_dns"
+		fi
+
+		umask 0077
+		cat <<EOF > "$ENV_FILE"
+script_type=up
+dev=$dev
+proto=ikev2
+GV_CTX=$GV_CTX
+ifconfig_local=${PLUTO_MY_SOURCEIP:-}
+ifconfig_ipv6_local=${PLUTO_MY_SOURCEIP6:-}
+trusted_ip=${PLUTO_PEER:-}
+EOF
+
+		geovpn_bin="${GEOVPN_BIN:-/usr/bin/geovpn}"
+		if [ -x "$geovpn_bin" ]; then
+			exec "$geovpn_bin" _hook "$ENV_FILE"
+		fi
+		;;
+
+	down-client|down-host)
+		# Remove virtual IP(s) from the XFRM interface
+		if [ -n "${PLUTO_MY_SOURCEIP:-}" ]; then
+			ip -4 address del "${PLUTO_MY_SOURCEIP}/32" dev "$dev" 2>/dev/null || true
+		fi
+		if [ -n "${PLUTO_MY_SOURCEIP6:-}" ]; then
+			ip -6 address del "${PLUTO_MY_SOURCEIP6}/128" dev "$dev" 2>/dev/null || true
+		fi
+
+		umask 0077
+		cat <<EOF > "$ENV_FILE"
+script_type=down
+dev=$dev
+proto=ikev2
+GV_CTX=$GV_CTX
+trusted_ip=${PLUTO_PEER:-}
+EOF
+
+		geovpn_bin="${GEOVPN_BIN:-/usr/bin/geovpn}"
+		if [ -x "$geovpn_bin" ]; then
+			exec "$geovpn_bin" _hook "$ENV_FILE"
+		fi
+		;;
+esac
+
+exit 0

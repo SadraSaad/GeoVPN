@@ -823,3 +823,736 @@ msgstr ""
 msgid "e.g. wiki.corp.example or 203.0.113.0/24"
 msgstr ""
 
+
+msgid "%d Profiles Ready"
+msgstr ""
+
+msgid "%d files ready"
+msgstr ""
+
+msgid "+ Add Custom"
+msgstr ""
+
+msgid "+ Add as custom tag: "
+msgstr ""
+
+msgid "+ Import Profiles"
+msgstr ""
+
+msgid "+ New Credential Set"
+msgstr ""
+
+msgid "0 files in queue"
+msgstr ""
+
+msgid "Action Needed"
+msgstr ""
+
+msgid "Allowed IPs"
+msgstr ""
+
+msgid "Batch Import Summary"
+msgstr ""
+
+msgid "Batch Preview & Review"
+msgstr ""
+
+msgid "Batch import error: "
+msgstr ""
+
+msgid "Browse Files"
+msgstr ""
+
+msgid "Cancel Job"
+msgstr ""
+
+msgid "Cannot start test: "
+msgstr ""
+
+msgid "Clean Up Test State"
+msgstr ""
+
+msgid "Cleanup completed with %d remaining items."
+msgstr ""
+
+msgid "Cleanup error: "
+msgstr ""
+
+msgid "Clear Queue"
+msgstr ""
+
+msgid "Close"
+msgstr ""
+
+msgid "Commit Batch Import (%d profiles)"
+msgstr ""
+
+msgid "Connect"
+msgstr ""
+
+msgid "Connect Now"
+msgstr ""
+
+msgid "Connection & HTTP probes successful"
+msgstr ""
+
+msgid "Connection succeeded with warnings"
+msgstr ""
+
+msgid "Connection test failed"
+msgstr ""
+
+msgid "Create Shared Credential Set"
+msgstr ""
+
+msgid "Credential Set ID"
+msgstr ""
+
+msgid "Credential set created: "
+msgstr ""
+
+msgid "Credentials are saved securely as root-only 0600 secret files under /etc/geovpn/credentials/. Multiple profiles can reference the same credential set."
+msgstr ""
+
+msgid "DNS Resolvers"
+msgstr ""
+
+msgid "Deduplication Policy"
+msgstr ""
+
+msgid "Diagnostic Detail"
+msgstr ""
+
+msgid "Diagnostic Hint"
+msgstr ""
+
+msgid "Display capped: Showing first 200 of %d profiles."
+msgstr ""
+
+msgid "Drag & Drop .ovpn, .conf, and .sswan Configuration Files Here"
+msgstr ""
+
+msgid "Edit Profile"
+msgstr ""
+
+msgid "Endpoint Host"
+msgstr ""
+
+msgid "Endpoint Port"
+msgstr ""
+
+msgid "Engine busy"
+msgstr ""
+
+msgid "Enter new password (leave empty to keep unchanged)"
+msgstr ""
+
+msgid "Enter new preshared key (leave empty to keep unchanged)"
+msgstr ""
+
+msgid "Enter new private key (leave empty to keep unchanged)"
+msgstr ""
+
+msgid "Enter username"
+msgstr ""
+
+msgid "Error saving profile: "
+msgstr ""
+
+msgid "Error updating profile: "
+msgstr ""
+
+msgid "Errors"
+msgstr ""
+
+msgid "Exceeds 128 KB size limit"
+msgstr ""
+
+msgid "Failed"
+msgstr ""
+
+msgid "Failed to create credential set: "
+msgstr ""
+
+msgid "Failed to load profile: "
+msgstr ""
+
+msgid "Failed to process batch"
+msgstr ""
+
+msgid "File Name"
+msgstr ""
+
+msgid "Generic (Standard OpenVPN & WireGuard)"
+msgstr ""
+
+msgid "GeoVPN — Connection Profiles"
+msgstr ""
+
+msgid "GeoVPN — Profile & Batch Importer"
+msgstr ""
+
+msgid "GeoVPN — Test Panel"
+msgstr ""
+
+msgid "HTTP Probe (Latency / Loss)"
+msgstr ""
+
+msgid "HTTP Probe Latency"
+msgstr ""
+
+msgid "HTTP Probe Target"
+msgstr ""
+
+msgid "Handshake"
+msgstr ""
+
+msgid "Handshake Latency"
+msgstr ""
+
+msgid "Import Completed"
+msgstr ""
+
+msgid "Import More"
+msgstr ""
+
+msgid "Import Preset"
+msgstr ""
+
+msgid "Import Profiles"
+msgstr ""
+
+msgid "Import Settings & Credentials"
+msgstr ""
+
+msgid "Interface Address"
+msgstr ""
+
+msgid "Invalid"
+msgstr ""
+
+msgid "Keep both (rename duplicates with numbered suffix)"
+msgstr ""
+
+msgid "Key"
+msgstr ""
+
+msgid "Key + PSK"
+msgstr ""
+
+msgid "Key required"
+msgstr ""
+
+msgid "Launching pre-connection test job..."
+msgstr ""
+
+msgid "MTU / Keepalive"
+msgstr ""
+
+msgid "Max Handshake"
+msgstr ""
+
+msgid "Max Latency"
+msgstr ""
+
+msgid "Max Packet Loss"
+msgstr ""
+
+msgid "New Credential Set"
+msgstr ""
+
+msgid "No VPN profiles configured to test."
+msgstr ""
+
+msgid "No VPN profiles configured. Import .ovpn or .conf files to get started."
+msgstr ""
+
+msgid "No categories found in catalog."
+msgstr ""
+
+msgid "No files selected yet. Drag and drop configuration files above."
+msgstr ""
+
+msgid "No passing or warning profiles found to connect. Run tests first."
+msgstr ""
+
+msgid "No valid files in queue to import."
+msgstr ""
+
+msgid "None (use profile key file)"
+msgstr ""
+
+msgid "None / Inline credentials"
+msgstr ""
+
+msgid "Notice: IKEv2 configuration is experimental. Standard strongSwan client packages are required."
+msgstr ""
+
+msgid "OK"
+msgstr ""
+
+msgid "OpenVPN Configuration File"
+msgstr ""
+
+msgid "OpenVPN profile updated successfully."
+msgstr ""
+
+msgid "Optimal route"
+msgstr ""
+
+msgid "Overwrite duplicates (update endpoints and keys)"
+msgstr ""
+
+msgid "Password (Write-Only)"
+msgstr ""
+
+msgid "Password (for OpenVPN)"
+msgstr ""
+
+msgid "Please select one or more profiles to test."
+msgstr ""
+
+msgid "Please specify a credential set ID."
+msgstr ""
+
+msgid "Pre-Connection Test"
+msgstr ""
+
+msgid "Pre-Connection Test Engine"
+msgstr ""
+
+msgid "Pre-Connection Test Results"
+msgstr ""
+
+msgid "Pre-connection testing creates isolated temporary links (gvt0) under fail-closed table 4300 with zero leakage into the active VPN tunnel or LAN. Results are scored against configured latency and handshake thresholds."
+msgstr ""
+
+msgid "Preshared Key (Optional)"
+msgstr ""
+
+msgid "Private Key (Secret)"
+msgstr ""
+
+msgid "Profile"
+msgstr ""
+
+msgid "Protocol"
+msgstr ""
+
+msgid "Protocol & Provider"
+msgstr ""
+
+msgid "Read error"
+msgstr ""
+
+msgid "Recommendation: "
+msgstr ""
+
+msgid "Routing Table"
+msgstr ""
+
+msgid "Save Credentials"
+msgstr ""
+
+msgid "Save error: "
+msgstr ""
+
+msgid "Score / Status"
+msgstr ""
+
+msgid "Search category (e.g. ir, google)..."
+msgstr ""
+
+msgid "Server Public Key"
+msgstr ""
+
+msgid "Shared Credential Set"
+msgstr ""
+
+msgid "Shared User/Pass"
+msgstr ""
+
+msgid "Size"
+msgstr ""
+
+msgid "Skip duplicates (preserve existing profile)"
+msgstr ""
+
+msgid "Skipped (Duplicates)"
+msgstr ""
+
+msgid "Starting runner..."
+msgstr ""
+
+msgid "Successfully Imported"
+msgstr ""
+
+msgid "Supports multiple files at once (up to 50 files, max 128 KB each)"
+msgstr ""
+
+msgid "Test"
+msgstr ""
+
+msgid "Test All Profiles"
+msgstr ""
+
+msgid "Test Panel"
+msgstr ""
+
+msgid "Test Result"
+msgstr ""
+
+msgid "Test Result: %s"
+msgstr ""
+
+msgid "Test Selected"
+msgstr ""
+
+msgid "Test environment cleanly verified: 0 residual routes, rules, or test interfaces."
+msgstr ""
+
+msgid "Test failed to launch: "
+msgstr ""
+
+msgid "Test in Test Panel"
+msgstr ""
+
+msgid "Test job cancelled."
+msgstr ""
+
+msgid "Test job finished successfully."
+msgstr ""
+
+msgid "Test job in progress..."
+msgstr ""
+
+msgid "Test launch failed: "
+msgstr ""
+
+msgid "Test poll error: "
+msgstr ""
+
+msgid "Testing..."
+msgstr ""
+
+msgid "Untested"
+msgstr ""
+
+msgid "Username (for OpenVPN)"
+msgstr ""
+
+msgid "View Profiles"
+msgstr ""
+
+msgid "WG Pre-shared Key"
+msgstr ""
+
+msgid "WG Private Key"
+msgstr ""
+
+msgid "Windscribe (Automatic DNS 10.255.255.3 & port tuning)"
+msgstr ""
+
+msgid "Windscribe Protocol Support Notice"
+msgstr ""
+
+msgid "WireGuard Pre-shared Key (optional)"
+msgstr ""
+
+msgid "WireGuard Private Key (optional)"
+msgstr ""
+
+msgid "WireGuard profile updated successfully."
+msgstr ""
+
+msgid "Write-only: current password is never prefilled to prevent exposure."
+msgstr ""
+
+msgid "Write-only: current private key is never displayed to prevent exposure."
+msgstr ""
+
+msgid "Write-only: leave empty unless updating preshared key."
+msgstr ""
+
+msgid "★ Connect to Best"
+msgstr ""
+
+msgid "Connect to top-scoring profile \"%s\" (Status: %s, Latency: %d ms)?"
+msgstr ""
+
+msgid "Currently probing \"%s\"..."
+msgstr ""
+
+msgid "Delete profile \"%s\"?"
+msgstr ""
+
+msgid "Edit Profile: \"%s\""
+msgstr ""
+
+msgid "Failed to process batch slice"
+msgstr ""
+
+msgid "Issues encountered during import:"
+msgstr ""
+
+msgid "None (inline username/password)"
+msgstr ""
+
+msgid "Space-separated IP addresses or \"auto\" for WAN DHCP servers."
+msgstr ""
+
+msgid "Space-separated IP addresses or \"pushed\" to use server-pushed resolvers."
+msgstr ""
+
+msgid "Standard OpenVPN (UDP/TCP) and WireGuard configurations are fully supported with high performance. Please note that Windscribe \"Stealth\" (TLS encapsulation over TCP 443 via Stunnel) and \"WStunnel\" (WebSocket encapsulation) require proprietary wrapper binaries not included in standard OpenWrt."
+msgstr ""
+
+msgid "Testing profile \"%s\" (handshake & HTTP probe)..."
+msgstr ""
+
+msgid "Auto-Connect & Failover"
+msgstr ""
+
+msgid "GeoVPN — Auto-Connect & Failover"
+msgstr ""
+
+msgid "Health & Failover Telemetry"
+msgstr ""
+
+msgid "Healthy"
+msgstr ""
+
+msgid "Degraded"
+msgstr ""
+
+msgid "Failing"
+msgstr ""
+
+msgid "Down"
+msgstr ""
+
+msgid "Unknown"
+msgstr ""
+
+msgid "Runtime Override Active (Temporary)"
+msgstr ""
+
+msgid "Persisted in UCI"
+msgstr ""
+
+msgid "Switch to Primary Profile"
+msgstr ""
+
+msgid "Failed to clear override: "
+msgstr ""
+
+msgid "Active Tunnel Profile"
+msgstr ""
+
+msgid "Consecutive Failures"
+msgstr ""
+
+msgid "%d / %d failures"
+msgstr ""
+
+msgid "Recent Metrics"
+msgstr ""
+
+msgid "Handshake Age"
+msgstr ""
+
+msgid "HTTP Latency"
+msgstr ""
+
+msgid "Packet Loss"
+msgstr ""
+
+msgid "Rate Limits & Cooldown"
+msgstr ""
+
+msgid "Switch Cooldown: "
+msgstr ""
+
+msgid "Ready (No cooldown)"
+msgstr ""
+
+msgid "Cooldown active: %ds remaining"
+msgstr ""
+
+msgid "Switches in Last Hour: "
+msgstr ""
+
+msgid "%d / %d"
+msgstr ""
+
+msgid "Failover Backoff: "
+msgstr ""
+
+msgid "Exponential backoff active: %ds remaining"
+msgstr ""
+
+msgid "Manual Health Check"
+msgstr ""
+
+msgid "Run Health Check Now"
+msgstr ""
+
+msgid "Running Health Check..."
+msgstr ""
+
+msgid "Health check failed: "
+msgstr ""
+
+msgid "Auto-Connect & Health Policies"
+msgstr ""
+
+msgid "Auto-Connect Mode"
+msgstr ""
+
+msgid "Manual Only (Off)"
+msgstr ""
+
+msgid "Connect Gate Only"
+msgstr ""
+
+msgid "Connect Best After Testing"
+msgstr ""
+
+msgid "Ordered Fallback List"
+msgstr ""
+
+msgid "Defines connection strategy: off (manual), gate (require test pass), best (connect top-ranked passing profile), fallback (ordered list)."
+msgstr ""
+
+msgid "Connect Gate"
+msgstr ""
+
+msgid "Off (Connect immediately without test)"
+msgstr ""
+
+msgid "Warn (Test before connect, warn on failure)"
+msgstr ""
+
+msgid "Require (Strict: abort connect if test fails)"
+msgstr ""
+
+msgid "Enforce pre-connection test before activating a profile. Require aborts connect if test fails."
+msgstr ""
+
+msgid "Health Checks Enabled"
+msgstr ""
+
+msgid "Enable periodic cron health ticks (no resident daemon)"
+msgstr ""
+
+msgid "Health Tick Interval"
+msgstr ""
+
+msgid "60 seconds (1 minute)"
+msgstr ""
+
+msgid "120 seconds (2 minutes - Default)"
+msgstr ""
+
+msgid "180 seconds (3 minutes)"
+msgstr ""
+
+msgid "300 seconds (5 minutes)"
+msgstr ""
+
+msgid "600 seconds (10 minutes)"
+msgstr ""
+
+msgid "How frequently the router tests active tunnel health via live probe."
+msgstr ""
+
+msgid "Failure Threshold"
+msgstr ""
+
+msgid "Number of consecutive health check failures required before triggering failover (hysteresis)."
+msgstr ""
+
+msgid "Down Grace Period"
+msgstr ""
+
+msgid "Seconds tunnel interface can remain disconnected before triggering failover immediately."
+msgstr ""
+
+msgid "Automatic Failover"
+msgstr ""
+
+msgid "Automatically switch to another healthy profile on failure"
+msgstr ""
+
+msgid "Automatic Failback"
+msgstr ""
+
+msgid "Switch back to primary profile when it passes 3 consecutive ticks"
+msgstr ""
+
+msgid "Persist Failover Switch"
+msgstr ""
+
+msgid "Commit active_profile to flash UCI on failover (off = temporary RAM override)"
+msgstr ""
+
+msgid "Rate Limiting"
+msgstr ""
+
+msgid "Min interval (s):"
+msgstr ""
+
+msgid "Max switches/hour:"
+msgstr ""
+
+msgid "Fallback Profile Pool"
+msgstr ""
+
+msgid "Select profiles used for failover pool when in fallback mode (hold Ctrl/Cmd to select multiple)."
+msgstr ""
+
+msgid "Auto-connect and failover settings saved and applied."
+msgstr ""
+
+msgid "Failed to save settings: "
+msgstr ""
+
+msgid "N/A"
+msgstr ""
+
+msgid "Experimental"
+msgstr ""
+
+msgid "Write-only: current password is never displayed to prevent exposure."
+msgstr ""
+
+msgid "Password required"
+msgstr ""
+
+msgid "The IKEv2 protocol driver is not installed. To enable IKEv2 tunnels, install the add-on package: apk add geovpn-ikev2"
+msgstr ""
+
+msgid "IKEv2 profile updated successfully."
+msgstr ""
+
+msgid "Shared EAP-MSCHAPv2"
+msgstr ""
+
+msgid "None (use profile secret file)"
+msgstr ""
+
+msgid "Dead Peer Detection (s)"
+msgstr ""
+
+msgid "Remote Identity (ID)"
+msgstr ""
+
+msgid "CA Certificate File"
+msgstr ""
+
+msgid "EAP-MSCHAPv2"
+msgstr ""
+
+msgid "The WireGuard protocol driver is not installed. To enable WireGuard tunnels, install the add-on package: apk add geovpn-wireguard"
+msgstr ""
+

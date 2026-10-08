@@ -46,12 +46,21 @@ jobs:
           python3 -m unittest discover -s tests/unit -p "test_*.py" -v
 
   sdk-build:
-    name: OpenWrt SDK Build (25.12.5)
+    name: OpenWrt SDK Build (${{ matrix.package }} on ${{ matrix.version }})
     runs-on: ubuntu-24.04
     needs: unit-tests
     strategy:
+      fail-fast: false
       matrix:
         version: ["25.12.5"]
+        package:
+          - geovpn-core
+          - luci-app-geovpn
+          - geovpn-wireguard
+          - geovpn-ikev2
+          - geovpn
+          - geovpn-full
+          - geovpn-data-seed
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -62,11 +71,11 @@ jobs:
           sudo apt-get install -y build-essential zstd libncurses-dev gawk git subversion libssl-dev diffutils bzip2 wget file python3
 
       - name: Build packages with SDK
-        run: ./tools/build-sdk.sh ${{ matrix.version }}
+        run: ./tools/build-sdk.sh ${{ matrix.version }} ${{ matrix.package }}
 
       - name: Upload APK artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: geovpn-apk-${{ matrix.version }}
+          name: geovpn-apk-${{ matrix.version }}-${{ matrix.package }}
           path: out/*.apk
           if-no-files-found: ignore

@@ -11,6 +11,14 @@ if [ "$script_type" != "up" ] && [ "$script_type" != "down" ]; then
 fi
 
 HOOK_DIR="/var/run/geovpn"
+GV_CTX="${GV_CTX:-}"
+if [ -n "$GV_CTX" ]; then
+	CTX_KIND=$(echo "$GV_CTX" | cut -d: -f1)
+	CTX_ID=$(echo "$GV_CTX" | cut -d: -f2)
+	if [ "$CTX_KIND" = "test" ] && [ -n "$CTX_ID" ]; then
+		HOOK_DIR="/var/run/geovpn/test/$CTX_ID"
+	fi
+fi
 mkdir -p "$HOOK_DIR"
 chmod 0700 "$HOOK_DIR"
 
@@ -18,7 +26,7 @@ ENV_FILE="$HOOK_DIR/hook.env"
 
 # Extract strictly whitelisted environment variables into sanitized file
 umask 0077
-env | grep -E '^(script_type|dev|ifconfig_local|ifconfig_remote|ifconfig_netmask|ifconfig_ipv6_local|ifconfig_ipv6_netbits|trusted_ip|trusted_ip6|route_vpn_gateway|foreign_option_[0-9]+)=' > "$ENV_FILE"
+env | grep -E '^(script_type|dev|GV_CTX|ifconfig_local|ifconfig_remote|ifconfig_netmask|ifconfig_ipv6_local|ifconfig_ipv6_netbits|trusted_ip|trusted_ip6|route_vpn_gateway|foreign_option_[0-9]+)=' > "$ENV_FILE"
 
 # Hand over to the ucode handler via CLI
-exec /usr/bin/geovpn _hook
+exec /usr/bin/geovpn _hook "$ENV_FILE"

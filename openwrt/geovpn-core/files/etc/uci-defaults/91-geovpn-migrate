@@ -1,0 +1,198 @@
+#!/bin/sh
+#
+# GeoVPN v1 -> v2 Migration Script
+# /etc/uci-defaults/91-geovpn-migrate
+#
+set -e
+
+ACTION="${1:-migrate}"
+CONFIG_FILE="${CONFIG_FILE:-/etc/config/geovpn}"
+BACKUP_DIR="${BACKUP_DIR:-/etc/geovpn/backup}"
+
+# Prefer ucode migration engine when ucode is available
+if command -v ucode >/dev/null 2>&1; then
+	SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+	REPO_ROOT="$(cd "$SCRIPT_DIR/../../.." && pwd)"
+	exec ucode -L /usr/share/ucode -L "$REPO_ROOT/files/usr/share/ucode" -e '
+		import * as cfg from "geovpn.config";
+		let cfile = getenv("CONFIG_FILE");
+		let cdir = "/etc/config";
+		if (cfile) {
+			let parts = split(cfile, "/");
+			cdir = join("/", slice(parts, 0, -1));
+		}
+		let bdir = getenv("BACKUP_DIR") || "/etc/geovpn/backup";
+		let act = ARGV[0] || "migrate";
+		if (act == "--rollback" || act == "rollback") {
+			let res = cfg.rollback_migration(cdir, bdir);
+			if (!res || !res.ok) { warn("Rollback failed\n"); exit(1); }
+			exit(0);
+		}
+		if (act == "--prepare-downgrade" || act == "prepare-downgrade") {
+			let res = cfg.prepare_downgrade(cdir);
+			if (!res || !res.ok) { warn("Prepare downgrade failed\n"); exit(1); }
+			exit(0);
+		}
+		let res = cfg.migrate_v1_to_v2(cdir, bdir);
+		if (!res || !res.ok) { warn("Migration failed\n"); exit(1); }
+		exit(0);
+	' -- "$ACTION"
+fi
+
+do_rollback() {
+	if [ ! -d "$BACKUP_DIR" ]; then
+		echo "GeoVPN: backup directory $BACKUP_DIR does not exist" >&2
+		return 1
+	fi
+	NEWEST=$(find "$BACKUP_DIR" -name "geovpn.v1.*" -type f 2>/dev/null | sort | tail -n 1)
+	if [ -z "$NEWEST" ] || [ ! -f "$NEWEST" ]; then
+		echo "GeoVPN: no backup found in $BACKUP_DIR" >&2
+		return 1
+	fi
+	cp -f "$NEWEST" "$CONFIG_FILE"
+	chmod 0600 "$CONFIG_FILE"
+	echo "GeoVPN: restored configuration from $NEWEST"
+	return 0
+}
+
+do_prepare_downgrade() {
+	if [ ! -f "$CONFIG_FILE" ]; then
+		echo "GeoVPN: config file $CONFIG_FILE not found" >&2
+		return 1
+	fi
+	if command -v uci >/dev/null 2>&1; then
+		CONF_DIR="$(dirname "$CONFIG_FILE")"
+		ACTIVE=$(uci -q -c "$CONF_DIR" -P "$CONF_DIR" get geovpn.main.active_profile || true)
+		if [ -n "$ACTIVE" ]; then
+			PROTO=$(uci -q -c "$CONF_DIR" -P "$CONF_DIR" get "geovpn.$ACTIVE.proto" || echo "openvpn")
+			if [ "$PROTO" != "openvpn" ]; then
+				echo "GeoVPN: active profile $ACTIVE is proto '$PROTO'; resetting active profile for baseline v1" >&2
+				uci -q -c "$CONF_DIR" -P "$CONF_DIR" set geovpn.main.active_profile=''
+			fi
+		fi
+		# Warn for non-openvpn profiles
+		for sec in $(uci -q -c "$CONF_DIR" -P "$CONF_DIR" show geovpn | grep '=profile$' | cut -d'.' -f2 | cut -d'=' -f1); do
+			p_proto=$(uci -q -c "$CONF_DIR" -P "$CONF_DIR" get "geovpn.$sec.proto" || echo "openvpn")
+			if [ "$p_proto" != "openvpn" ]; then
+				echo "GeoVPN: Warning: profile $sec uses proto '$p_proto', which is unsupported in baseline v1" >&2
+			fi
+		done
+		uci -q -c "$CONF_DIR" -P "$CONF_DIR" set geovpn.main.config_version='1'
+		uci -q -c "$CONF_DIR" -P "$CONF_DIR" commit geovpn
+	fi
+	echo "GeoVPN: prepared for downgrade (config_version=1)"
+	return 0
+}
+
+do_migrate() {
+	if [ ! -f "$CONFIG_FILE" ]; then
+		return 0
+	fi
+
+	mkdir -p "$BACKUP_DIR"
+	chmod 0700 "$BACKUP_DIR"
+
+	if ! command -v uci >/dev/null 2>&1; then
+		echo "GeoVPN: uci utility required for migration" >&2
+		return 1
+	fi
+
+	CONF_DIR="$(dirname "$CONFIG_FILE")"
+	VER=$(uci -q -c "$CONF_DIR" -P "$CONF_DIR" get geovpn.main.config_version || echo 0)
+	if [ "$VER" -ge 2 ] 2>/dev/null; then
+		return 0
+	fi
+
+	# Create backup before any modification
+	TS=$(date +%s 2>/dev/null || echo 0)
+	BACKUP_FILE="$BACKUP_DIR/geovpn.v1.$TS"
+	cp -f "$CONFIG_FILE" "$BACKUP_FILE"
+	chmod 0600 "$BACKUP_FILE"
+
+	# Apply migration
+	if ! (
+		set -e
+		# Upgrade all profile sections to have proto 'openvpn' and auto_pool '1'
+		for sec in $(uci -q -c "$CONF_DIR" -P "$CONF_DIR" show geovpn | grep '=profile$' | cut -d'.' -f2 | cut -d'=' -f1); do
+			p_proto=$(uci -q -c "$CONF_DIR" -P "$CONF_DIR" get "geovpn.$sec.proto" || true)
+			if [ -z "$p_proto" ]; then
+				uci -c "$CONF_DIR" -P "$CONF_DIR" set "geovpn.$sec.proto=openvpn"
+			fi
+			p_pool=$(uci -q -c "$CONF_DIR" -P "$CONF_DIR" get "geovpn.$sec.auto_pool" || true)
+			if [ -z "$p_pool" ]; then
+				uci -c "$CONF_DIR" -P "$CONF_DIR" set "geovpn.$sec.auto_pool=1"
+			fi
+		done
+
+		# Add test section if missing
+		t_type=$(uci -q -c "$CONF_DIR" -P "$CONF_DIR" get geovpn.test 2>/dev/null || true)
+		if [ -z "$t_type" ]; then
+			uci -c "$CONF_DIR" -P "$CONF_DIR" set geovpn.test='test'
+			uci -c "$CONF_DIR" -P "$CONF_DIR" set geovpn.test.max_handshake_ms='8000'
+			uci -c "$CONF_DIR" -P "$CONF_DIR" set geovpn.test.max_latency_ms='800'
+			uci -c "$CONF_DIR" -P "$CONF_DIR" set geovpn.test.max_loss_pct='34'
+			uci -c "$CONF_DIR" -P "$CONF_DIR" set geovpn.test.require_http='1'
+			uci -c "$CONF_DIR" -P "$CONF_DIR" set geovpn.test.samples='3'
+			uci -c "$CONF_DIR" -P "$CONF_DIR" set geovpn.test.timeout_s='20'
+			uci -c "$CONF_DIR" -P "$CONF_DIR" set geovpn.test.tolerance_ms='50'
+			uci -c "$CONF_DIR" -P "$CONF_DIR" set geovpn.test.test_ttl='300'
+			uci -c "$CONF_DIR" -P "$CONF_DIR" set geovpn.test.max_real='1'
+			uci -c "$CONF_DIR" -P "$CONF_DIR" set geovpn.test.min_free_ram_mb='48'
+			uci -c "$CONF_DIR" -P "$CONF_DIR" set geovpn.test.max_load='3.0'
+			uci -c "$CONF_DIR" -P "$CONF_DIR" add_list geovpn.test.targets='https://www.gstatic.com/generate_204'
+			uci -c "$CONF_DIR" -P "$CONF_DIR" add_list geovpn.test.targets='http://cp.cloudflare.com/generate_204'
+			uci -c "$CONF_DIR" -P "$CONF_DIR" add_list geovpn.test.proto_preference='wireguard'
+			uci -c "$CONF_DIR" -P "$CONF_DIR" add_list geovpn.test.proto_preference='openvpn'
+			uci -c "$CONF_DIR" -P "$CONF_DIR" add_list geovpn.test.proto_preference='ikev2'
+			uci -c "$CONF_DIR" -P "$CONF_DIR" set geovpn.test.speed_url=''
+			uci -c "$CONF_DIR" -P "$CONF_DIR" set geovpn.test.speed_max_kb='2048'
+			uci -c "$CONF_DIR" -P "$CONF_DIR" set geovpn.test.rt_table='4300'
+		fi
+
+		# Add autoconnect section if missing
+		a_type=$(uci -q -c "$CONF_DIR" -P "$CONF_DIR" get geovpn.auto 2>/dev/null || true)
+		if [ -z "$a_type" ]; then
+			uci -c "$CONF_DIR" -P "$CONF_DIR" set geovpn.auto='autoconnect'
+			uci -c "$CONF_DIR" -P "$CONF_DIR" set geovpn.auto.mode='off'
+			uci -c "$CONF_DIR" -P "$CONF_DIR" set geovpn.auto.connect_gate='off'
+			uci -c "$CONF_DIR" -P "$CONF_DIR" set geovpn.auto.health_enabled='0'
+			uci -c "$CONF_DIR" -P "$CONF_DIR" set geovpn.auto.health_interval='120'
+			uci -c "$CONF_DIR" -P "$CONF_DIR" set geovpn.auto.fail_threshold='3'
+			uci -c "$CONF_DIR" -P "$CONF_DIR" set geovpn.auto.down_grace='30'
+			uci -c "$CONF_DIR" -P "$CONF_DIR" set geovpn.auto.failover='0'
+			uci -c "$CONF_DIR" -P "$CONF_DIR" set geovpn.auto.failover_max_candidates='3'
+			uci -c "$CONF_DIR" -P "$CONF_DIR" set geovpn.auto.best_max_candidates='8'
+			uci -c "$CONF_DIR" -P "$CONF_DIR" set geovpn.auto.failback='0'
+			uci -c "$CONF_DIR" -P "$CONF_DIR" set geovpn.auto.min_switch_interval='60'
+			uci -c "$CONF_DIR" -P "$CONF_DIR" set geovpn.auto.max_switches_per_hour='6'
+			uci -c "$CONF_DIR" -P "$CONF_DIR" set geovpn.auto.persist_switch='0'
+		fi
+
+		uci -c "$CONF_DIR" -P "$CONF_DIR" set geovpn.main.config_version='2'
+		uci -c "$CONF_DIR" -P "$CONF_DIR" commit geovpn
+	); then
+		echo "GeoVPN: migration to v2 complete (backup saved to $BACKUP_FILE)"
+		return 0
+	else
+		echo "GeoVPN: migration failed, restoring backup $BACKUP_FILE" >&2
+		cp -f "$BACKUP_FILE" "$CONFIG_FILE"
+		chmod 0600 "$CONFIG_FILE"
+		return 1
+	fi
+}
+
+case "$ACTION" in
+	--rollback|rollback)
+		do_rollback
+		;;
+	--prepare-downgrade|prepare-downgrade)
+		do_prepare_downgrade
+		;;
+	--migrate|migrate|"")
+		do_migrate
+		;;
+	*)
+		echo "Usage: $0 [migrate|--rollback|--prepare-downgrade]" >&2
+		exit 1
+		;;
+esac

@@ -1,15 +1,20 @@
-# GeoVPN — OpenVPN client with geo-based split tunneling for OpenWrt
+# GeoVPN — VPN client with geo-based split tunneling for OpenWrt
 
 [English](README.md) · [فارسی](README.fa.md)
 
-GeoVPN turns an OpenWrt router into an **OpenVPN client that sends only the traffic you choose through the VPN**.
-Pick countries (GeoIP) and domain categories (GeoSite) in LuCI: matching traffic goes **directly** through your normal
-internet connection, everything else goes **through the VPN** — or the other way round. It is managed entirely from the web
-interface, runs on small routers, and installs with one command.
+GeoVPN turns an OpenWrt router into a **VPN client that sends only the traffic you choose through the VPN** — with
+**OpenVPN, WireGuard or IKEv2**. Pick countries (GeoIP) and domain categories (GeoSite) in LuCI: matching traffic goes
+**directly** through your normal internet connection, everything else goes **through the VPN** — or the other way round.
+Import your provider's files (Windscribe is a first-class target), **test every profile before connecting**, connect to the
+best one, and let GeoVPN fail over automatically if it stops working.
 
-> Status: v1.0 · Requires **OpenWrt 25.12+** (apk-based) · Primary test device: **Google WiFi (AC-1304)**
+> Status: v1.1 · Requires **OpenWrt 25.12+** (apk-based) · Primary test device: **Google WiFi (AC-1304)**
 
 ## Features
+- **Three protocols**: OpenVPN, WireGuard, IKEv2 (EAP username/password) — one Connections tab, one split-tunneling engine.
+- **Import**: `.ovpn`, WireGuard `.conf`, IKEv2 form/paste (and strongSwan `.sswan`); drop many files at once; credentials entered once and shared.
+- **Test before you connect**: per-profile and *Test all* (handshake/connect time, URL latency, pass/fail thresholds) in an isolated test tunnel that never touches your active VPN or LAN traffic.
+- **Auto-connect**: connect only if the test passes, connect to the best profile, ordered fallback list, optional health checks with automatic failover.
 - Multiple OpenVPN client profiles; **import `.ovpn`** by upload or paste (certificates, keys, `tls-crypt`, `auth-user-pass` handled safely).
 - Start / stop / restart, live status (IP, uptime, traffic), logs, automatic reconnect, autostart at boot.
 - **Geo split tunneling**: GeoIP (country codes) and GeoSite (domain categories), custom IP/CIDR and domain rules,
@@ -28,6 +33,13 @@ interface, runs on small routers, and installs with one command.
 | Primary device | **Google WiFi AC-1304** (`ipq40xx/chromium`, 512 MB RAM, 4 GB eMMC) |
 | Other devices | Packages are architecture-independent and expected to work on any 25.12 device with ≥ 128 MB RAM (best effort) |
 | Browser | Current Chrome/Firefox/Safari (LuCI JS views) |
+
+### Protocols and packages
+| Protocol | Package | Notes |
+|---|---|---|
+| OpenVPN | `geovpn-core` (always) | `openvpn-openssl`, OpenVPN 2.7.x |
+| WireGuard | `geovpn-wireguard` (or in `geovpn-full`) | kernel module `kmod-wireguard`; single-peer profiles |
+| IKEv2 | `geovpn-ikev2` (or in `geovpn-full`) | strongSwan `swanctl` + XFRM interface; **experimental**; larger (see Performance) |
 
 ## How it works
 ```
@@ -78,8 +90,11 @@ echo 'https://geovpn.github.io/geovpn/25.12/packages.adb' > /etc/apk/repositorie
 
 # 3. install everything with one command
 apk update
-apk add geovpn
+apk add geovpn          # standard: core + OpenVPN + LuCI + Persian + seed
+# optional, full suite (adds WireGuard + IKEv2):
+apk add geovpn-full     # ⚠ verify package availability for your release: apk search strongswan
 ```
+Add WireGuard later with `apk add geovpn-wireguard`; add IKEv2 with `apk add geovpn-ikev2`; remove either with `apk del <package>` (profiles stay, disabled).
 ### B) From LuCI
 *System → Software* → **Update lists** → search `geovpn` → install. (The feed and key must be added once via SSH as above,
 because LuCI cannot add third-party feeds or keys.)
@@ -121,6 +136,35 @@ Open LuCI → **VPN → GeoVPN**.
    ```
    In LuCI the **Test a domain or IP** box shows the same answer.
 
+## Using your Windscribe configs
+GeoVPN needs a Windscribe **Pro or Build-a-Plan** account and the files from your account's **Config Generators**
+(OpenVPN, WireGuard, IKEv2). GeoVPN cannot download them for you (no account tokens are used).
+
+**OpenVPN** — generate a `.ovpn` (choose location, UDP/TCP, port 443 is a good default) and click **Get Credentials**
+for the separate *OpenVPN username/password* (these are **not** your account login and are the same for all profiles).
+In LuCI: *VPN → GeoVPN → Connections → Import*, select one or many `.ovpn` files, enter the credentials once and keep
+“use for all” ticked.
+
+**WireGuard** — generate a `.conf` per location (keep a new key pair or reuse one). **Do not edit `AllowedIPs`**;
+GeoVPN decides what goes through the tunnel. Import the files the same way (no credentials needed, keys are inside).
+Tip: GeoVPN uses MTU 1420 and keepalive 25 if the file has none.
+
+**IKEv2** *(experimental, needs `geovpn-ikev2`)* — the generator only gives you a **hostname, username and password**.
+*Add → IKEv2* and paste them (or fill the form).
+
+Not supported: Windscribe *Stealth/WStunnel*, the Windscribe app's firewall and app-level split tunneling (GeoVPN has its own kill switch and split tunneling).
+WireGuard keys are tied to the location and can be invalidated by Windscribe — if a profile never gets a handshake, generate a new config.
+
+## Testing profiles and auto-connect
+- **Test** (per row) or **Test all**: GeoVPN brings the profile up on a separate temporary device (`gvt0`), measures the
+  handshake/connect time and a few HTTP requests through it, and tears it down. Your active VPN and your LAN are not affected.
+  A test takes ≤ 20 s; one tunnel test runs at a time to protect the router's CPU.
+- **Pass/fail** thresholds and test URLs: *Settings → Testing*. Results are sorted by latency.
+- **Connect best** tests (or reuses a recent pass) and connects the fastest passing profile. **Connect only if the test passes**: *Settings → Auto-connect → Connect gate = require*.
+- **Failover**: *Auto-connect → Health checks* + *Failover*. When the active VPN fails the checks, GeoVPN tests the next candidates and switches to the first one that passes. Recommended together with the **kill switch** (otherwise VPN-bound traffic briefly goes direct during the switch).
+- Limits you should know: UDP-only servers (WireGuard, OpenVPN/UDP with `tls-auth`) cannot be pinged without a real handshake — the real test is the check; the active profile is checked “live” instead of with a second tunnel; IKEv2 tests are best-effort.
+- CLI: `geovpn test --all`, `geovpn test <id>`, `geovpn test-cleanup --verify`, `geovpn switch <id>`.
+
 ## Configuration reference (`/etc/config/geovpn`)
 `main` section:
 
@@ -153,9 +197,13 @@ Open LuCI → **VPN → GeoVPN**.
 | `flush_conntrack` | `0` | Drop tracked connections on reload |
 | `log_level` | `info` | `error` / `warn` / `info` / `debug` |
 
-`profile` sections: `name`, `enabled`, `remote` (list `"host port proto"`), `remote_random`, `auth_user_pass`, `tls_kind`,
-`key_direction`, `cipher`, `data_ciphers`, `data_ciphers_fallback`, `auth`, `tls_version_min`, `verify_x509_name`,
-`peer_fingerprint`, `remote_cert_tls`, `mssfix`, `tun_mtu`, `keepalive`, `compress`, `extra` (allowlisted directives).
+`profile` sections: `name`, `enabled`, `proto` (`openvpn|wireguard|ikev2`), `provider`, `group`, `cred`, `auto_pool`, `test_url`;
+OpenVPN: `remote` (list `"host port proto"`), `remote_random`, `auth_user_pass`, `tls_kind`, `key_direction`, `cipher`, `data_ciphers`, `data_ciphers_fallback`, `auth`, `tls_version_min`, `verify_x509_name`, `peer_fingerprint`, `remote_cert_tls`, `mssfix`, `tun_mtu`, `keepalive`, `compress`, `extra` (allowlisted directives);
+WireGuard: `wg_endpoint_host`, `wg_endpoint_port`, `wg_public_key`, `wg_address`, `wg_dns`, `wg_allowed_ips`, `wg_mtu` (1420), `wg_keepalive` (25);
+IKEv2: `ike_host`, `ike_remote_id`, `ike_auth`, `ike_ca`, `ike_proposals`, `ike_esp`, `ike_dpd` (30), `ike_fragmentation`, `ike_mobike`, `ike_if_id` (4242).
+`credential` sections: `name`, `kind`.
+`test` section: `max_handshake_ms` (8000), `max_latency_ms` (800), `max_loss_pct` (34), `require_http` (1), `samples` (3), `timeout_s` (20), `test_ttl` (300), `max_real` (1), `targets`, `speed_url`.
+`autoconnect` section: `mode` (`off|gate|best|fallback`), `fallback`, `connect_gate` (`off|warn|require`), `health_enabled`, `health_interval` (120), `fail_threshold` (3), `down_grace` (30), `failover`, `failback`, `min_switch_interval` (60), `max_switches_per_hour` (6), `persist_switch` (0).
 `data` section: `source_url`, `verify`, `pack_pubkey`, `auto_update`, `update_cron`, `update_via`, `keep_prev`.
 Selections and rules: `config geoip` (`code`, `enabled`), `config geosite` (`name`, `enabled`),
 `config rule` (`name`, `type` cidr|domain, `value`, `action` direct|vpn, `enabled`), `config client`
@@ -215,22 +263,37 @@ Enable **Kill switch**; keep **DNS hijack** and **Block DoT** on; set IPv6 to *A
 | Out of memory | Reduce categories; check estimates; `free -m`; lower `max_cidrs/max_domains` |
 | Conflicts with pbr / mwan3 | `geovpn diag` shows overlaps; don't give the same destinations to both; change `mark_shift`/`rule_priority` |
 | Slow VPN | OpenVPN is single-threaded; try `CHACHA20-POLY1305` or AES-GCM on the server side; check CPU with `top` |
+| WireGuard: no handshake | UDP blocked or wrong endpoint; for Windscribe the key may be invalidated → regenerate the config; `wg show geovpn0` |
+| WireGuard imports but nothing works | `AllowedIPs` must include `0.0.0.0/0` (GeoVPN refuses narrower ones) |
+| OpenVPN profile “needs credentials” | Add the credential set (Windscribe: the *OpenVPN* credentials, not your login) |
+| IKEv2 “authentication failed” | Re-check username/password (IKEv2 credentials), hostname; `logread -e charon` |
+| IKEv2 not available in the UI | `apk add geovpn-ikev2` (or `geovpn-full`); check `apk search strongswan` for your release |
+| Test says `resources` | Free RAM < 48 MB or high load: stop other jobs, try again |
+| Test says `target_conflict` | Change the test URL (its IP is used by another GeoVPN rule) |
+| Leftovers after a crash (`gvt0`, rule 701) | `geovpn test-cleanup` (they also expire by themselves within 90 s) |
+| Failover keeps switching | Raise `fail_threshold`/`min_switch_interval`; check the target URL is reachable through every profile |
 
 Useful commands: `geovpn status --json`, `logread -e geovpn`, `nft list table inet geovpn`, `ip -6 rule`, `ip -6 route show table 4200`.
 
 ## Security notes
 - Imported `.ovpn` files are **parsed with an allowlist**; script/plugin/management/log directives are dropped. Keys and passwords are stored only under `/etc/geovpn/profiles` (root, mode 0600) and are never shown in the UI or logs.
+- WireGuard files are parsed with an allowlist; `PostUp/PreUp/PostDown/PreDown` and unknown/obfuscation keys are **rejected**. Private keys live only in `/etc/geovpn/profiles/<id>/` (root, 0600).
+- Test URLs must be `http(s)` to public hosts; private/LAN targets are refused.
+- Backups contain your VPN keys and credentials (`/etc/geovpn/profiles`, `/etc/geovpn/credentials`).
 - Data packs are verified with a signature and hashes; do not disable verification unless you host your own pack.
 - Clients that use DNS-over-HTTPS to a public resolver bypass the router's DNS and therefore GeoSite matching; GeoVPN blocks plain/DoT bypass and can block known DoH IPs, but cannot stop DoH to arbitrary hosts.
 - Backups made with *Generate archive* contain your VPN keys — store them securely.
 
 ## Performance notes (Google WiFi AC-1304)
 OpenVPN runs in userspace on a 716 MHz Cortex-A7, so expect **tens of Mbit/s** through the tunnel (varies with cipher); direct traffic is not affected by the VPN.
+WireGuard runs in the kernel and is usually faster than OpenVPN on this CPU. IKEv2 (strongSwan) adds a few MB of flash/RAM. A tunnel test briefly runs a second tunnel (≈ 25 s, one at a time).
 Default selections (country + a few categories) need only a few MB of RAM. The classifier is evaluated once per connection.
 
 ## FAQ
 **Does GeoVPN replace `luci-app-openvpn`?** No, it is independent; you can have both, but don't run the same tunnel twice.
-**Can I use WireGuard?** Not in v1. **Can I run two VPNs?** Not in v1 (one active tunnel).
+**Can I test the profile I'm currently using?** It gets a *live check* (handshake age, a few requests through the live tunnel) instead of a second tunnel, because many providers don't like two sessions on one account.
+**Does GeoVPN rotate keys or fetch new Windscribe configs?** No. You download configs yourself; GeoVPN only imports and tests them.
+**Upgrading from 1.0?** Automatic: your config is backed up to `/etc/geovpn/backup/` and migrated without touching existing profiles. Roll back with `geovpn migrate --rollback`.
 **Why not geosite.dat directly?** It is 10+ MB; the router would need to parse it. We compile small per-category lists in CI.
 **Does it block ads?** No. Use a dedicated blocker; ad categories can only be *routed*.
 **Is my traffic logged by GeoVPN?** No; there is no telemetry. Only syslog lines about connection state.

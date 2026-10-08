@@ -7,7 +7,8 @@
     },
     "depends": {
       "acl": [
-        "luci-app-geovpn"
+        "luci-app-geovpn",
+        "luci-app-geovpn-extra"
       ],
       "uci": {
         "geovpn": true
@@ -22,9 +23,33 @@
       "path": "geovpn/profiles"
     }
   },
+  "admin/vpn/geovpn/importer": {
+    "title": "Import Profiles",
+    "order": 15,
+    "action": {
+      "type": "view",
+      "path": "geovpn/importer"
+    }
+  },
+  "admin/vpn/geovpn/testpanel": {
+    "title": "Test Panel",
+    "order": 20,
+    "action": {
+      "type": "view",
+      "path": "geovpn/testpanel"
+    }
+  },
+  "admin/vpn/geovpn/autoconnect": {
+    "title": "Auto-Connect & Failover",
+    "order": 25,
+    "action": {
+      "type": "view",
+      "path": "geovpn/autoconnect"
+    }
+  },
   "admin/vpn/geovpn/split": {
     "title": "Split Tunneling",
-    "order": 20,
+    "order": 30,
     "action": {
       "type": "view",
       "path": "geovpn/split"
@@ -32,7 +57,7 @@
   },
   "admin/vpn/geovpn/settings": {
     "title": "Settings",
-    "order": 30,
+    "order": 40,
     "action": {
       "type": "view",
       "path": "geovpn/settings"
@@ -40,7 +65,7 @@
   },
   "admin/vpn/geovpn/logs": {
     "title": "Logs & Diagnostics",
-    "order": 40,
+    "order": 50,
     "action": {
       "type": "view",
       "path": "geovpn/logs"

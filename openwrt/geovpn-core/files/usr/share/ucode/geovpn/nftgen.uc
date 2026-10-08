@@ -50,9 +50,16 @@ function render_ruleset(config, geo_cidrs, active_profile) {
 	// Always direct sets (VPN servers)
 	let always4_elems = [];
 	let always6_elems = [];
-	if (active_profile && active_profile.remotes) {
-		for (let r in active_profile.remotes) {
-			let host = split(r, ' ')[0];
+	if (active_profile) {
+		if (active_profile.remotes) {
+			for (let r in active_profile.remotes) {
+				let host = split(r, ' ')[0];
+				if (util.is_ipv4(host)) push(always4_elems, host);
+				else if (util.is_ipv6(host)) push(always6_elems, host);
+			}
+		}
+		if (active_profile.wg_endpoint_host) {
+			let host = active_profile.wg_endpoint_host;
 			if (util.is_ipv4(host)) push(always4_elems, host);
 			else if (util.is_ipv6(host)) push(always6_elems, host);
 		}

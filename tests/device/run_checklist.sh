@@ -57,14 +57,25 @@ else
 fi
 
 # 3. Flash storage space
-OVERLAY_FREE_KB=$(df -k /overlay 2>/dev/null | tail -n 1 | awk '{print $4}' || df -k / | tail -n 1 | awk '{print $4}')
+OVERLAY_FREE_KB=""
+TARGET_NAME="root filesystem"
+if [ -d /overlay ]; then
+	OVERLAY_FREE_KB=$(df -k /overlay 2>/dev/null | awk 'NR>1 {print $(NF-2)}')
+	if [ -n "$OVERLAY_FREE_KB" ]; then
+		TARGET_NAME="overlay"
+	fi
+fi
+if [ -z "$OVERLAY_FREE_KB" ]; then
+	OVERLAY_FREE_KB=$(df -k / 2>/dev/null | awk 'NR>1 {print $(NF-2)}')
+fi
+OVERLAY_FREE_KB="${OVERLAY_FREE_KB:-0}"
 OVERLAY_FREE_MB=$((OVERLAY_FREE_KB / 1024))
 if [ "$OVERLAY_FREE_MB" -ge 100 ]; then
-	check_item "Storage Space (Overlay)" "PASS" "${OVERLAY_FREE_MB} MB free on overlay"
+	check_item "Storage Space ($TARGET_NAME)" "PASS" "${OVERLAY_FREE_MB} MB free on $TARGET_NAME"
 elif [ "$OVERLAY_FREE_MB" -ge 5 ]; then
-	check_item "Storage Space (Overlay)" "PASS" "${OVERLAY_FREE_MB} MB free on root filesystem"
+	check_item "Storage Space ($TARGET_NAME)" "PASS" "${OVERLAY_FREE_MB} MB free on $TARGET_NAME"
 else
-	check_item "Storage Space (Overlay)" "FAIL" "Only ${OVERLAY_FREE_MB} MB free storage"
+	check_item "Storage Space ($TARGET_NAME)" "FAIL" "Only ${OVERLAY_FREE_MB} MB free storage"
 fi
 
 # 4. Kernel TUN device
@@ -124,11 +135,45 @@ else
 fi
 
 # 9. Conntrack and Flow Offloading inspection
-if [ -f /proc/net/nf_conntrack ]; then
-	CT_COUNT=$(wc -l < /proc/net/nf_conntrack || echo "0")
+if [ -r /proc/net/nf_conntrack ]; then
+	CT_COUNT=$(wc -l < /proc/net/nf_conntrack 2>/dev/null || echo "0")
 	check_item "Connection Tracking" "PASS" "Conntrack active ($CT_COUNT active flows)"
-else
+elif [ -f /proc/net/nf_conntrack ]; then
+	check_item "Connection Tracking" "PASS" "Conntrack active (requires root to inspect flow table)"
+elif [ -d /sys/module/nf_conntrack ] || grep -q nf_conntrack /proc/modules 2>/dev/null; then
 	check_item "Connection Tracking" "PASS" "Conntrack module loaded"
+else
+	check_item "Connection Tracking" "WARN" "Conntrack table / module not found"
+fi
+
+# 10. WireGuard Kernel & Tools (Optional Add-on geovpn-wireguard)
+if command -v wg >/dev/null 2>&1; then
+	if [ -d /sys/module/wireguard ] || grep -q wireguard /proc/modules 2>/dev/null; then
+		check_item "WireGuard (kmod + tools)" "PASS" "Kernel module loaded and wg tool functional"
+	else
+		check_item "WireGuard (tools only)" "WARN" "wg CLI present but kmod-wireguard not yet loaded"
+	fi
+else
+	check_item "WireGuard (geovpn-wireguard)" "WARN" "Optional package not installed (apk add geovpn-wireguard)"
+fi
+
+# 11. strongSwan & XFRM Interface (Optional Add-on geovpn-ikev2)
+if command -v swanctl >/dev/null 2>&1; then
+	if [ -d /sys/module/xfrm_interface ] || grep -q xfrm_interface /proc/modules 2>/dev/null; then
+		check_item "strongSwan & XFRM (IKEv2)" "PASS" "swanctl available and kmod-xfrm-interface loaded"
+	else
+		check_item "strongSwan (tools only)" "WARN" "swanctl present but kmod-xfrm-interface not loaded"
+	fi
+else
+	check_item "strongSwan (geovpn-ikev2)" "WARN" "Optional package not installed (apk add geovpn-ikev2)"
+fi
+
+# 12. Policy Routing Tables & Mark Isolation
+if ip rule add fwmark 0x03000000/0x0f000000 lookup 4300 prio 32700 2>/dev/null; then
+	ip rule del prio 32700 2>/dev/null || true
+	check_item "Policy Routing Tables" "PASS" "Rules priority and table 4200/4300 supported"
+else
+	check_item "Policy Routing Tables" "WARN" "Testing mark rule creation requires root privileges"
 fi
 
 echo "=========================================================="
@@ -139,3 +184,4 @@ if [ "$FAILED" -gt 0 ]; then
 fi
 echo "Hardware check: PASSED (System ready for GeoVPN deployment)."
 exit 0
+

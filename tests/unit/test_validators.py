@@ -92,8 +92,13 @@ def is_url(s):
 
 def scrub_secrets(text):
     text = re.sub(r'-----BEGIN [A-Z0-9 _-]+-----[\s\S]*?-----END [A-Z0-9 _-]+-----', '[REDACTED PEM BLOCK]', text)
-    text = re.sub(r'password\s+[^\r\n]+', 'password [REDACTED]', text, flags=re.IGNORECASE)
-    text = re.sub(r'auth-user-pass\s+[^\r\n]+', 'auth-user-pass [REDACTED]', text, flags=re.IGNORECASE)
+    text = re.sub(r'("?(?:password|passwd|auth-user-pass|PrivateKey|PresharedKey|private[-_]?key|preshared[-_]?key|secret)"?\s*[:=]\s*")[^"\r\n]+"', r'\1[REDACTED]"', text, flags=re.IGNORECASE)
+    text = re.sub(r'("?(?:password|passwd|auth-user-pass|PrivateKey|PresharedKey|private[-_]?key|preshared[-_]?key|secret)"?\s*[:=]\s*)([^"\[ \t\r\n,}]+)', r'\1[REDACTED]', text, flags=re.IGNORECASE)
+    text = re.sub(r'(password[ \t]+)[^\r\n]+', r'\1[REDACTED]', text, flags=re.IGNORECASE)
+    text = re.sub(r'(auth-user-pass[ \t]+)[^\r\n]+', r'\1[REDACTED]', text, flags=re.IGNORECASE)
+    text = re.sub(r'(private-key[ \t]+)[^ \t\r\n]+', r'\1[REDACTED]', text, flags=re.IGNORECASE)
+    text = re.sub(r'(preshared-key[ \t]+)[^ \t\r\n]+', r'\1[REDACTED]', text, flags=re.IGNORECASE)
+    text = re.sub(r'\b0x[0-9a-fA-F]{16,}\b', '[REDACTED HEX SECRET]', text)
     return text
 
 
@@ -169,6 +174,27 @@ class TestValidators(unittest.TestCase):
         self.assertNotIn("mypass", scrubbed)
         self.assertIn("[REDACTED PEM BLOCK]", scrubbed)
         self.assertIn("[REDACTED]", scrubbed)
+
+        # JSON quoted secrets
+        json_sample = '{"password": "secret123", "PrivateKey": "MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTI=", "secret": "psk123"}'
+        json_scrubbed = scrub_secrets(json_sample)
+        self.assertNotIn("secret123", json_scrubbed)
+        self.assertNotIn("MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTI=", json_scrubbed)
+        self.assertNotIn("psk123", json_scrubbed)
+        self.assertIn('[REDACTED]', json_scrubbed)
+
+        # Bare 0x hex secret in log line
+        hex_sample = "Log message: charon generated 0xdeadbeef1234567890abcdef12345678 internal key"
+        hex_scrubbed = scrub_secrets(hex_sample)
+        self.assertNotIn("0xdeadbeef1234567890abcdef12345678", hex_scrubbed)
+        self.assertIn('[REDACTED HEX SECRET]', hex_scrubbed)
+
+        # WireGuard CLI / INI sample
+        wg_sample = "Config: PrivateKey = MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTI=, peer preshared-key /etc/geovpn/psk.key"
+        wg_scrubbed = scrub_secrets(wg_sample)
+        self.assertNotIn("MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTI=", wg_scrubbed)
+        self.assertNotIn("/etc/geovpn/psk.key", wg_scrubbed)
+        self.assertIn('[REDACTED]', wg_scrubbed)
 
 
 if __name__ == '__main__':

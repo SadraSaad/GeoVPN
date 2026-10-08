@@ -145,12 +145,28 @@ function safe_path(base_dir, sub_path) {
 	return base_dir + '/' + sub_path;
 }
 
+const RE_WG_KEY = /^[A-Za-z0-9+/]{43}=$/;
+
+function is_wireguard_key(s) {
+	if (type(s) != 'string') return false;
+	return (match(s, RE_WG_KEY) != null || match(s, /^[A-Za-z0-9+/]{44}$/) != null);
+}
+
 function scrub_secrets(text) {
 	if (type(text) != 'string') return '';
 	let scrubbed = text;
 	scrubbed = replace(scrubbed, /-----BEGIN [A-Z0-9 _-]+-----[\s\S]*?-----END [A-Z0-9 _-]+-----/g, '[REDACTED PEM BLOCK]');
-	scrubbed = replace(scrubbed, /password\s+[^\r\n]+/gi, 'password [REDACTED]');
-	scrubbed = replace(scrubbed, /auth-user-pass\s+[^\r\n]+/gi, 'auth-user-pass [REDACTED]');
+	// Quoted values in JSON/configs: "password": "...", "PrivateKey": "..."
+	scrubbed = replace(scrubbed, /("?(password|passwd|auth-user-pass|PrivateKey|PresharedKey|private[-_]?key|preshared[-_]?key|secret)"?\s*[:=]\s*")[^"\r\n]+"/gi, '$1[REDACTED]"');
+	// Unquoted values in configs/UCI: password = ... or PrivateKey = ...
+	scrubbed = replace(scrubbed, /("?(password|passwd|auth-user-pass|PrivateKey|PresharedKey|private[-_]?key|preshared[-_]?key|secret)"?\s*[:=]\s*)([^"\[ \t\r\n,}]+)/gi, '$1[REDACTED]');
+	// CLI/directive style with whitespace: password secret or auth-user-pass path
+	scrubbed = replace(scrubbed, /(password[ \t]+)[^\r\n]+/gi, 'password [REDACTED]');
+	scrubbed = replace(scrubbed, /(auth-user-pass[ \t]+)[^\r\n]+/gi, 'auth-user-pass [REDACTED]');
+	scrubbed = replace(scrubbed, /(private-key[ \t]+)[^ \t\r\n]+/gi, 'private-key [REDACTED]');
+	scrubbed = replace(scrubbed, /(preshared-key[ \t]+)[^ \t\r\n]+/gi, 'preshared-key [REDACTED]');
+	// Bare 0x hex secrets (e.g. strongSwan / IKEv2 secrets >= 16 chars)
+	scrubbed = replace(scrubbed, /\b0x[0-9a-fA-F]{16,}\b/g, '[REDACTED HEX SECRET]');
 	return scrubbed;
 }
 
@@ -170,6 +186,9 @@ function argv_to_cmd(argv) {
 }
 
 function safe_exec(argv, input_data) {
+	if (type(global._safe_exec_hook) == 'function') {
+		return global._safe_exec_hook(argv, input_data);
+	}
 	if (type(argv) != 'array' && type(argv) != 'string') {
 		return { code: -1, stdout: '', stderr: 'Invalid argv' };
 	}
@@ -213,6 +232,7 @@ export {
 	is_hostname,
 	is_url,
 	is_pem_block,
+	is_wireguard_key,
 	safe_path,
 	scrub_secrets,
 	safe_exec,

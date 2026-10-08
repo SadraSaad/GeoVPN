@@ -10,25 +10,39 @@ import * as cfg from 'geovpn.config';
 import * as state from 'geovpn.state';
 import * as parse from 'geovpn.ovpn_parse';
 import * as diag from 'geovpn.diag';
+import * as importer from 'geovpn.import';
+import * as te from 'geovpn.test_engine';
+import * as cred from 'geovpn.cred';
+import * as health from 'geovpn.health';
+import * as drv_common from 'geovpn.drivers.common';
 
-return {
-	'luci.geovpn': {
+let base_methods = {
 		status: {
 			call: function(req) {
 				let s = state.get_state();
 				let cursor = uci.cursor();
 				cursor.load('geovpn');
 				s.service.enabled = cursor.get('geovpn', 'main', 'enabled') == '1';
-				s.service.active_profile = cursor.get('geovpn', 'main', 'active_profile') || '';
+				let override = cfg.get_active_override();
+				s.service.active_profile = override || cursor.get('geovpn', 'main', 'active_profile') || '';
+				s.tunnel.override = override || null;
 
 				if (s.service.active_profile) {
 					let p = cfg.get_profile(s.service.active_profile);
-					if (p) s.tunnel.name = p.name || s.service.active_profile;
+					if (p) {
+						s.tunnel.name = p.name || s.service.active_profile;
+						s.tunnel.proto = p.proto || 'openvpn';
+					}
 				}
 
 				let ifstats = state.get_interface_stats(s.tunnel.device || 'geovpn0');
 				s.tunnel.rx_bytes = ifstats.rx_bytes;
 				s.tunnel.tx_bytes = ifstats.tx_bytes;
+
+				let h_summary = health.get_health_summary();
+				s.tunnel.health = h_summary.status || 'unknown';
+				s.tunnel.last_handshake = h_summary.last_handshake || null;
+				s.drivers = drv_common.list_drivers();
 
 				return s;
 			}
@@ -53,25 +67,23 @@ return {
 					return { error: 'BAD_REQUEST', message: 'Config content cannot be empty' };
 				}
 
-				let res = parse.parse_ovpn(content, name);
+				let res = importer.import_profile({
+					name: name,
+					content: content,
+					proto: 'openvpn',
+					dedupe: 'replace'
+				});
 				if (!res.ok) {
 					return { error: 'PARSE_ERROR', message: res.error };
 				}
 
-				let id = cfg.create_profile(res.profile);
-				let pdir = cfg.PROFILES_DIR + '/' + id;
-				let f = fs.open(pdir + '/profile.ovpn', 'w', 0o600);
-				if (f) {
-					f.write(content);
-					f.close();
-				}
 				return {
 					ok: true,
-					id: id,
-					name: res.profile.name,
-					warnings: res.profile.warnings,
-					ignored: res.profile.ignored,
-					incomplete: res.profile.incomplete
+					id: res.id,
+					name: res.name,
+					warnings: res.warnings || [],
+					ignored: res.ignored || [],
+					incomplete: res.incomplete || []
 				};
 			}
 		},
@@ -116,6 +128,22 @@ return {
 					ok: true,
 					id: id,
 					name: p.name || id,
+					proto: p.proto || 'openvpn',
+					provider: p.provider || '',
+					cred: p.cred || '',
+					remotes: p.remotes || [],
+					cipher: p.cipher || '',
+					auth_user_pass: p.auth_user_pass,
+					wg_endpoint_host: p.wg_endpoint_host || '',
+					wg_endpoint_port: p.wg_endpoint_port || '',
+					wg_public_key: p.wg_public_key || '',
+					wg_address: p.wg_address || [],
+					wg_dns: p.wg_dns || [],
+					wg_allowed_ips: p.wg_allowed_ips || [],
+					wg_mtu: p.wg_mtu || '',
+					wg_keepalive: p.wg_keepalive || '',
+					has_wg_key: p.has_wg_key || false,
+					has_wg_psk: p.has_wg_psk || false,
 					ovpn: ovpn_content,
 					auth: auth_content
 				};
@@ -129,6 +157,7 @@ return {
 				let name = (req && req.args && req.args.name) ? req.args.name : '';
 				let ovpn = (req && req.args) ? req.args.ovpn : '';
 				let auth = (req && req.args) ? req.args.auth : null;
+				let args = (req && req.args) ? req.args : {};
 
 				if (!util.is_profile_id(id)) {
 					return { error: 'INVALID_ID', message: 'Invalid profile ID' };
@@ -168,6 +197,53 @@ return {
 						af.close();
 					}
 					cursor.set('geovpn', id, 'auth_user_pass', (length(trim(auth)) > 0) ? '1' : '0');
+				}
+
+				if (args.cred != null) {
+					cursor.set('geovpn', id, 'cred', args.cred);
+				}
+
+				if (p.proto == 'wireguard' || args.proto == 'wireguard' || args.wg_endpoint_host) {
+					if (args.wg_endpoint_host) cursor.set('geovpn', id, 'wg_endpoint_host', args.wg_endpoint_host);
+					if (args.wg_endpoint_port) cursor.set('geovpn', id, 'wg_endpoint_port', sprintf('%d', +args.wg_endpoint_port));
+					if (args.wg_public_key) cursor.set('geovpn', id, 'wg_public_key', args.wg_public_key);
+					if (args.wg_address) cursor.set('geovpn', id, 'wg_address', (type(args.wg_address) == 'array') ? args.wg_address : [args.wg_address]);
+					if (args.wg_dns) cursor.set('geovpn', id, 'wg_dns', (type(args.wg_dns) == 'array') ? args.wg_dns : [args.wg_dns]);
+					if (args.wg_allowed_ips) cursor.set('geovpn', id, 'wg_allowed_ips', (type(args.wg_allowed_ips) == 'array') ? args.wg_allowed_ips : [args.wg_allowed_ips]);
+					if (args.wg_mtu) cursor.set('geovpn', id, 'wg_mtu', sprintf('%d', +args.wg_mtu));
+					if (args.wg_keepalive != null) cursor.set('geovpn', id, 'wg_keepalive', sprintf('%d', +args.wg_keepalive));
+					if (args.cred != null) cursor.set('geovpn', id, 'cred', args.cred);
+					if (args.wg_key && length(trim(args.wg_key)) > 0) {
+						let kf = fs.open(pdir + '/wg.key', 'w', 0o600);
+						if (kf) {
+							kf.write(trim(args.wg_key));
+							kf.close();
+						}
+					}
+					if (args.wg_psk && length(trim(args.wg_psk)) > 0) {
+						let pf = fs.open(pdir + '/wg.psk', 'w', 0o600);
+						if (pf) {
+							pf.write(trim(args.wg_psk));
+							pf.close();
+						}
+						cursor.set('geovpn', id, 'wg_has_psk', '1');
+					}
+				}
+
+				if (p.proto == 'ikev2' || args.proto == 'ikev2' || args.ike_host) {
+					if (args.ike_host) cursor.set('geovpn', id, 'ike_host', args.ike_host);
+					if (args.ike_remote_id) cursor.set('geovpn', id, 'ike_remote_id', args.ike_remote_id);
+					if (args.ike_username) cursor.set('geovpn', id, 'ike_username', args.ike_username);
+					if (args.ike_ca) cursor.set('geovpn', id, 'ike_ca', args.ike_ca);
+					if (args.ike_dpd) cursor.set('geovpn', id, 'ike_dpd', sprintf('%d', +args.ike_dpd));
+					if (args.cred != null) cursor.set('geovpn', id, 'cred', args.cred);
+					if (args.password && length(trim(args.password)) > 0) {
+						let sf = fs.open(pdir + '/ike.secret', 'w', 0o600);
+						if (sf) {
+							sf.write(trim(args.password));
+							sf.close();
+						}
+					}
 				}
 
 				cursor.commit('geovpn');
@@ -232,6 +308,27 @@ return {
 			call: function(req) {
 				let action = (req && req.args) ? req.args.action : 'status';
 				let target_profile = (req && req.args) ? req.args.profile : null;
+				let persist = (req && req.args && (req.args.persist == 1 || req.args.persist == '1' || req.args.persist == true));
+
+				if (action == 'switch') {
+					if (!target_profile || !util.is_profile_id(target_profile)) {
+						return { error: 'INVALID_ID', message: 'Valid profile ID required for switch' };
+					}
+					let sres = health.manual_switch(target_profile, persist);
+					if (!sres || !sres.ok) {
+						return {
+							error: (sres && sres.error) ? sres.error : 'SWITCH_FAILED',
+							message: (sres && sres.message) ? sres.message : 'Switch failed',
+							reason: sres ? sres.reason : null
+						};
+					}
+					return { ok: true, state: 'connected', profile: target_profile, persisted: !!persist };
+				}
+
+				if (action == 'health_tick' || action == 'health-tick') {
+					let hres = health.run_health_tick({ force: true });
+					return hres || { ok: false, error: 'TICK_FAILED' };
+				}
 
 				if (target_profile && util.is_profile_id(target_profile)) {
 					let cursor = uci.cursor();
@@ -380,5 +477,176 @@ return {
 				return diag.run_diag();
 			}
 		}
+};
+
+let ext_methods = {
+	import_profile: {
+		args: { name: '', filename: '', content: '', proto: '', provider: '', cred: '', dry_run: false, dedupe: 'skip' },
+		call: function(req) {
+			let args = (req && req.args) ? req.args : {};
+			if (!args.content || length(args.content) == 0) {
+				return { error: 'BAD_REQUEST', message: 'Config content cannot be empty' };
+			}
+			let res = importer.import_profile({
+				name: args.name,
+				filename: args.filename,
+				content: args.content,
+				proto: args.proto,
+				provider: args.provider || args.preset,
+				cred: args.cred,
+				dry_run: args.dry_run,
+				dedupe: args.dedupe || 'skip'
+			});
+			if (!res.ok) {
+				return { error: 'IMPORT_ERROR', message: res.error };
+			}
+			return res;
+		}
+	},
+
+	import_batch: {
+		args: { items: [], cred: '', dedupe: 'skip', atomic: false, proto: '', provider: '' },
+		call: function(req) {
+			let args = (req && req.args) ? req.args : {};
+			let items = args.items || [];
+			if (type(items) != 'array' || length(items) == 0) {
+				return { error: 'BAD_REQUEST', message: 'Items array cannot be empty' };
+			}
+			let res = importer.import_batch(items, {
+				cred: args.cred,
+				dedupe: args.dedupe || 'skip',
+				atomic: args.atomic,
+				proto: args.proto,
+				provider: args.provider || args.preset
+			});
+			if (!res.ok) {
+				return {
+					error: 'BATCH_ERROR',
+					message: res.error,
+					rolled_back: res.rolled_back || false,
+					rollback_count: res.rollback_count || 0,
+					errors: res.errors || []
+				};
+			}
+			return res;
+		}
+	},
+
+	test_start: {
+		args: { ids: [], all: false, probe_url: '' },
+		call: function(req) {
+			let args = (req && req.args) ? req.args : {};
+			let target = args.all ? 'all' : (args.ids || []);
+			let has_spawn = fs.stat('/usr/libexec/geovpn/spawn') && fs.stat('/usr/bin/geovpn');
+			if (has_spawn) {
+				let t_id = 't' + substr(sprintf('%08x', time()), 0, 8) + substr(sprintf('%04x', rand() % 65536), 0, 4);
+				let target_arg = (target == 'all') ? 'all' : ((type(target) == 'array') ? join(',', target) : target);
+				let spawn_args = ['/usr/bin/geovpn', 'test', target_arg, '--job-id', t_id];
+				if (args.probe_url) {
+					push(spawn_args, '--probe-url');
+					push(spawn_args, args.probe_url);
+				}
+				util.safe_exec(['/usr/libexec/geovpn/spawn', ...spawn_args]);
+				return { ok: true, job_id: t_id, total: (type(target) == 'array' ? length(target) : 1), async: true };
+			}
+			let res = te.test_job_start(target, { probe_url: args.probe_url });
+			if (!res.ok) {
+				return { error: res.error || 'BUSY', message: res.message || 'Cannot start test' };
+			}
+			return { ok: true, job_id: res.job_id, total: res.total, results: res.results || [] };
+		}
+	},
+
+	test_status: {
+		args: { job_id: '' },
+		call: function(req) {
+			let jid = (req && req.args) ? req.args.job_id : null;
+			if (!jid) return { error: 'INVALID_ARGS', message: 'job_id required' };
+			return te.test_job_status(jid);
+		}
+	},
+
+	test_cancel: {
+		args: { job_id: '' },
+		call: function(req) {
+			let jid = (req && req.args) ? req.args.job_id : null;
+			te.test_cancel(jid);
+			te.test_cleanup(jid, false);
+			return { ok: true };
+		}
+	},
+
+	test_results: {
+		args: { ids: [] },
+		call: function(req) {
+			let ids = (req && req.args) ? req.args.ids : [];
+			let items = te.get_cached_results(ids);
+			return { items: items };
+		}
+	},
+
+	test_cleanup: {
+		args: { verify: false },
+		call: function(req) {
+			let verify = (req && req.args && req.args.verify == true);
+			return te.test_cleanup(null, verify);
+		}
+	},
+
+	list_credentials: {
+		call: function(req) {
+			return { items: cred.list_credentials() };
+		}
+	},
+
+	save_credential: {
+		args: { id: '', username: '', password: '', wg_key: '', wg_psk: '' },
+		call: function(req) {
+			let args = (req && req.args) ? req.args : {};
+			let id = args.id;
+			if (!id || !cred.is_valid_id(id)) {
+				return { error: 'INVALID_ID', message: 'Invalid credential ID' };
+			}
+			let saved = false;
+			if (args.username || args.password) {
+				cred.store_userpass(id, args.username, args.password);
+				saved = true;
+			}
+			if (args.wg_key) {
+				cred.store_wg_keys(id, args.wg_key, args.wg_psk);
+				saved = true;
+			}
+			return { ok: true, id: id };
+		}
+	},
+
+	delete_credential: {
+		args: { id: '' },
+		call: function(req) {
+			let id = (req && req.args) ? req.args.id : null;
+			if (!id || !cred.is_valid_id(id)) {
+				return { error: 'INVALID_ID', message: 'Invalid credential ID' };
+			}
+			let ok = cred.delete_credential(id);
+			return { ok: ok };
+		}
+	},
+
+	autoconnect_status: {
+		call: function(req) {
+			return health.get_autoconnect_status();
+		}
+	},
+
+	health_tick: {
+		args: { force: true },
+		call: function(req) {
+			let force = (req && req.args && req.args.force !== false);
+			return health.run_health_tick({ force: force });
+		}
 	}
+};
+
+return {
+	'luci.geovpn': proto(base_methods, ext_methods)
 };

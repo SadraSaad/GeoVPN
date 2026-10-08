@@ -1,0 +1,46 @@
+{
+  "commands": [
+    [
+      "ip",
+      "-4",
+      "rule",
+      "add",
+      "priority",
+      "700",
+      "fwmark",
+      "0x01000000/0x0f000000",
+      "lookup",
+      "4200"
+    ],
+    [
+      "ip",
+      "-6",
+      "rule",
+      "add",
+      "priority",
+      "700",
+      "fwmark",
+      "0x01000000/0x0f000000",
+      "lookup",
+      "4200"
+    ]
+  ],
+  "undo": [
+    [
+      "ip",
+      "-6",
+      "rule",
+      "del",
+      "priority",
+      "700"
+    ],
+    [
+      "ip",
+      "-4",
+      "rule",
+      "del",
+      "priority",
+      "700"
+    ]
+  ]
+}

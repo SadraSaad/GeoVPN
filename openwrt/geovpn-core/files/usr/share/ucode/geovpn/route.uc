@@ -5,6 +5,13 @@
 
 import * as util from './util.uc';
 
+function rollback(undo_journal) {
+	util.log('warn', 'Rolling back routing changes via undo journal...');
+	for (let i = length(undo_journal) - 1; i >= 0; i--) {
+		util.safe_exec(undo_journal[i]);
+	}
+}
+
 function apply_routes(main_cfg) {
 	let prio = sprintf('%d', main_cfg.rule_priority || 700);
 	let table = sprintf('%d', main_cfg.rt_table || 4200);
@@ -55,13 +62,6 @@ function apply_routes(main_cfg) {
 	return true;
 }
 
-function rollback(undo_journal) {
-	util.log('warn', 'Rolling back routing changes via undo journal...');
-	for (let i = length(undo_journal) - 1; i >= 0; i--) {
-		util.safe_exec(undo_journal[i]);
-	}
-}
-
 function set_tunnel_up(dev, has_ipv6, table_id) {
 	let table = sprintf('%d', table_id || 4200);
 	util.safe_exec(['sysctl', '-w', sprintf('net.ipv4.conf.%s.rp_filter=2', dev)]);
@@ -79,6 +79,56 @@ function set_tunnel_down(table_id) {
 	util.log('info', sprintf('Default routes removed from table %s', table));
 }
 
+function test_route_init(table_id, prio_id) {
+	let table = sprintf('%d', table_id || 4300);
+	let prio = sprintf('%d', prio_id || 701);
+	let mark_spec = '0x03000000/0x0f000000';
+
+	// 1. Remove any stale test rules
+	util.safe_exec(['ip', '-4', 'rule', 'del', 'priority', prio]);
+	util.safe_exec(['ip', '-6', 'rule', 'del', 'priority', prio]);
+
+	// 2. Add policy routing rules for test mark
+	let r4 = util.safe_exec(['ip', '-4', 'rule', 'add', 'priority', prio, 'fwmark', mark_spec, 'lookup', table]);
+	let r6 = util.safe_exec(['ip', '-6', 'rule', 'add', 'priority', prio, 'fwmark', mark_spec, 'lookup', table]);
+
+	// 3. Invariant T2: Fail-closed unreachable default route in table 4300 BEFORE test link is raised
+	util.safe_exec(['ip', '-4', 'route', 'replace', 'unreachable', 'default', 'table', table, 'metric', '4000']);
+	util.safe_exec(['ip', '-6', 'route', 'replace', 'unreachable', 'default', 'table', table, 'metric', '4000']);
+
+	util.log('info', sprintf('Test policy routing initialized: table %s, priority %s, mark %s (fail-closed)', table, prio, mark_spec));
+	return (r4.code == 0 && r6.code == 0);
+}
+
+function test_route_up(dev, has_ipv6, table_id) {
+	let table = sprintf('%d', table_id || 4300);
+	util.safe_exec(['ip', '-4', 'route', 'replace', 'default', 'dev', dev, 'table', table, 'metric', '10']);
+	if (has_ipv6) {
+		util.safe_exec(['ip', '-6', 'route', 'replace', 'default', 'dev', dev, 'table', table, 'metric', '10']);
+	}
+	util.log('info', sprintf('Test default routes for dev %s installed in table %s', dev, table));
+}
+
+function test_route_down(dev, table_id) {
+	let table = sprintf('%d', table_id || 4300);
+	util.safe_exec(['ip', '-4', 'route', 'del', 'default', 'dev', dev, 'table', table, 'metric', '10']);
+	util.safe_exec(['ip', '-6', 'route', 'del', 'default', 'dev', dev, 'table', table, 'metric', '10']);
+	util.log('info', sprintf('Test default routes removed from table %s', table));
+}
+
+function test_route_teardown(table_id, prio_id) {
+	let table = sprintf('%d', table_id || 4300);
+	let prio = sprintf('%d', prio_id || 701);
+
+	util.safe_exec(['ip', '-4', 'rule', 'del', 'priority', prio]);
+	util.safe_exec(['ip', '-6', 'rule', 'del', 'priority', prio]);
+	util.safe_exec(['ip', '-4', 'route', 'flush', 'table', table]);
+	util.safe_exec(['ip', '-6', 'route', 'flush', 'table', table]);
+
+	util.log('info', sprintf('Test routing table %s and priority %s cleared', table, prio));
+	return true;
+}
+
 function teardown_routes(main_cfg) {
 	let prio = sprintf('%d', (main_cfg && main_cfg.rule_priority) ? main_cfg.rule_priority : 700);
 	let table = sprintf('%d', (main_cfg && main_cfg.rt_table) ? main_cfg.rt_table : 4200);
@@ -88,6 +138,9 @@ function teardown_routes(main_cfg) {
 	util.safe_exec(['ip', '-4', 'route', 'flush', 'table', table]);
 	util.safe_exec(['ip', '-6', 'route', 'flush', 'table', table]);
 
+	// Invariant T1/T4: Also clear test routing table and rules on teardown/panic
+	test_route_teardown(4300, 701);
+
 	util.log('info', sprintf('Routing table %s and priority %s cleared', table, prio));
 	return true;
 }
@@ -96,5 +149,9 @@ export {
 	apply_routes,
 	set_tunnel_up,
 	set_tunnel_down,
-	teardown_routes
+	teardown_routes,
+	test_route_init,
+	test_route_up,
+	test_route_down,
+	test_route_teardown
 };

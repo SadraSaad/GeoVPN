@@ -1,0 +1,9 @@
+#!/bin/sh
+ROOTFS="${OW_ROOTFS:-/tmp/ow-rootfs}"
+if [ -x "$ROOTFS/lib/ld-musl-x86_64.so.1" ] && [ -x "$ROOTFS/sbin/uci" ]; then
+	exec "$ROOTFS/lib/ld-musl-x86_64.so.1" --library-path "$ROOTFS/lib:$ROOTFS/usr/lib" "$ROOTFS/sbin/uci" "$@"
+fi
+if command -v uci.bin >/dev/null 2>&1; then
+	exec uci.bin "$@"
+fi
+exit 127

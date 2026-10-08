@@ -7,8 +7,8 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=geovpn
-PKG_VERSION:=1.0.0
-PKG_RELEASE:=3
+PKG_VERSION:=1.1.0
+PKG_RELEASE:=1
 PKG_LICENSE:=Apache-2.0
 PKG_LICENSE_FILES:=LICENSE
 PKG_MAINTAINER:=GeoVPN Developers <geovpn@example.org>
@@ -19,15 +19,15 @@ define Package/geovpn
   SECTION:=net
   CATEGORY:=Network
   SUBMENU:=VPN
-  TITLE:=GeoVPN meta-package (backend + LuCI + Persian)
+  TITLE:=GeoVPN meta-package (core + OpenVPN + LuCI + seed)
   PKGARCH:=all
-  DEPENDS:=+geovpn-core +luci-app-geovpn +luci-i18n-geovpn-fa
+  DEPENDS:=+geovpn-core +openvpn-openssl +luci-app-geovpn +luci-i18n-geovpn-fa +geovpn-data-seed
 endef
 
 define Package/geovpn/description
-  Meta-package installing the complete GeoVPN suite:
+  Meta-package installing the standard GeoVPN suite:
   OpenVPN core service, policy routing, LuCI web management interface,
-  and Persian language pack.
+  Persian language pack, and starter offline data.
 endef
 
 define Build/Compile

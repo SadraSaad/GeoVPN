@@ -162,20 +162,26 @@ function render_dnsmasq_conf(config, geosite_domains, active_profile) {
 	}
 
 	// 1. Infrastructure hosts (VPN server hostnames) -> always direct
+	let infra_domains = [];
 	if (active_profile && active_profile.remotes) {
-		let infra_domains = [];
 		for (let r in active_profile.remotes) {
 			let host = split(r, ' ')[0];
 			if (util.is_domain(host)) {
 				push(infra_domains, host);
 			}
 		}
-		if (length(infra_domains) > 0) {
-			for (let chunk in chunk_domains(infra_domains, MAX_DOMAINS_PER_LINE, 40)) {
-				let d_spec = '/' + join('/', chunk) + '/';
-				push(lines, sprintf('server=%s%s', d_spec, primary_direct_dns));
-				push(lines, sprintf('nftset=%s4#inet#geovpn#always4_dyn,6#inet#geovpn#always6_dyn', d_spec));
-			}
+	}
+	if (active_profile && active_profile.wg_endpoint_host) {
+		let host = active_profile.wg_endpoint_host;
+		if (util.is_domain(host)) {
+			push(infra_domains, host);
+		}
+	}
+	if (length(infra_domains) > 0) {
+		for (let chunk in chunk_domains(infra_domains, MAX_DOMAINS_PER_LINE, 40)) {
+			let d_spec = '/' + join('/', chunk) + '/';
+			push(lines, sprintf('server=%s%s', d_spec, primary_direct_dns));
+			push(lines, sprintf('nftset=%s4#inet#geovpn#always4_dyn,6#inet#geovpn#always6_dyn', d_spec));
 		}
 	}
 

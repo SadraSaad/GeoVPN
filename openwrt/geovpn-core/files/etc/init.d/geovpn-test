@@ -1,0 +1,32 @@
+#!/bin/sh /etc/rc.common
+#
+# GeoVPN Isolated Test Instance procd init script (§7.3.1)
+#
+# shellcheck disable=SC2034
+START=96
+STOP=11
+export USE_PROCD=1
+
+PROG=/usr/sbin/openvpn
+RUN_DIR=/var/run/geovpn/test
+
+start_service() {
+	CONF_FILE="$1"
+	[ -n "$CONF_FILE" ] || CONF_FILE="$RUN_DIR/test.conf"
+	if [ ! -f "$CONF_FILE" ]; then
+		echo "GeoVPN-test: configuration file not found" >&2
+		return 1
+	fi
+
+	procd_open_instance "geovpn-test"
+	procd_set_param command "$PROG" --config "$CONF_FILE" --syslog geovpn-test
+	procd_set_param respawn 0 0 0
+	procd_set_param file "$CONF_FILE"
+	procd_set_param stdout 1
+	procd_set_param stderr 1
+	procd_close_instance
+}
+
+stop_service() {
+	true
+}

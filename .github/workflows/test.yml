@@ -1,4 +1,4 @@
-name: Integration Tests
+name: Tests
 
 on:
   push:
@@ -8,9 +8,47 @@ on:
   workflow_dispatch:
 
 jobs:
+  lint:
+    name: Lint & Static Checks
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y shellcheck nodejs npm jq
+
+      - name: Run linter
+        run: ./tools/lint.sh
+
+  unit-tests:
+    name: Complete Unit Test Suite
+    runs-on: ubuntu-24.04
+    needs: lint
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Fetch OpenWrt rootfs for ucode runtime (optional)
+        run: |
+          mkdir -p /tmp/ow-rootfs
+          wget -qO- https://downloads.openwrt.org/releases/25.12.5/targets/x86/64/openwrt-25.12.5-x86-64-rootfs.tar.gz | tar -xz -C /tmp/ow-rootfs 2>/dev/null || true
+
+      - name: Run complete unit test suite
+        run: |
+          python3 -m unittest discover -s tests/unit -p "test_*.py" -v
+
   integration:
     name: Network Namespace Integration Tests
     runs-on: ubuntu-24.04
+    needs: unit-tests
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

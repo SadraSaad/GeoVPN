@@ -5,7 +5,7 @@
 
 import * as fs from 'fs';
 
-const RUN_DIR = '/var/run/geovpn';
+const RUN_DIR = getenv('GEOVPN_RUN_DIR') || '/var/run/geovpn';
 const STATE_FILE = RUN_DIR + '/state.json';
 const UPDATE_FILE = RUN_DIR + '/update.json';
 

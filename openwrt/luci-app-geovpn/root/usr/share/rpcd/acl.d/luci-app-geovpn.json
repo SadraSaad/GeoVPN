@@ -34,5 +34,32 @@
         ]
       }
     }
+  },
+  "luci-app-geovpn-extra": {
+    "description": "Grant access to GeoVPN testing, batch import, and credentials",
+    "read": {
+      "ubus": {
+        "luci.geovpn": [
+          "test_status",
+          "test_results",
+          "list_credentials",
+          "autoconnect_status"
+        ]
+      }
+    },
+    "write": {
+      "ubus": {
+        "luci.geovpn": [
+          "test_start",
+          "test_cancel",
+          "test_cleanup",
+          "import_profile",
+          "import_batch",
+          "save_credential",
+          "delete_credential",
+          "health_tick"
+        ]
+      }
+    }
   }
 }

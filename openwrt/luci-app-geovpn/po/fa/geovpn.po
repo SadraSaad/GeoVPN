@@ -824,3 +824,738 @@ msgstr "مثلاً digikala.com یا 1.1.1.1"
 msgid "e.g. wiki.corp.example or 203.0.113.0/24"
 msgstr "مثلاً wiki.corp.example یا 203.0.113.0/24"
 
+
+msgid "%d Profiles Ready"
+msgstr "%d پروفایل آماده"
+
+msgid "%d files ready"
+msgstr "%d پرونده آماده"
+
+msgid "+ Add Custom"
+msgstr "+ افزودن سفارشی"
+
+msgid "+ Add as custom tag: "
+msgstr "+ افزودن به عنوان برچسب سفارشی: "
+
+msgid "+ Import Profiles"
+msgstr "+ وارد کردن پروفایل‌ها"
+
+msgid "+ New Credential Set"
+msgstr "+ مجموعه اعتبارنامه جدید"
+
+msgid "0 files in queue"
+msgstr "۰ پرونده در صف"
+
+msgid "Action Needed"
+msgstr "نیاز به اقدام"
+
+msgid "Allowed IPs"
+msgstr "آی‌پی‌های مجاز (Allowed IPs)"
+
+msgid "Batch Import Summary"
+msgstr "خلاصه واردسازی دسته‌ای"
+
+msgid "Batch Preview & Review"
+msgstr "پیش‌نمایش و بررسی دسته‌ای"
+
+msgid "Batch import error: "
+msgstr "خطای واردسازی دسته‌ای: "
+
+msgid "Browse Files"
+msgstr "انتخاب پرونده‌ها"
+
+msgid "Cancel Job"
+msgstr "لغو آزمایش"
+
+msgid "Cannot start test: "
+msgstr "آزمایش شروع نشد: "
+
+msgid "Clean Up Test State"
+msgstr "پاکسازی وضعیت آزمایش"
+
+msgid "Cleanup completed with %d remaining items."
+msgstr "پاکسازی با %d مورد باقی‌مانده انجام شد."
+
+msgid "Cleanup error: "
+msgstr "خطای پاکسازی: "
+
+msgid "Clear Queue"
+msgstr "پاکسازی صف"
+
+msgid "Close"
+msgstr "بستن"
+
+msgid "Commit Batch Import (%d profiles)"
+msgstr "ثبت نهایی واردسازی دسته‌ای (%d پروفایل)"
+
+msgid "Connect"
+msgstr "اتصال"
+
+msgid "Connect Now"
+msgstr "اتصال فوری"
+
+msgid "Connection & HTTP probes successful"
+msgstr "دست‌دهی و کاوش‌های HTTP با موفقیت انجام شد"
+
+msgid "Connection succeeded with warnings"
+msgstr "اتصال با هشدار برقرار شد"
+
+msgid "Connection test failed"
+msgstr "آزمایش اتصال ناموفق بود"
+
+msgid "Create Shared Credential Set"
+msgstr "ایجاد مجموعه اعتبارنامه مشترک"
+
+msgid "Credential Set ID"
+msgstr "شناسه مجموعه اعتبارنامه"
+
+msgid "Credential set created: "
+msgstr "مجموعه اعتبارنامه ایجاد شد: "
+
+msgid "Credentials are saved securely as root-only 0600 secret files under /etc/geovpn/credentials/. Multiple profiles can reference the same credential set."
+msgstr "اعتبارنامه‌ها به عنوان پرونده‌های محرمانه 0600 فقط-دسترسی ریشه تحت <bdi dir='ltr'>/etc/geovpn/credentials/</bdi> ذخیره می‌شوند. چندین پروفایل می‌توانند به این اعتبارنامه ارجاع دهند."
+
+msgid "DNS Resolvers"
+msgstr "کارگزارهای دی‌ان‌اس (DNS)"
+
+msgid "Deduplication Policy"
+msgstr "خط‌مشی مدیریت موارد تکراری"
+
+msgid "Diagnostic Detail"
+msgstr "جزئیات عیب‌یابی"
+
+msgid "Diagnostic Hint"
+msgstr "راهنمای عیب‌یابی"
+
+msgid "Display capped: Showing first 200 of %d profiles."
+msgstr "نمایش محدود: ۲۰۰ پروفایل نخست از مجموع %d نمایش داده شده است."
+
+msgid "Drag & Drop .ovpn, .conf, and .sswan Configuration Files Here"
+msgstr "پرونده‌های پیکربندی .ovpn، .conf و .sswan را به اینجا بکشید و رها کنید"
+
+msgid "Edit Profile"
+msgstr "ویرایش پروفایل"
+
+msgid "Endpoint Host"
+msgstr "میزبان مقصد (Host)"
+
+msgid "Endpoint Port"
+msgstr "درگاه مقصد (Port)"
+
+msgid "Engine busy"
+msgstr "موتور آزمایش مشغول است"
+
+msgid "Enter new password (leave empty to keep unchanged)"
+msgstr "رمز عبور جدید را وارد کنید (جهت عدم تغییر خالی بگذارید)"
+
+msgid "Enter new preshared key (leave empty to keep unchanged)"
+msgstr "کلید مشترک جدید (PSK) را وارد کنید (جهت عدم تغییر خالی بگذارید)"
+
+msgid "Enter new private key (leave empty to keep unchanged)"
+msgstr "کلید خصوصی جدید را وارد کنید (جهت عدم تغییر خالی بگذارید)"
+
+msgid "Enter username"
+msgstr "نام کاربری را وارد کنید"
+
+msgid "Error saving profile: "
+msgstr "خطا در ذخیره پروفایل: "
+
+msgid "Error updating profile: "
+msgstr "خطا در به‌روزرسانی پروفایل: "
+
+msgid "Errors"
+msgstr "خطاها"
+
+msgid "Exceeds 128 KB size limit"
+msgstr "حجم پرونده از سقف ۱۲۸ کیلوبایت بیشتر است"
+
+msgid "Failed"
+msgstr "ناموفق"
+
+msgid "Failed to create credential set: "
+msgstr "ایجاد مجموعه اعتبارنامه ناموفق بود: "
+
+msgid "Failed to load profile: "
+msgstr "بارگذاری پروفایل ناموفق بود: "
+
+msgid "Failed to process batch"
+msgstr "پردازش دسته‌ای ناموفق بود"
+
+msgid "File Name"
+msgstr "نام پرونده"
+
+msgid "Generic (Standard OpenVPN & WireGuard)"
+msgstr "عمومی (استاندارد OpenVPN و WireGuard)"
+
+msgid "GeoVPN — Connection Profiles"
+msgstr "GeoVPN — پروفایل‌های اتصال"
+
+msgid "GeoVPN — Profile & Batch Importer"
+msgstr "GeoVPN — واردکننده پروفایل و دسته‌ای"
+
+msgid "GeoVPN — Test Panel"
+msgstr "GeoVPN — پانل آزمایش"
+
+msgid "HTTP Probe (Latency / Loss)"
+msgstr "کاوش HTTP (تأخیر / افت بسته)"
+
+msgid "HTTP Probe Latency"
+msgstr "تأخیر کاوش HTTP"
+
+msgid "HTTP Probe Target"
+msgstr "هدف کاوش HTTP"
+
+msgid "Handshake"
+msgstr "دست‌دهی (Handshake)"
+
+msgid "Handshake Latency"
+msgstr "تأخیر دست‌دهی"
+
+msgid "Import Completed"
+msgstr "واردسازی به پایان رسید"
+
+msgid "Import More"
+msgstr "واردسازی موارد دیگر"
+
+msgid "Import Preset"
+msgstr "پیش‌تنظیم واردسازی"
+
+msgid "Import Profiles"
+msgstr "وارد کردن پروفایل‌ها"
+
+msgid "Import Settings & Credentials"
+msgstr "تنظیمات واردسازی و اعتبارنامه‌ها"
+
+msgid "Interface Address"
+msgstr "نشانی رابط (Address)"
+
+msgid "Invalid"
+msgstr "نامعتبر"
+
+msgid "Keep both (rename duplicates with numbered suffix)"
+msgstr "نگهداری هر دو (تغییر نام تکراری با پسوند عددی)"
+
+msgid "Key"
+msgstr "کلید"
+
+msgid "Key + PSK"
+msgstr "کلید + کلید مشترک (PSK)"
+
+msgid "Key required"
+msgstr "نیازمند کلید"
+
+msgid "Launching pre-connection test job..."
+msgstr "در حال راه‌اندازی فرآیند آزمایش پیش از اتصال..."
+
+msgid "MTU / Keepalive"
+msgstr "MTU / نگه‌داری اتصال"
+
+msgid "Max Handshake"
+msgstr "حداکثر زمان دست‌دهی"
+
+msgid "Max Latency"
+msgstr "حداکثر تأخیر مجاز"
+
+msgid "Max Packet Loss"
+msgstr "حداکثر افت بسته مجاز"
+
+msgid "New Credential Set"
+msgstr "مجموعه اعتبارنامه جدید"
+
+msgid "No VPN profiles configured to test."
+msgstr "هیچ پروفایل VPN برای آزمایش پیکربندی نشده است."
+
+msgid "No VPN profiles configured. Import .ovpn or .conf files to get started."
+msgstr "هیچ پروفایل VPN پیکربندی نشده است. برای شروع پرونده‌های .ovpn یا .conf را وارد کنید."
+
+msgid "No categories found in catalog."
+msgstr "دسته‌بندی در کاتالوگ یافت نشد."
+
+msgid "No files selected yet. Drag and drop configuration files above."
+msgstr "هنوز پرونده‌ای انتخاب نشده است. پرونده‌های پیکربندی را به کادر بالا بکشید و رها کنید."
+
+msgid "No passing or warning profiles found to connect. Run tests first."
+msgstr "هیچ پروفایل موفق یا دارای هشداری برای اتصال یافت نشد. ابتدا آزمایش را اجرا کنید."
+
+msgid "No valid files in queue to import."
+msgstr "پرونده معتبری در صف جهت واردسازی وجود ندارد."
+
+msgid "None (use profile key file)"
+msgstr "هیچ‌کدام (استفاده از پرونده کلید درون پروفایل)"
+
+msgid "None / Inline credentials"
+msgstr "هیچ‌کدام / اعتبارنامه درون‌پیکربندی"
+
+msgid "Notice: IKEv2 configuration is experimental. Standard strongSwan client packages are required."
+msgstr "توجه: پیکربندی IKEv2 آزمایشی است. بسته‌های کلاینت استاندارد strongSwan مورد نیاز است."
+
+msgid "OK"
+msgstr "سالم"
+
+msgid "OpenVPN Configuration File"
+msgstr "پرونده پیکربندی OpenVPN"
+
+msgid "OpenVPN profile updated successfully."
+msgstr "پروفایل OpenVPN با موفقیت به‌روزرسانی شد."
+
+msgid "Optimal route"
+msgstr "مسیر بهینه"
+
+msgid "Overwrite duplicates (update endpoints and keys)"
+msgstr "بازنویسی تکراری‌ها (به‌روزرسانی مقاصد و کلیدها)"
+
+msgid "Password (Write-Only)"
+msgstr "رمز عبور (فقط-نوشتنی)"
+
+msgid "Password (for OpenVPN)"
+msgstr "رمز عبور (ویژه OpenVPN)"
+
+msgid "Please select one or more profiles to test."
+msgstr "لطفاً یک یا چند پروفایل را برای آزمایش انتخاب کنید."
+
+msgid "Please specify a credential set ID."
+msgstr "لطفاً شناسه مجموعه اعتبارنامه را مشخص کنید."
+
+msgid "Pre-Connection Test"
+msgstr "آزمایش پیش از اتصال"
+
+msgid "Pre-Connection Test Engine"
+msgstr "موتور آزمایش پیش از اتصال"
+
+msgid "Pre-Connection Test Results"
+msgstr "نتایج آزمایش پیش از اتصال"
+
+msgid "Pre-connection testing creates isolated temporary links (gvt0) under fail-closed table 4300 with zero leakage into the active VPN tunnel or LAN. Results are scored against configured latency and handshake thresholds."
+msgstr "آزمایش پیش از اتصال پیوندهای موقت ایزوله‌شده (<bdi dir='ltr'>gvt0</bdi>) را تحت جدول مسدودسازی امن ۴۳۰۰ بدون هیچ‌گونه نشت به تونل فعال VPN یا شبکه محلی می‌سازد. نتایج بر اساس آستانه‌های پیکربندی‌شده دست‌دهی و تأخیر ارزیابی می‌شوند."
+
+msgid "Preshared Key (Optional)"
+msgstr "کلید مشترک PSK (اختیاری)"
+
+msgid "Private Key (Secret)"
+msgstr "کلید خصوصی (محرمانه)"
+
+msgid "Profile"
+msgstr "پروفایل"
+
+msgid "Protocol"
+msgstr "پروتکل"
+
+msgid "Protocol & Provider"
+msgstr "پروتکل و ارائه‌دهنده"
+
+msgid "Read error"
+msgstr "خطای خواندن"
+
+msgid "Recommendation: "
+msgstr "پیشنهاد: "
+
+msgid "Routing Table"
+msgstr "جدول مسیریابی"
+
+msgid "Save Credentials"
+msgstr "ذخیره اعتبارنامه‌ها"
+
+msgid "Save error: "
+msgstr "خطای ذخیره‌سازی: "
+
+msgid "Score / Status"
+msgstr "امتیاز / وضعیت"
+
+msgid "Search category (e.g. ir, google)..."
+msgstr "جستجوی دسته‌بندی (مانند ir یا google)..."
+
+msgid "Server Public Key"
+msgstr "کلید عمومی سرور"
+
+msgid "Shared Credential Set"
+msgstr "مجموعه اعتبارنامه مشترک"
+
+msgid "Shared User/Pass"
+msgstr "کاربر/رمز مشترک"
+
+msgid "Size"
+msgstr "حجم"
+
+msgid "Skip duplicates (preserve existing profile)"
+msgstr "نادیده گرفتن تکراری‌ها (حفظ پروفایل موجود)"
+
+msgid "Skipped (Duplicates)"
+msgstr "نادیده گرفته شده (تکراری)"
+
+msgid "Starting runner..."
+msgstr "در حال شروع اجراکننده..."
+
+msgid "Successfully Imported"
+msgstr "با موفقیت وارد شد"
+
+msgid "Supports multiple files at once (up to 50 files, max 128 KB each)"
+msgstr "پشتیبانی همزمان از چندین پرونده (تا ۵۰ پرونده، حداکثر ۱۲۸ کیلوبایت برای هر کدام)"
+
+msgid "Test"
+msgstr "آزمایش"
+
+msgid "Test All Profiles"
+msgstr "آزمایش همه پروفایل‌ها"
+
+msgid "Test Panel"
+msgstr "پانل آزمایش"
+
+msgid "Test Result"
+msgstr "نتیجه آزمایش"
+
+msgid "Test Result: %s"
+msgstr "نتیجه آزمایش: %s"
+
+msgid "Test Selected"
+msgstr "آزمایش موارد انتخابی"
+
+msgid "Test environment cleanly verified: 0 residual routes, rules, or test interfaces."
+msgstr "محیط آزمایش با موفقیت تأیید شد: ۰ مسیر، قانون یا رابط آزمایشی باقی‌مانده است."
+
+msgid "Test failed to launch: "
+msgstr "راه‌اندازی آزمایش ناموفق بود: "
+
+msgid "Test in Test Panel"
+msgstr "آزمایش در پانل آزمایش"
+
+msgid "Test job cancelled."
+msgstr "فرآیند آزمایش لغو شد."
+
+msgid "Test job finished successfully."
+msgstr "فرآیند آزمایش با موفقیت به پایان رسید."
+
+msgid "Test job in progress..."
+msgstr "فرآیند آزمایش در حال اجرا است..."
+
+msgid "Test launch failed: "
+msgstr "راه‌اندازی آزمایش شکست خورد: "
+
+msgid "Test poll error: "
+msgstr "خطای دریافت وضعیت آزمایش: "
+
+msgid "Testing..."
+msgstr "در حال آزمایش..."
+
+msgid "Untested"
+msgstr "آزمایش‌نشده"
+
+msgid "Username (for OpenVPN)"
+msgstr "نام کاربری (ویژه OpenVPN)"
+
+msgid "View Profiles"
+msgstr "مشاهده پروفایل‌ها"
+
+msgid "WG Pre-shared Key"
+msgstr "کلید مشترک وایرگارد (PSK)"
+
+msgid "WG Private Key"
+msgstr "کلید خصوصی وایرگارد"
+
+msgid "Windscribe (Automatic DNS 10.255.255.3 & port tuning)"
+msgstr "وینداسکرایب (تنظیم خودکار دی‌ان‌اس 10.255.255.3 و بهینه‌سازی درگاه)"
+
+msgid "Windscribe Protocol Support Notice"
+msgstr "اطلاعیه پشتیبانی پروتکل‌های وینداسکرایب"
+
+msgid "WireGuard Pre-shared Key (optional)"
+msgstr "کلید مشترک وایرگارد (اختیاری)"
+
+msgid "WireGuard Private Key (optional)"
+msgstr "کلید خصوصی وایرگارد (اختیاری)"
+
+msgid "WireGuard profile updated successfully."
+msgstr "پروفایل WireGuard با موفقیت به‌روزرسانی شد."
+
+msgid "Write-only: current password is never prefilled to prevent exposure."
+msgstr "فقط-نوشتنی: جهت حفظ امنیت و جلوگیری از افشا، رمز عبور کنونی هرگز نمایش داده نمی‌شود."
+
+msgid "Write-only: current private key is never displayed to prevent exposure."
+msgstr "فقط-نوشتنی: جهت حفظ امنیت، کلید خصوصی کنونی هرگز نمایش داده نمی‌شود."
+
+msgid "Write-only: leave empty unless updating preshared key."
+msgstr "فقط-نوشتنی: در صورت عدم تمایل به تغییر کلید مشترک خالی بگذارید."
+
+msgid "★ Connect to Best"
+msgstr "★ اتصال به بهترین گزینه"
+
+msgid "Connect to top-scoring profile \"%s\" (Status: %s, Latency: %d ms)?"
+msgstr "اتصال به پروفایل دارای بالاترین امتیاز «<bdi dir='ltr'>%s</bdi>» (وضعیت: <bdi dir='ltr'>%s</bdi>، تأخیر: <bdi dir='ltr'>%d ms</bdi>)؟"
+
+msgid "Currently probing \"%s\"..."
+msgstr "در حال سنجش ارتباط با «<bdi dir='ltr'>%s</bdi>»..."
+
+msgid "Delete profile \"%s\"?"
+msgstr "پروفایل «<bdi dir='ltr'>%s</bdi>» حذف شود؟"
+
+msgid "Edit Profile: \"%s\""
+msgstr "ویرایش پروفایل: «<bdi dir='ltr'>%s</bdi>»"
+
+msgid "Failed to process batch slice"
+msgstr "پردازش بخش دسته‌ای با خطا مواجه شد"
+
+msgid "Issues encountered during import:"
+msgstr "مشکلات رخ‌داده در حین واردسازی:"
+
+msgid "None (inline username/password)"
+msgstr "هیچ‌کدام (نام‌کاربری/گذرواژه درون پرونده)"
+
+msgid "Space-separated IP addresses or \"auto\" for WAN DHCP servers."
+msgstr "نشانی‌های IP با فاصله یا <bdi dir='ltr'>\"auto\"</bdi> برای کارگزارهای WAN DHCP."
+
+msgid "Space-separated IP addresses or \"pushed\" to use server-pushed resolvers."
+msgstr "نشانی‌های IP با فاصله یا <bdi dir='ltr'>\"pushed\"</bdi> برای استفاده از کارگزارهای فرستاده‌شده از سرور."
+
+msgid "Standard OpenVPN (UDP/TCP) and WireGuard configurations are fully supported with high performance. Please note that Windscribe \"Stealth\" (TLS encapsulation over TCP 443 via Stunnel) and \"WStunnel\" (WebSocket encapsulation) require proprietary wrapper binaries not included in standard OpenWrt."
+msgstr "پیکربندی‌های استاندارد <bdi dir='ltr'>OpenVPN (UDP/TCP)</bdi> و <bdi dir='ltr'>WireGuard</bdi> با کارایی بالا به طور کامل پشتیبانی می‌شوند. لطفاً توجه داشته باشید که حالت‌های <bdi dir='ltr'>\"Stealth\"</bdi> (کپسوله‌سازی <bdi dir='ltr'>TLS</bdi> روی <bdi dir='ltr'>TCP 443</bdi> از طریق <bdi dir='ltr'>Stunnel</bdi>) و <bdi dir='ltr'>\"WStunnel\"</bdi> (کپسوله‌سازی <bdi dir='ltr'>WebSocket</bdi>) متعلق به وینداسکرایب، نیازمند باینری‌های انحصاری هستند که در <bdi dir='ltr'>OpenWrt</bdi> استاندارد گنجانده نشده‌اند."
+
+msgid "Testing profile \"%s\" (handshake & HTTP probe)..."
+msgstr "در حال آزمایش پروفایل «<bdi dir='ltr'>%s</bdi>» (دست‌دادن و کاوش HTTP)..."
+
+
+msgid "Auto-Connect & Failover"
+msgstr "اتصال خودکار و جابه‌جایی اضطراری"
+
+msgid "GeoVPN — Auto-Connect & Failover"
+msgstr "جئو‌وی‌پی‌ان — اتصال خودکار و جابه‌جایی اضطراری"
+
+msgid "Health & Failover Telemetry"
+msgstr "تله‌متری سلامت و جابه‌جایی اضطراری"
+
+msgid "Healthy"
+msgstr "سالم"
+
+msgid "Degraded"
+msgstr "تضعیف‌شده"
+
+msgid "Failing"
+msgstr "در حال شکست"
+
+msgid "Down"
+msgstr "قطع"
+
+msgid "Unknown"
+msgstr "نامشخص"
+
+msgid "Runtime Override Active (Temporary)"
+msgstr "جایگزینی موقت زمان اجرا فعال است (در حافظه)"
+
+msgid "Persisted in UCI"
+msgstr "ذخیره‌شده در UCI"
+
+msgid "Switch to Primary Profile"
+msgstr "تغییر به پروفایل اصلی"
+
+msgid "Failed to clear override: "
+msgstr "پاک‌سازی جایگزینی ناموفق بود: "
+
+msgid "Active Tunnel Profile"
+msgstr "پروفایل تونل فعال"
+
+msgid "Consecutive Failures"
+msgstr "شکست‌های متوالی"
+
+msgid "%d / %d failures"
+msgstr "<bdi dir='ltr'>%d / %d</bdi> شکست"
+
+msgid "Recent Metrics"
+msgstr "معیارهای اخیر"
+
+msgid "Handshake Age"
+msgstr "عمر دست‌دهی"
+
+msgid "HTTP Latency"
+msgstr "تأخیر HTTP"
+
+msgid "Packet Loss"
+msgstr "اتلاف بسته"
+
+msgid "Rate Limits & Cooldown"
+msgstr "محدودیت‌های نرخ و زمان خنک‌سازی"
+
+msgid "Switch Cooldown: "
+msgstr "خنک‌سازی تعویض: "
+
+msgid "Ready (No cooldown)"
+msgstr "آماده (بدون زمان انتظار)"
+
+msgid "Cooldown active: %ds remaining"
+msgstr "خنک‌سازی فعال است: <bdi dir='ltr'>%d ثانیه</bdi> باقی‌مانده"
+
+msgid "Switches in Last Hour: "
+msgstr "تعویض‌ها در یک ساعت گذشته: "
+
+msgid "%d / %d"
+msgstr "<bdi dir='ltr'>%d / %d</bdi>"
+
+msgid "Failover Backoff: "
+msgstr "عقب‌نشینی جابه‌جایی: "
+
+msgid "Exponential backoff active: %ds remaining"
+msgstr "عقب‌نشینی نمایی فعال است: <bdi dir='ltr'>%d ثانیه</bdi> باقی‌مانده"
+
+msgid "Manual Health Check"
+msgstr "بررسی دستی سلامت"
+
+msgid "Run Health Check Now"
+msgstr "اجرای فوری بررسی سلامت"
+
+msgid "Running Health Check..."
+msgstr "در حال بررسی سلامت..."
+
+msgid "Health check failed: "
+msgstr "بررسی سلامت ناموفق بود: "
+
+msgid "Auto-Connect & Health Policies"
+msgstr "سیاست‌های اتصال خودکار و سلامت"
+
+msgid "Auto-Connect Mode"
+msgstr "حالت اتصال خودکار"
+
+msgid "Manual Only (Off)"
+msgstr "فقط دستی (خاموش)"
+
+msgid "Connect Gate Only"
+msgstr "فقط درگاه اتصال (بررسی پیش از اتصال)"
+
+msgid "Connect Best After Testing"
+msgstr "اتصال به بهترین گزینه پس از آزمایش"
+
+msgid "Ordered Fallback List"
+msgstr "فهرست اولویت‌دار پشتیبان"
+
+msgid "Defines connection strategy: off (manual), gate (require test pass), best (connect top-ranked passing profile), fallback (ordered list)."
+msgstr "تعیین استراتژی اتصال: خاموش (دستی)، درگاه (الزام قبولی در آزمون)، بهترین (اتصال به رتبه اول آزمون)، پشتیبان (فهرست اولویت‌دار)."
+
+msgid "Connect Gate"
+msgstr "درگاه اتصال"
+
+msgid "Off (Connect immediately without test)"
+msgstr "خاموش (اتصال فوری بدون آزمایش)"
+
+msgid "Warn (Test before connect, warn on failure)"
+msgstr "هشدار (آزمایش قبل از اتصال، هشدار در صورت عدم موفقیت)"
+
+msgid "Require (Strict: abort connect if test fails)"
+msgstr "الزامی (سخت‌گیرانه: لغو اتصال در صورت عدم قبولی در آزمون)"
+
+msgid "Enforce pre-connection test before activating a profile. Require aborts connect if test fails."
+msgstr "اجرای آزمون پیش از اتصال پیش از فعال‌سازی پروفایل. حالت الزامی در صورت شکست آزمون اتصال را لغو می‌کند."
+
+msgid "Health Checks Enabled"
+msgstr "بررسی سلامت فعال است"
+
+msgid "Enable periodic cron health ticks (no resident daemon)"
+msgstr "فعال‌سازی بررسی‌های دوره‌ای cron سلامت (بدون دیمون مقیم)"
+
+msgid "Health Tick Interval"
+msgstr "بازه بررسی دوره‌ای سلامت"
+
+msgid "60 seconds (1 minute)"
+msgstr "<bdi dir='ltr'>60</bdi> ثانیه (1 دقیقه)"
+
+msgid "120 seconds (2 minutes - Default)"
+msgstr "<bdi dir='ltr'>120</bdi> ثانیه (2 دقیقه - پیش‌فرض)"
+
+msgid "180 seconds (3 minutes)"
+msgstr "<bdi dir='ltr'>180</bdi> ثانیه (3 دقیقه)"
+
+msgid "300 seconds (5 minutes)"
+msgstr "<bdi dir='ltr'>300</bdi> ثانیه (5 دقیقه)"
+
+msgid "600 seconds (10 minutes)"
+msgstr "<bdi dir='ltr'>600</bdi> ثانیه (10 دقیقه)"
+
+msgid "How frequently the router tests active tunnel health via live probe."
+msgstr "فاصله زمانی بررسی سلامت تونل فعال توسط مسیریاب از طریق کاوشگر زنده."
+
+msgid "Failure Threshold"
+msgstr "آستانه شکست"
+
+msgid "Number of consecutive health check failures required before triggering failover (hysteresis)."
+msgstr "تعداد شکست‌های متوالی در بررسی سلامت پیش از آغاز جابه‌جایی اضطراری (هیسترزیس)."
+
+msgid "Down Grace Period"
+msgstr "مهلت مدارای قطعی"
+
+msgid "Seconds tunnel interface can remain disconnected before triggering failover immediately."
+msgstr "مدت زمان (به ثانیه) مجاز برای قطعی رابط تونل پیش از آغاز فوری جابه‌جایی اضطراری."
+
+msgid "Automatic Failover"
+msgstr "جابه‌جایی اضطراری خودکار"
+
+msgid "Automatically switch to another healthy profile on failure"
+msgstr "تغییر خودکار به پروفایل سالم دیگر در صورت قطعی"
+
+msgid "Automatic Failback"
+msgstr "بازگشت خودکار به اصلی"
+
+msgid "Switch back to primary profile when it passes 3 consecutive ticks"
+msgstr "بازگشت به پروفایل اصلی در صورت قبولی در ۳ بررسی متوالی"
+
+msgid "Persist Failover Switch"
+msgstr "پایداری تغییرات جابه‌جایی اضطراری"
+
+msgid "Commit active_profile to flash UCI on failover (off = temporary RAM override)"
+msgstr "ثبت پروفایل جدید در حافظه فلش UCI (خاموش = جایگزینی موقت در حافظه رم جهت جلوگیری از استهلاک فلش)"
+
+msgid "Rate Limiting"
+msgstr "محدودیت نرخ تعویض"
+
+msgid "Min interval (s):"
+msgstr "حداقل فاصله (ثانیه):"
+
+msgid "Max switches/hour:"
+msgstr "حداکثر تعویض در ساعت:"
+
+msgid "Fallback Profile Pool"
+msgstr "مجموعه پروفایل‌های پشتیبان"
+
+msgid "Select profiles used for failover pool when in fallback mode (hold Ctrl/Cmd to select multiple)."
+msgstr "انتخاب پروفایل‌های مورد استفاده برای جابه‌جایی اضطراری در حالت پشتیبان (کلید Ctrl/Cmd را برای انتخاب چندگانه نگه دارید)."
+
+msgid "Auto-connect and failover settings saved and applied."
+msgstr "تنظیمات اتصال خودکار و جابه‌جایی اضطراری ذخیره و اعمال شد."
+
+msgid "Failed to save settings: "
+msgstr "ذخیره تنظیمات ناموفق بود: "
+
+msgid "N/A"
+msgstr "ناموجود"
+
+msgid "Experimental"
+msgstr "آزمایشی"
+
+msgid "Write-only: current password is never displayed to prevent exposure."
+msgstr "فقط-نوشتنی: گذرواژه فعلی برای جلوگیری از افشا نمایش داده نمی‌شود."
+
+msgid "Password required"
+msgstr "گذرواژه لازم است"
+
+msgid "The IKEv2 protocol driver is not installed. To enable IKEv2 tunnels, install the add-on package: apk add geovpn-ikev2"
+msgstr "راه‌انداز پروتکل IKEv2 نصب نشده است. برای فعال‌سازی تونل‌های IKEv2، بسته الحاقی را نصب کنید: apk add geovpn-ikev2"
+
+msgid "IKEv2 profile updated successfully."
+msgstr "پروفایل IKEv2 با موفقیت به‌روزرسانی شد."
+
+msgid "Shared EAP-MSCHAPv2"
+msgstr "اشتراکی EAP-MSCHAPv2"
+
+msgid "None (use profile secret file)"
+msgstr "هیچ‌کدام (استفاده از فایل محرمانه پروفایل)"
+
+msgid "Dead Peer Detection (s)"
+msgstr "تشخیص قطعی اتصال (ثانیه)"
+
+msgid "Remote Identity (ID)"
+msgstr "شناسه راه دور (ID)"
+
+msgid "CA Certificate File"
+msgstr "فایل گواهی CA"
+
+msgid "EAP-MSCHAPv2"
+msgstr "EAP-MSCHAPv2"
+
+msgid "The WireGuard protocol driver is not installed. To enable WireGuard tunnels, install the add-on package: apk add geovpn-wireguard"
+msgstr "راه‌انداز پروتکل WireGuard نصب نشده است. برای فعال‌سازی تونل‌های WireGuard، بسته الحاقی را نصب کنید: apk add geovpn-wireguard"
+
+

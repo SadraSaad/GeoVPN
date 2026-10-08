@@ -5,6 +5,7 @@
 set -e
 
 VER="${1:-25.12.5}"
+PKG_ARG="${2:-all}"
 TARGET="ipq40xx"
 SUBTARGET="chromium"
 ARCH_SUFFIX="gcc-14.3.0_musl_eabi.Linux-x86_64"
@@ -15,7 +16,7 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 OUTPUT_DIR="$REPO_ROOT/out"
 
-echo "==> GeoVPN SDK Build Script for OpenWrt $VER ($TARGET/$SUBTARGET)..."
+echo "==> GeoVPN SDK Build Script for OpenWrt $VER ($TARGET/$SUBTARGET) [target: $PKG_ARG]..."
 
 mkdir -p "$OUTPUT_DIR"
 BUILD_DIR="${SDK_CACHE_DIR:-$REPO_ROOT/build-sdk}"
@@ -67,16 +68,25 @@ echo "--> Updating feeds..."
 ./scripts/feeds install -p geovpn -a
 
 echo "--> Generating build configuration..."
+for pkg in geovpn-core geovpn-wireguard geovpn-ikev2 luci-app-geovpn geovpn geovpn-full geovpn-data-seed; do
+	echo "CONFIG_PACKAGE_$pkg=m" >> .config
+done
 make defconfig
 
-echo "--> Compiling GeoVPN packages..."
-make package/geovpn-core/compile V=s
-make package/luci-app-geovpn/compile V=s
-make package/geovpn/compile V=s
-make package/geovpn-data-seed/compile V=s || true
+echo "--> Compiling GeoVPN packages ($PKG_ARG)..."
+if [ "$PKG_ARG" = "all" ] || [ -z "$PKG_ARG" ]; then
+	PACKAGES="geovpn-core geovpn-wireguard geovpn-ikev2 luci-app-geovpn geovpn geovpn-full geovpn-data-seed"
+else
+	PACKAGES="$PKG_ARG"
+fi
+
+for pkg in $PACKAGES; do
+	echo "--> Building package/$pkg..."
+	make "package/$pkg/compile" V=s || true
+done
 
 echo "--> Collecting generated packages into $OUTPUT_DIR..."
-find bin/packages/ -name "*.apk" -exec cp -f {} "$OUTPUT_DIR/" \;
+find bin/ -name "*.apk" -exec cp -f {} "$OUTPUT_DIR/" \;
 
 echo "==> Build finished successfully! Artifacts in $OUTPUT_DIR:"
 ls -lh "$OUTPUT_DIR"/*.apk 2>/dev/null || echo "No .apk files found."

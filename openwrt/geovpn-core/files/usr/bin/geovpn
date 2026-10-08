@@ -27,8 +27,41 @@ case "$ACTION" in
 		ip -6 rule del priority 700 2>/dev/null || true
 		ip route flush table 4200 2>/dev/null || true
 		ip -6 route flush table 4200 2>/dev/null || true
+		ip -4 rule del priority 701 2>/dev/null || true
+		ip -6 rule del priority 701 2>/dev/null || true
+		ip route flush table 4300 2>/dev/null || true
+		ip -6 route flush table 4300 2>/dev/null || true
+		ip link del dev gvt0 2>/dev/null || true
 		nft delete table inet geovpn 2>/dev/null || true
+		rm -rf /var/run/geovpn/test 2>/dev/null || true
+		rm -f /var/run/geovpn/test.lock 2>/dev/null || true
 		exit 0
+		;;
+	test-cleanup|test_cleanup)
+		ip -4 rule del priority 701 2>/dev/null || true
+		ip -6 rule del priority 701 2>/dev/null || true
+		ip route flush table 4300 2>/dev/null || true
+		ip -6 route flush table 4300 2>/dev/null || true
+		ip link del dev gvt0 2>/dev/null || true
+		rm -rf /var/run/geovpn/test 2>/dev/null || true
+		rm -f /var/run/geovpn/test.lock 2>/dev/null || true
+		echo "GeoVPN: test cleanup complete"
+		exit 0
+		;;
+	health-tick|health_tick)
+		exit 0
+		;;
+	switch)
+		exit 0
+		;;
+	migrate|--migrate)
+		exec /etc/uci-defaults/91-geovpn-migrate "$@"
+		;;
+	rollback|--rollback)
+		exec /etc/uci-defaults/91-geovpn-migrate --rollback
+		;;
+	prepare-downgrade|--prepare-downgrade)
+		exec /etc/uci-defaults/91-geovpn-migrate --prepare-downgrade
 		;;
 	*)
 		echo "GeoVPN: ucode runtime required for command '$ACTION'" >&2

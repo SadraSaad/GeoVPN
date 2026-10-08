@@ -127,6 +127,10 @@ function parse_ovpn(content, profile_name) {
 		return { ok: false, error: 'Config size exceeds 128 KB limit' };
 	}
 
+	if (index(content, '\0') != -1) {
+		return { ok: false, error: 'Config contains NUL byte' };
+	}
+
 	// Remove UTF-8 BOM if present
 	if (substr(content, 0, 3) == '\xef\xbb\xbf') {
 		content = substr(content, 3);
@@ -153,8 +157,14 @@ function parse_ovpn(content, profile_name) {
 		remote_cert_tls: 'server',
 		mssfix: 1450,
 		tun_mtu: 1500,
-		keepalive: '10 60',
+		keepalive: '',
 		compress: 'none',
+		proto: 'openvpn',
+		provider: '',
+		ping: '',
+		ping_restart: '',
+		ping_exit: '',
+		explicit_exit_notify: '',
 		extra: [],
 		materials: {},
 		ignored: [],
@@ -284,10 +294,26 @@ function parse_ovpn(content, profile_name) {
 			if (length(tokens) > 1) profile.cipher = tokens[1];
 		} else if (cmd == 'data-ciphers') {
 			if (length(tokens) > 1) profile.data_ciphers = tokens[1];
+		} else if (cmd == 'ncp-ciphers') {
+			if (length(tokens) > 1) {
+				profile.data_ciphers = tokens[1];
+				push(profile.warnings, 'ncp-ciphers is a deprecated alias for data-ciphers');
+			}
 		} else if (cmd == 'data-ciphers-fallback') {
 			if (length(tokens) > 1) profile.data_ciphers_fallback = tokens[1];
 		} else if (cmd == 'auth') {
 			if (length(tokens) > 1) profile.auth = tokens[1];
+		} else if (cmd == 'ping') {
+			if (length(tokens) > 1) profile.ping = tokens[1];
+		} else if (cmd == 'ping-restart') {
+			if (length(tokens) > 1) profile.ping_restart = tokens[1];
+		} else if (cmd == 'ping-exit') {
+			if (length(tokens) > 1) profile.ping_exit = tokens[1];
+		} else if (cmd == 'explicit-exit-notify') {
+			if (length(tokens) > 1) profile.explicit_exit_notify = tokens[1];
+			else profile.explicit_exit_notify = '1';
+		} else if (cmd == 'comp-lzo') {
+			if (length(tokens) > 1 && tokens[1] == 'no') profile.compress = 'none';
 		} else if (cmd == 'tls-version-min') {
 			if (length(tokens) > 1) profile.tls_version_min = tokens[1];
 		} else if (cmd == 'verify-x509-name') {
@@ -338,6 +364,17 @@ function parse_ovpn(content, profile_name) {
 		profile.tls_kind = 'tls-crypt';
 	} else if (profile.materials['tls-auth']) {
 		profile.tls_kind = 'tls-auth';
+	}
+
+	// Provider detection
+	if (profile.verify_x509_name && index(profile.verify_x509_name, '.windscribe.com') != -1) {
+		profile.provider = 'windscribe';
+	}
+	for (let r in profile.remotes) {
+		if (index(r, '.windscribe.com') != -1) {
+			profile.provider = 'windscribe';
+			break;
+		}
 	}
 
 	if (length(profile.remotes) == 0) {

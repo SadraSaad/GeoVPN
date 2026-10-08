@@ -15,18 +15,22 @@ echo "==> Running GeoVPN static checks..."
 FAIL=0
 
 # 1. Shell script linting
-echo "[1/5] Checking shell scripts..."
+echo "[1/6] Checking shell scripts..."
 SH_FILES="
 $REPO_ROOT/tools/lint.sh
 $REPO_ROOT/tools/build-sdk.sh
 $REPO_ROOT/tools/mk-feed.sh
 $REPO_ROOT/openwrt/geovpn-core/files/etc/init.d/geovpn
+$REPO_ROOT/openwrt/geovpn-core/files/etc/init.d/geovpn-test
 $REPO_ROOT/openwrt/geovpn-core/files/etc/uci-defaults/90-geovpn
+$REPO_ROOT/openwrt/geovpn-core/files/etc/uci-defaults/91-geovpn-migrate
 $REPO_ROOT/openwrt/geovpn-core/files/etc/hotplug.d/iface/50-geovpn
 $REPO_ROOT/openwrt/geovpn-core/files/usr/bin/geovpn
 $REPO_ROOT/openwrt/geovpn-core/files/usr/bin/geovpn-update
+$REPO_ROOT/openwrt/geovpn-core/files/usr/bin/geovpn-import-rules
 $REPO_ROOT/openwrt/geovpn-core/files/usr/libexec/geovpn/ovpn-hook
 $REPO_ROOT/openwrt/geovpn-core/files/usr/libexec/geovpn/spawn
+$REPO_ROOT/openwrt/geovpn-core/files/usr/libexec/geovpn/ike-updown
 $REPO_ROOT/tests/integration/run.sh
 $REPO_ROOT/tests/device/test_perf.sh
 $REPO_ROOT/tests/device/run_checklist.sh
@@ -54,7 +58,7 @@ for f in $SH_FILES; do
 done
 
 # 2. JSON validation
-echo "[2/5] Validating JSON configurations..."
+echo "[2/6] Validating JSON configurations..."
 JSON_FILES="
 $REPO_ROOT/openwrt/luci-app-geovpn/root/usr/share/luci/menu.d/luci-app-geovpn.json
 $REPO_ROOT/openwrt/luci-app-geovpn/root/usr/share/rpcd/acl.d/luci-app-geovpn.json
@@ -71,7 +75,7 @@ for f in $JSON_FILES; do
 done
 
 # 3. JavaScript checks
-echo "[3/5] Validating JavaScript files..."
+echo "[3/6] Validating JavaScript files..."
 JS_FILES=$(find "$REPO_ROOT/openwrt/luci-app-geovpn/htdocs" -name "*.js" 2>/dev/null || true)
 for f in $JS_FILES; do
 	if [ -f "$f" ]; then
@@ -87,7 +91,7 @@ for f in $JS_FILES; do
 done
 
 # 4. ucode syntax check
-echo "[4/5] Checking ucode files..."
+echo "[4/6] Checking ucode files..."
 UC_FILES=$(find "$REPO_ROOT/openwrt" -name "*.uc" 2>/dev/null || true)
 UCODE_LIB="$REPO_ROOT/openwrt/geovpn-core/files/usr/share/ucode"
 for f in $UC_FILES; do
@@ -133,7 +137,7 @@ if proc.returncode != 0:
 done
 
 # 5. PO/POT translation completeness
-echo "[5/5] Validating PO translation templates..."
+echo "[5/6] Validating PO translation templates..."
 POT_FILE="$REPO_ROOT/openwrt/luci-app-geovpn/po/templates/geovpn.pot"
 PO_FILE="$REPO_ROOT/openwrt/luci-app-geovpn/po/fa/geovpn.po"
 if [ -f "$POT_FILE" ] && [ -f "$PO_FILE" ]; then
@@ -151,6 +155,29 @@ else:
     print(f'OK: Persian translation coverage is {len(translated)}/{len(msgids)} strings (100%).')
 " || FAIL=1
 fi
+
+# 6. OpenWrt package Makefiles check
+echo "[6/6] Validating OpenWrt package Makefiles..."
+ALL_MAKEFILES="
+$REPO_ROOT/openwrt/geovpn/Makefile
+$REPO_ROOT/openwrt/geovpn-core/Makefile
+$REPO_ROOT/openwrt/geovpn-wireguard/Makefile
+$REPO_ROOT/openwrt/geovpn-ikev2/Makefile
+$REPO_ROOT/openwrt/geovpn-full/Makefile
+$REPO_ROOT/openwrt/luci-app-geovpn/Makefile
+$REPO_ROOT/openwrt/geovpn-data-seed/Makefile
+"
+for mf in $ALL_MAKEFILES; do
+	if [ ! -f "$mf" ]; then
+		echo "FAIL: Makefile not found: $mf"
+		FAIL=1
+	elif ! grep -q "PKGARCH:=all" "$mf" && ! grep -q "LUCI_PKGARCH:=all" "$mf"; then
+		echo "FAIL: Missing PKGARCH:=all or LUCI_PKGARCH:=all in $mf"
+		FAIL=1
+	else
+		echo "OK: Package Makefile valid: $(basename "$(dirname "$mf")")/Makefile"
+	fi
+done
 
 if [ "$FAIL" -ne 0 ]; then
 	echo "==> Lint failed!"

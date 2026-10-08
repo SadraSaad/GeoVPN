@@ -7,6 +7,9 @@ START=95
 STOP=10
 export USE_PROCD=1
 
+EXTRA_COMMANDS="switch"
+EXTRA_HELP="	switch <profile_id> [--persist]	Switch active profile"
+
 PROG=/usr/sbin/openvpn
 RUN_DIR=/var/run/geovpn
 
@@ -17,9 +20,21 @@ start_service() {
 		return 1
 	fi
 
-	ACTIVE_ID=$(uci -q get geovpn.main.active_profile || true)
+	if [ -f "$RUN_DIR/active_override" ]; then
+		ACTIVE_ID=$(cat "$RUN_DIR/active_override" | tr -d ' \t\n\r')
+	else
+		ACTIVE_ID=$(uci -q get geovpn.main.active_profile || true)
+	fi
 	if [ -z "$ACTIVE_ID" ]; then
 		echo "GeoVPN: no active profile configured." >&2
+		return 0
+	fi
+
+	PROTO=$(uci -q get geovpn."$ACTIVE_ID".proto || echo "openvpn")
+	if [ "$PROTO" = "wireguard" ] || [ "$PROTO" = "ikev2" ]; then
+		procd_open_instance "geovpn"
+		procd_set_param file /etc/config/geovpn
+		procd_close_instance
 		return 0
 	fi
 
@@ -44,4 +59,8 @@ stop_service() {
 
 reload_service() {
 	/usr/bin/geovpn _reload
+}
+
+switch() {
+	/usr/bin/geovpn switch "$@"
 }
