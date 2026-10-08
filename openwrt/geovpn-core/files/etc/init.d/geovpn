@@ -21,7 +21,7 @@ start_service() {
 	fi
 
 	if [ -f "$RUN_DIR/active_override" ]; then
-		ACTIVE_ID=$(cat "$RUN_DIR/active_override" | tr -d ' \t\n\r')
+		ACTIVE_ID=$(tr -d ' \t\n\r' < "$RUN_DIR/active_override")
 	else
 		ACTIVE_ID=$(uci -q get geovpn.main.active_profile || true)
 	fi

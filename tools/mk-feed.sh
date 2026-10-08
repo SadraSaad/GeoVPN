@@ -31,12 +31,12 @@ cp -f "$PKG_DIR"/*.apk "$FEED_DIR/" 2>/dev/null || true
 cd "$FEED_DIR"
 
 echo "--> Checking available packages in $FEED_DIR..."
-APK_COUNT=$(ls -1 ./*.apk 2>/dev/null | wc -l || echo 0)
+APK_COUNT=$(find . -maxdepth 1 -name '*.apk' 2>/dev/null | wc -l)
 if [ "$APK_COUNT" -eq 0 ]; then
 	echo "NOTICE: No .apk files found in $FEED_DIR. Preparing directory."
 else
 	echo "--> Found $APK_COUNT package(s):"
-	ls -1 ./*.apk 2>/dev/null || true
+	find . -maxdepth 1 -name '*.apk' 2>/dev/null || true
 fi
 
 echo "--> Generating package checksums (SHA256SUMS)..."
