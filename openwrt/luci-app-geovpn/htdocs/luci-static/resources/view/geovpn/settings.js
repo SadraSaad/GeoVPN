@@ -768,11 +768,21 @@ return view.extend({
 				uci.set('geovpn', 'data', 'pack_pubkey', packPubkeyInput.value.trim());
 				uci.set('geovpn', 'data', 'keep_prev', keepPrevCheck.checked ? '1' : '0');
 
+				// Save Language if changed
+				var chosenLang = langSelect.value;
+				var langChanged = (chosenLang && chosenLang !== currentLang);
+				if (langChanged) {
+					uci.set('luci', 'main', 'lang', chosenLang);
+				}
+
 				uci.save();
 				uci.apply().then(function() {
 					api.callService('reload').then(function() {
 						ui.hideIndicator();
 						ui.addNotification(null, E('p', {}, [ _('Settings applied successfully.') ]), 'info');
+						if (langChanged) {
+							window.setTimeout(function() { location.reload(); }, 1200);
+						}
 					});
 				}).catch(function(err) {
 					ui.hideIndicator();

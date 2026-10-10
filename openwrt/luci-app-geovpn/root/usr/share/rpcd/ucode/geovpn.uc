@@ -987,6 +987,10 @@ let ext_methods = {
 	}
 };
 
+let all_methods = {};
+for (let k in base_methods) all_methods[k] = base_methods[k];
+for (let k in ext_methods) all_methods[k] = ext_methods[k];
+
 return {
-	'luci.geovpn': proto(base_methods, ext_methods)
+	'luci.geovpn': all_methods
 };
