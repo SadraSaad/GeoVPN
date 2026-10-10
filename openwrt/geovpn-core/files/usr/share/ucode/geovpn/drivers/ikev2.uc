@@ -136,11 +136,19 @@ function prepare(arg1, arg2, cfg) {
 			if (!secret && up.password) secret = up.password;
 		}
 	}
-	if (!secret && ctx.id) {
-		let up = cred.get_userpass(ctx.id);
+	let prof_id = (ctx && ctx.id) || profile.id;
+	let pdir = (cfg && type(cfg.get_profiles_dir) == 'function') ? cfg.get_profiles_dir() : (getenv('GEOVPN_PROFILES_DIR') || '/etc/geovpn/profiles');
+
+	if (!secret && prof_id) {
+		let up = cred.get_userpass(prof_id);
 		if (up) {
 			if (!username && up.username) username = up.username;
 			if (!secret && up.password) secret = up.password;
+		}
+		if (!secret) {
+			let sp = sprintf('%s/%s/ike.secret', pdir, prof_id);
+			let sf = fs.open(sp, 'r');
+			if (sf) { secret = trim(sf.read('all') || ''); sf.close(); }
 		}
 		if (!secret) {
 			let sf = fs.open(sprintf('%s/ike.secret', rundir), 'r');

@@ -190,6 +190,10 @@ config profile 'p_wg'
         env['BACKUP_DIR'] = self.backup_dir
 
         # Run migration
+        uci_check = subprocess.run([os.path.join(self.repo_root, 'tools', 'bin', 'uci')], capture_output=True)
+        if uci_check.returncode == 127:
+            self.skipTest("uci binary not available in test environment")
+
         proc = subprocess.run(['/bin/sh', self.script_path, 'migrate'], env=env, capture_output=True, text=True)
         self.assertEqual(proc.returncode, 0, f"Script failed: {proc.stderr}")
 
@@ -373,6 +377,10 @@ MIIB/zCCAaagAwIBAgIJAP
             "CONFIG_FILE": self.config_file,
             "BACKUP_DIR": self.backup_dir
         }
+
+        uci_check = subprocess.run([os.path.join(self.repo_root, 'tools', 'bin', 'uci')], capture_output=True)
+        if uci_check.returncode == 127:
+            self.skipTest("uci binary not available in test environment")
 
         # Migrate
         proc_m = subprocess.run(['/bin/sh', self.script_path, 'migrate'], env=env, capture_output=True, text=True)

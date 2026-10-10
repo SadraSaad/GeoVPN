@@ -16,6 +16,20 @@ import * as cred from 'geovpn.cred';
 import * as health from 'geovpn.health';
 import * as drv_common from 'geovpn.drivers.common';
 
+function get_installed_version() {
+	let res = util.safe_exec(['apk', 'info', '-v', 'geovpn-core']);
+	if (res && res.code == 0 && res.stdout) {
+		let m = match(res.stdout, /geovpn-core-([0-9]+\.[0-9]+(?:\.[0-9]+)?)/);
+		if (m && m[1]) return m[1];
+	}
+	res = util.safe_exec(['apk', 'info', '-v', 'luci-app-geovpn']);
+	if (res && res.code == 0 && res.stdout) {
+		let m = match(res.stdout, /luci-app-geovpn-([0-9]+\.[0-9]+(?:\.[0-9]+)?)/);
+		if (m && m[1]) return m[1];
+	}
+	return '1.1.0';
+}
+
 let base_methods = {
 		status: {
 			call: function(req) {
@@ -23,6 +37,9 @@ let base_methods = {
 				let cursor = uci.cursor();
 				cursor.load('geovpn');
 				s.service.enabled = cursor.get('geovpn', 'main', 'enabled') == '1';
+				let ver = get_installed_version();
+				s.version = ver;
+				if (s.service) s.service.version = ver;
 				let override = cfg.get_active_override();
 				s.service.active_profile = override || cursor.get('geovpn', 'main', 'active_profile') || '';
 				s.tunnel.override = override || null;
@@ -144,6 +161,13 @@ let base_methods = {
 					wg_keepalive: p.wg_keepalive || '',
 					has_wg_key: p.has_wg_key || false,
 					has_wg_psk: p.has_wg_psk || false,
+					ike_host: p.ike_host || '',
+					ike_remote_id: p.ike_remote_id || '',
+					ike_auth: p.ike_auth || '',
+					ike_username: p.ike_username || '',
+					ike_ca: p.ike_ca || '',
+					ike_dpd: p.ike_dpd || '',
+					has_ike_secret: p.has_ike_secret || false,
 					ovpn: ovpn_content,
 					auth: auth_content
 				};
@@ -643,6 +667,322 @@ let ext_methods = {
 		call: function(req) {
 			let force = (req && req.args && req.args.force !== false);
 			return health.run_health_tick({ force: force });
+		}
+	},
+
+	profile_add: {
+		args: {
+			name: '',
+			proto: 'ikev2',
+			host: '',
+			username: '',
+			password: '',
+			remote_id: '',
+			ca: 'geovpn-isrg-x1.pem',
+			dpd: 30,
+			port: 0,
+			public_key: '',
+			private_key: '',
+			preshared_key: '',
+			address: '',
+			allowed_ips: '',
+			cred: ''
+		},
+		call: function(req) {
+			let args = (req && req.args) ? req.args : {};
+			let proto = args.proto || 'ikev2';
+			let host = trim(args.host || '');
+			if (!host || length(host) == 0) {
+				return { error: 'BAD_REQUEST', message: 'Endpoint Host / IP is required' };
+			}
+
+			let name = trim(args.name || '');
+			if (!name || length(name) == 0) {
+				name = host;
+			}
+
+			let cursor = cfg.get_cursor();
+			let all_sections = cursor.get_all('geovpn');
+			let profile_count = 0;
+			if (all_sections) {
+				for (let s in all_sections) {
+					if (all_sections[s]['.type'] == 'profile') profile_count++;
+				}
+			}
+			if (profile_count >= 100) {
+				return { error: 'LIMIT_REACHED', message: 'Maximum 100 profiles allowed' };
+			}
+
+			let prof = {
+				name: name,
+				proto: proto,
+				enabled: '1',
+				auto_pool: '1',
+				cred: args.cred || ''
+			};
+
+			if (proto == 'ikev2') {
+				let username = trim(args.username || '');
+				let password = trim(args.password || '');
+				let remote_id = trim(args.remote_id || '') || host;
+				let ca = trim(args.ca || '') || 'geovpn-isrg-x1.pem';
+				let dpd = +args.dpd || 30;
+
+				if (!username && !args.cred) {
+					return { error: 'BAD_REQUEST', message: 'Username is required for IKEv2' };
+				}
+
+				prof.ike_host = host;
+				prof.ike_remote_id = remote_id;
+				prof.ike_auth = 'eap-mschapv2';
+				prof.ike_username = username;
+				prof.password = password;
+				prof.ike_ca = ca;
+				prof.ike_dpd = dpd;
+				prof.ike_mobike = '0';
+				prof.ike_fragmentation = '1';
+				prof.ike_if_id = '4200';
+				prof.ike_mtu = '1420';
+			} else if (proto == 'wireguard') {
+				prof.wg_endpoint_host = host;
+				prof.wg_endpoint_port = +args.port || 51820;
+				prof.wg_public_key = trim(args.public_key || '');
+				prof.private_key = trim(args.private_key || '');
+				prof.preshared_key = trim(args.preshared_key || '');
+				prof.wg_has_psk = (length(prof.preshared_key) > 0) ? '1' : '0';
+				let addrs = args.address;
+				if (type(addrs) == 'string') addrs = split(addrs, /[\s,]+/);
+				prof.wg_address = (type(addrs) == 'array') ? addrs : (addrs ? [addrs] : []);
+				let aips = args.allowed_ips;
+				if (type(aips) == 'string') aips = split(aips, /[\s,]+/);
+				prof.wg_allowed_ips = (type(aips) == 'array' && length(aips) > 0) ? aips : ['0.0.0.0/0'];
+				prof.wg_mtu = 1420;
+				prof.wg_keepalive = 25;
+			} else {
+				let port = +args.port || 1194;
+				let ovpn_proto = args.ovpn_proto || 'udp';
+				prof.remotes = [ sprintf('%s %d %s', host, port, ovpn_proto) ];
+				prof.remote = prof.remotes;
+				let username = trim(args.username || '');
+				let password = trim(args.password || '');
+				if (username || password) {
+					prof.auth_user_pass = '1';
+				}
+			}
+
+			let id = cfg.create_profile(prof);
+			if (!id) {
+				return { error: 'CREATE_FAILED', message: 'Failed to create profile' };
+			}
+
+			if (proto == 'openvpn' && (args.username || args.password)) {
+				let pdir = cfg.PROFILES_DIR + '/' + id;
+				let af = fs.open(pdir + '/auth', 'w', 0o600);
+				if (af) {
+					af.write(sprintf('%s\n%s\n', trim(args.username || ''), trim(args.password || '')));
+					af.close();
+					fs.chmod(pdir + '/auth', 0o600);
+				}
+			}
+
+			return { ok: true, id: id, name: name, proto: proto };
+		}
+	},
+
+	check_update: {
+		call: function(req) {
+			let current_ver = get_installed_version();
+			let repo = 'SadraSaad/GeoVPN';
+			let url = 'https://api.github.com/repos/' + repo + '/releases/latest';
+
+			let res = util.safe_exec(['curl', '-s', '-L', '-m', '10', '-H', 'User-Agent: GeoVPN-Updater', url]);
+			if (!res || res.code != 0 || !res.stdout) {
+				res = util.safe_exec(['wget', '-q', '-O-', '-T', '10', '--user-agent=GeoVPN-Updater', url]);
+			}
+
+			if (!res || res.code != 0 || !res.stdout || length(trim(res.stdout)) == 0) {
+				return {
+					ok: false,
+					current_version: current_ver,
+					repo: repo,
+					error: 'NETWORK_ERROR',
+					message: 'Could not connect to GitHub API'
+				};
+			}
+
+			let doc = null;
+			try {
+				doc = json(res.stdout);
+			} catch (e) {
+				return {
+					ok: false,
+					current_version: current_ver,
+					repo: repo,
+					error: 'PARSE_ERROR',
+					message: 'Failed to parse GitHub response: ' + e
+				};
+			}
+
+			if (!doc || !doc.tag_name) {
+				return {
+					ok: false,
+					current_version: current_ver,
+					repo: repo,
+					error: 'NO_RELEASE',
+					message: (doc && doc.message) ? doc.message : 'No release found'
+				};
+			}
+
+			let latest_tag = doc.tag_name;
+			let clean_latest = replace(latest_tag, /^v/, '');
+			let clean_curr = replace(current_ver, /^v/, '');
+
+			let l_parts = split(clean_latest, '.');
+			let c_parts = split(clean_curr, '.');
+			let has_update = false;
+			for (let i = 0; i < 3; i++) {
+				let l_num = +l_parts[i] || 0;
+				let c_num = +c_parts[i] || 0;
+				if (l_num > c_num) {
+					has_update = true;
+					break;
+				} else if (l_num < c_num) {
+					has_update = false;
+					break;
+				}
+			}
+
+			let assets = [];
+			if (doc.assets && type(doc.assets) == 'array') {
+				for (let a in doc.assets) {
+					if (a && a.name && match(a.name, /\.apk$/)) {
+						push(assets, {
+							name: a.name,
+							url: a.browser_download_url,
+							size: a.size || 0
+						});
+					}
+				}
+			}
+
+			return {
+				ok: true,
+				current_version: current_ver,
+				latest_version: latest_tag,
+				update_available: has_update,
+				release_name: doc.name || latest_tag,
+				changelog: doc.body || '',
+				published_at: doc.published_at || '',
+				url: doc.html_url || ('https://github.com/' + repo),
+				assets: assets
+			};
+		}
+	},
+
+	apply_update: {
+		args: { version: '', assets: [] },
+		call: function(req) {
+			let args = (req && req.args) ? req.args : {};
+			let assets = args.assets || [];
+
+			if (type(assets) != 'array' || length(assets) == 0) {
+				let check = ext_methods.check_update.call(req);
+				if (check && check.ok && check.assets) {
+					assets = check.assets;
+				}
+			}
+
+			if (type(assets) != 'array' || length(assets) == 0) {
+				return { error: 'NO_ASSETS', message: 'No APK package assets available to install' };
+			}
+
+			let installed_pkgs = ['geovpn-core', 'luci-app-geovpn'];
+			let ike_stat = util.safe_exec(['apk', 'info', '-e', 'geovpn-ikev2']);
+			if (ike_stat.code == 0 || fs.stat('/usr/share/ucode/geovpn/drivers/ikev2.uc')) {
+				push(installed_pkgs, 'geovpn-ikev2');
+			}
+			let wg_stat = util.safe_exec(['apk', 'info', '-e', 'geovpn-wireguard']);
+			if (wg_stat.code == 0 || fs.stat('/usr/share/ucode/geovpn/drivers/wireguard.uc')) {
+				push(installed_pkgs, 'geovpn-wireguard');
+			}
+			let i18n_stat = util.safe_exec(['apk', 'info', '-e', 'luci-i18n-geovpn-fa']);
+			if (i18n_stat.code == 0 || fs.stat('/usr/lib/lua/luci/i18n/geovpn.fa.lmo') || fs.stat('/www/luci-static/resources/cbi/geovpn.fa.json')) {
+				push(installed_pkgs, 'luci-i18n-geovpn-fa');
+			}
+			let meta_stat = util.safe_exec(['apk', 'info', '-e', 'geovpn']);
+			if (meta_stat.code == 0) {
+				push(installed_pkgs, 'geovpn');
+			}
+
+			let tmpdir = fs.mkdtemp('/tmp/geovpn_update.XXXXXX');
+			if (!tmpdir) {
+				return { error: 'FS_ERROR', message: 'Failed to create temporary directory for update' };
+			}
+
+			let downloaded_apks = [];
+			for (let pkg in installed_pkgs) {
+				let matched_asset = null;
+				for (let a in assets) {
+					if (!a || !a.name || !match(a.name, /\.apk$/)) continue;
+					if (pkg == 'geovpn') {
+						if (match(a.name, /^geovpn[-_][0-9]/)) {
+							matched_asset = a;
+							break;
+						}
+					} else {
+						if (substr(a.name, 0, length(pkg) + 1) == (pkg + '-') ||
+						    substr(a.name, 0, length(pkg) + 1) == (pkg + '_')) {
+							matched_asset = a;
+							break;
+						}
+					}
+				}
+
+				if (matched_asset && matched_asset.url) {
+					let dest = tmpdir + '/' + matched_asset.name;
+					let dres = util.safe_exec(['curl', '-s', '-L', '-o', dest, matched_asset.url]);
+					if (!dres || dres.code != 0 || !fs.stat(dest) || fs.stat(dest).size == 0) {
+						dres = util.safe_exec(['wget', '-q', '-O', dest, matched_asset.url]);
+					}
+
+					if (fs.stat(dest) && fs.stat(dest).size > 0) {
+						push(downloaded_apks, dest);
+					}
+				}
+			}
+
+			if (length(downloaded_apks) == 0) {
+				fs.rmdir(tmpdir);
+				return { error: 'DOWNLOAD_FAILED', message: 'Failed to download release APK assets' };
+			}
+
+			let apk_cmd = ['apk', 'add', '--allow-untrusted'];
+			for (let apk_path in downloaded_apks) {
+				push(apk_cmd, apk_path);
+			}
+
+			let apk_res = util.safe_exec(apk_cmd);
+
+			for (let apk_path in downloaded_apks) {
+				fs.unlink(apk_path);
+			}
+			fs.rmdir(tmpdir);
+
+			if (apk_res.code != 0) {
+				return {
+					error: 'INSTALL_FAILED',
+					message: 'apk add failed: ' + (apk_res.stderr || apk_res.stdout || 'unknown error')
+				};
+			}
+
+			util.safe_exec(['sh', '-c', '(sleep 2; /etc/init.d/rpcd restart; /etc/init.d/uhttpd restart; /etc/init.d/dnsmasq restart) >/dev/null 2>&1 &']);
+
+			return {
+				ok: true,
+				version: args.version || 'latest',
+				packages_updated: length(downloaded_apks),
+				message: 'GeoVPN packages successfully updated. Services restarting.'
+			};
 		}
 	}
 };

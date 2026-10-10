@@ -11,7 +11,8 @@ return view.extend({
 		return Promise.all([
 			uci.load('geovpn'),
 			api.getStatus(),
-			api.getDiag()
+			api.getDiag(),
+			uci.load('luci').catch(function() { return null; })
 		]);
 	},
 
@@ -394,7 +395,262 @@ return view.extend({
 		]);
 
 		// ----------------------------------------------------
-		// 5. Maintenance & Diagnostic Export
+		// 5. Interface Language & Localization Card
+		// ----------------------------------------------------
+		var currentLang = (uci.get('luci', 'main', 'lang')) || 'auto';
+
+		var langSelect = E('select', { 'class': 'cbi-input-select' }, [
+			E('option', { 'value': 'auto', 'selected': (currentLang === 'auto') ? 'selected' : null }, [ _('Automatic (System)') ]),
+			E('option', { 'value': 'en', 'selected': (currentLang === 'en') ? 'selected' : null }, [ 'English' ]),
+			E('option', { 'value': 'fa', 'selected': (currentLang === 'fa') ? 'selected' : null }, [ 'فارسی (Persian)' ])
+		]);
+
+		var applyLangBtn = E('button', {
+			'class': 'cbi-button cbi-button-action',
+			'click': function() {
+				var chosen = langSelect.value;
+				ui.showIndicator();
+				uci.set('luci', 'main', 'lang', chosen);
+				uci.save();
+				uci.apply().then(function() {
+					ui.hideIndicator();
+					if (chosen === 'fa') {
+						document.documentElement.setAttribute('dir', 'rtl');
+						document.documentElement.setAttribute('lang', 'fa');
+					} else if (chosen === 'en') {
+						document.documentElement.setAttribute('dir', 'ltr');
+						document.documentElement.setAttribute('lang', 'en');
+					}
+					location.reload();
+				}).catch(function(err) {
+					ui.hideIndicator();
+					ui.addNotification(null, E('p', {}, [ _('Failed to switch language: ') + err ]), 'error');
+				});
+			}
+		}, [ _('Apply Language') ]);
+
+		var langCard = E('div', { 'class': 'gv-card' }, [
+			E('div', { 'class': 'gv-card-title' }, [
+				E('span', {}, [ _('Interface Language') ])
+			]),
+			E('div', { 'class': 'cbi-value' }, [
+				E('label', { 'class': 'cbi-value-title' }, [ _('Display Language') ]),
+				E('div', { 'class': 'cbi-value-field' }, [
+					E('div', { 'style': 'display: flex; gap: 10px; align-items: center; max-width: 400px;' }, [
+						langSelect,
+						applyLangBtn
+					]),
+					E('div', { 'class': 'cbi-value-description' }, [
+						_('Choose interface display language. Page will reload and update layout direction (LTR / RTL).')
+					])
+				])
+			])
+		]);
+
+		// ----------------------------------------------------
+		// 6. Updates & Version Card
+		// ----------------------------------------------------
+		var currentVersion = '1.1.0';
+		var repoUrl = 'https://github.com/SadraSaad/GeoVPN';
+
+		var updateStatusBox = E('div', {
+			'style': 'margin-top: 14px; padding: 12px 14px; border-radius: 6px; background: var(--cbi-input-background, rgba(127,127,127,0.06)); border: 1px solid var(--cbi-border-color, rgba(127,127,127,0.15)); font-size: 0.9rem;'
+		}, [
+			E('span', { 'style': 'opacity: 0.8;' }, [
+				_('Click "Check for Updates" to query latest releases from GitHub.')
+			])
+		]);
+
+		var checkUpdatesBtn = E('button', {
+			'class': 'cbi-button cbi-button-action',
+			'click': function() {
+				dom.content(updateStatusBox, [
+					E('span', { 'class': 'cbi-progressbar-spinner', 'style': 'margin-inline-end: 8px;' }),
+					E('span', {}, [ _('Checking for updates from GitHub...') ])
+				]);
+
+				function handleReleaseData(data) {
+					if (!data || !data.latest_version) {
+						dom.content(updateStatusBox, [
+							E('span', { 'style': 'color: #cf222e;' }, [
+								_('Failed to check for updates: ') + ((data && data.message) || _('No release data found.'))
+							])
+						]);
+						return;
+					}
+
+					var isNewer = data.update_available;
+					var latestTag = data.latest_version;
+					var changelog = data.changelog || '';
+					var assets = data.assets || [];
+
+					if (!isNewer) {
+						dom.content(updateStatusBox, [
+							E('div', { 'style': 'display: flex; align-items: center; gap: 8px; color: #2da44e;' }, [
+								E('span', { 'style': 'font-weight: 700;' }, [ '✔' ]),
+								E('span', {}, [ _('You are running the latest version (%s).').format(currentVersion) ])
+							])
+						]);
+						return;
+					}
+
+					var updateNowBtn = E('button', {
+						'class': 'cbi-button cbi-button-positive',
+						'style': 'margin-top: 10px;',
+						'click': function() {
+							if (!confirm(_('Upgrade GeoVPN to %s now? Downloaded packages will be installed and services restarted.').format(latestTag))) {
+								return;
+							}
+
+							ui.showIndicator();
+							dom.content(updateStatusBox, [
+								E('span', { 'class': 'cbi-progressbar-spinner', 'style': 'margin-inline-end: 8px;' }),
+								E('span', {}, [ _('Downloading and installing packages from GitHub Releases...') ])
+							]);
+
+							api.applyUpdate(latestTag, assets).then(function(upRes) {
+								ui.hideIndicator();
+								if (upRes && upRes.ok) {
+									dom.content(updateStatusBox, [
+										E('div', { 'style': 'color: #2da44e; font-weight: 600;' }, [
+											_('GeoVPN updated successfully! Reloading in 3 seconds...')
+										])
+									]);
+									ui.addNotification(null, E('p', {}, [ _('GeoVPN updated successfully! Reloading...') ]), 'info');
+									window.setTimeout(function() {
+										location.reload();
+									}, 3500);
+								} else {
+									dom.content(updateStatusBox, [
+										E('div', { 'style': 'color: #cf222e;' }, [
+											_('Update failed: ') + ((upRes && upRes.message) || _('Unknown error'))
+										])
+									]);
+									ui.addNotification(null, E('p', {}, [ _('Update failed: ') + ((upRes && upRes.message) || '') ]), 'error');
+								}
+							}).catch(function(err) {
+								ui.hideIndicator();
+								dom.content(updateStatusBox, [
+									E('div', { 'style': 'color: #cf222e;' }, [
+										_('Update failed: ') + err
+									])
+								]);
+								ui.addNotification(null, E('p', {}, [ _('Update failed: ') + err ]), 'error');
+							});
+						}
+					}, [ _('Update Now') ]);
+
+					var content = [
+						E('div', { 'style': 'display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;' }, [
+							E('span', { 'style': 'font-weight: 600; color: #1a7f37;' }, [
+								_('Update Available: %s').format(latestTag)
+							]),
+							E('a', {
+								'href': data.url || (repoUrl + '/releases/tag/' + latestTag),
+								'target': '_blank',
+								'class': 'cbi-button cbi-button-neutral',
+								'style': 'font-size: 0.8rem; padding: 2px 8px;'
+							}, [ _('View on GitHub') ])
+						]),
+						changelog ? E('div', {
+							'style': 'margin: 8px 0; padding: 10px; background: rgba(0,0,0,0.1); border-radius: 4px; max-height: 180px; overflow-y: auto; font-family: monospace; font-size: 0.8rem; white-space: pre-wrap;'
+						}, [ changelog ]) : E('span'),
+						updateNowBtn
+					];
+
+					dom.content(updateStatusBox, content);
+				}
+
+				api.checkUpdate().then(function(res) {
+					if (res && res.ok) {
+						handleReleaseData(res);
+					} else {
+						fetch('https://api.github.com/repos/SadraSaad/GeoVPN/releases/latest', {
+							headers: { 'Accept': 'application/vnd.github.v3+json' }
+						}).then(function(resp) {
+							if (!resp.ok) throw new Error('HTTP ' + resp.status);
+							return resp.json();
+						}).then(function(doc) {
+							var tag = doc.tag_name || '';
+							var cleanLatest = tag.replace(/^v/, '');
+							var cleanCur = currentVersion.replace(/^v/, '');
+							var lParts = cleanLatest.split('.').map(Number);
+							var cParts = cleanCur.split('.').map(Number);
+							var newer = false;
+							for (var i = 0; i < 3; i++) {
+								if ((lParts[i] || 0) > (cParts[i] || 0)) { newer = true; break; }
+								if ((lParts[i] || 0) < (cParts[i] || 0)) { newer = false; break; }
+							}
+							var assets = (doc.assets || []).filter(function(a) { return /\.apk$/.test(a.name); }).map(function(a) {
+								return { name: a.name, url: a.browser_download_url, size: a.size };
+							});
+							handleReleaseData({
+								ok: true,
+								latest_version: tag,
+								update_available: newer,
+								release_name: doc.name || tag,
+								changelog: doc.body || '',
+								url: doc.html_url,
+								assets: assets
+							});
+						}).catch(function(fErr) {
+							dom.content(updateStatusBox, [
+								E('span', { 'style': 'color: #cf222e;' }, [
+									_('Could not retrieve update information from GitHub: ') + fErr
+								])
+							]);
+						});
+					}
+				}).catch(function(err) {
+					dom.content(updateStatusBox, [
+						E('span', { 'style': 'color: #cf222e;' }, [
+							_('Update check error: ') + err
+						])
+					]);
+				});
+			}
+		}, [ _('Check for Updates') ]);
+
+		var updatesCard = E('div', { 'class': 'gv-card' }, [
+			E('div', { 'class': 'gv-card-title' }, [
+				E('span', {}, [ _('Updates & Version') ])
+			]),
+			E('div', { 'class': 'cbi-value' }, [
+				E('label', { 'class': 'cbi-value-title' }, [ _('Installed Version') ]),
+				E('div', { 'class': 'cbi-value-field' }, [
+					E('span', {
+						'class': 'gv-badge gv-badge-connected',
+						'style': 'margin-inline-end: 10px;'
+					}, [ currentVersion ]),
+					E('span', { 'style': 'font-size: 0.85rem; opacity: 0.8;' }, [
+						_('GeoVPN OpenWrt Package Suite')
+					])
+				])
+			]),
+			E('div', { 'class': 'cbi-value' }, [
+				E('label', { 'class': 'cbi-value-title' }, [ _('GitHub Repository') ]),
+				E('div', { 'class': 'cbi-value-field' }, [
+					E('a', {
+						'href': repoUrl,
+						'target': '_blank',
+						'style': 'font-weight: 600;'
+					}, [ widgets.renderLtr('https://github.com/SadraSaad/GeoVPN') ]),
+					E('div', { 'class': 'cbi-value-description' }, [
+						_('Official open-source repository, release tags, and issue tracker.')
+					])
+				])
+			]),
+			E('div', { 'class': 'cbi-value' }, [
+				E('label', { 'class': 'cbi-value-title' }, [ _('Check Releases') ]),
+				E('div', { 'class': 'cbi-value-field' }, [
+					checkUpdatesBtn,
+					updateStatusBox
+				])
+			])
+		]);
+
+		// ----------------------------------------------------
+		// 7. Maintenance & Diagnostic Export
 		// ----------------------------------------------------
 		var exportDiagBtn = E('button', {
 			'class': 'cbi-button cbi-button-action',
@@ -448,7 +704,7 @@ return view.extend({
 		]);
 
 		// ----------------------------------------------------
-		// 6. About Card
+		// 8. About Card
 		// ----------------------------------------------------
 		var aboutCard = E('div', { 'class': 'gv-card' }, [
 			E('div', { 'class': 'gv-card-title' }, [
@@ -466,13 +722,16 @@ return view.extend({
 		]);
 
 		// ----------------------------------------------------
-		// 7. Save & Apply Bottom Bar
+		// 9. Save & Apply Bottom Bar
 		// ----------------------------------------------------
 		var saveApplyBtn = E('button', {
 			'class': 'cbi-button cbi-button-positive',
 			'style': 'padding: 8px 24px; font-weight: 600;',
 			'click': function() {
 				ui.showIndicator();
+
+				// Save Language
+				uci.set('luci', 'main', 'lang', langSelect.value);
 
 				// Save Network
 				var ifs = lanIfsInput.value.trim().split(/\s+/).filter(Boolean);
@@ -532,6 +791,8 @@ return view.extend({
 			dnsCard,
 			routingLimitsCard,
 			dataSourceCard,
+			langCard,
+			updatesCard,
 			maintenanceCard,
 			aboutCard,
 			bottomBar

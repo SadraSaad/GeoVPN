@@ -3,6 +3,15 @@
 'require dom';
 
 function loadStylesheet() {
+	if (typeof document !== 'undefined') {
+		var docLang = (document.documentElement && (document.documentElement.getAttribute('lang') || document.documentElement.lang)) || '';
+		if (!docLang && typeof L !== 'undefined' && L.env && L.env.lang) docLang = L.env.lang;
+		if (docLang === 'fa' || (typeof L !== 'undefined' && L.env && L.env.lang === 'fa')) {
+			document.documentElement.setAttribute('dir', 'rtl');
+		} else if (docLang === 'en' || (typeof L !== 'undefined' && L.env && L.env.lang === 'en')) {
+			document.documentElement.setAttribute('dir', 'ltr');
+		}
+	}
 	if (typeof document !== 'undefined' && document.head && !document.getElementById('geovpn-style')) {
 		var style = E('style', { 'id': 'geovpn-style' }, [
 			'.gv-ltr { direction: ltr !important; unicode-bidi: isolate !important; display: inline-block; }\n' +

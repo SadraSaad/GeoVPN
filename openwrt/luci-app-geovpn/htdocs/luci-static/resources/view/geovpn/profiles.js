@@ -169,8 +169,19 @@ return view.extend({
 
 		if (profiles.length === 0) {
 			dom.append(tbody, E('tr', { 'class': 'tr' }, [
-				E('td', { 'class': 'td', 'colspan': '6', 'style': 'text-align: center; padding: 24px; opacity: 0.7;' }, [
-					_('No VPN profiles configured. Import .ovpn or .conf files to get started.')
+				E('td', { 'class': 'td', 'colspan': '6', 'style': 'text-align: center; padding: 32px 16px; opacity: 0.85;' }, [
+					E('p', { 'style': 'margin-bottom: 14px; font-size: 0.95rem;' }, [
+						_('No VPN profiles configured. Create an IKEv2 profile directly or import .ovpn / .conf files.')
+					]),
+					E('button', {
+						'class': 'cbi-button cbi-button-positive',
+						'style': 'margin-inline-end: 8px;',
+						'click': function() { showAddProfileModal(); }
+					}, [ _('+ Add Profile') ]),
+					E('a', {
+						'class': 'cbi-button cbi-button-action',
+						'href': L.url('admin/vpn/geovpn/importer')
+					}, [ _('+ Import Profiles') ])
 				])
 			]));
 		} else {
@@ -749,8 +760,340 @@ return view.extend({
 			});
 		}
 
+		// Add Profile Modal (Manual Creation)
+		function showAddProfileModal() {
+			var modalBody = E('div', {});
+
+			dom.append(modalBody, E('h4', { 'style': 'margin-bottom: 8px;' }, [
+				_('Add VPN Profile')
+			]));
+			dom.append(modalBody, E('p', { 'style': 'color: #57606a; margin-bottom: 16px; font-size: 0.9rem;' }, [
+				_('Create a new VPN connection profile directly by specifying endpoint and credentials.')
+			]));
+
+			var protoSelect = E('select', { 'class': 'cbi-input-select', 'style': 'width: 100%;' }, [
+				E('option', { 'value': 'ikev2', 'selected': 'selected' }, [ _('IKEv2 / IPsec (strongSwan)') ]),
+				E('option', { 'value': 'openvpn' }, [ _('OpenVPN') ]),
+				E('option', { 'value': 'wireguard' }, [ _('WireGuard') ])
+			]);
+
+			var nameInput = E('input', {
+				'type': 'text',
+				'class': 'cbi-input-text',
+				'placeholder': _('e.g. Frankfurt Server'),
+				'style': 'width: 100%;'
+			});
+
+			var hostInput = E('input', {
+				'type': 'text',
+				'class': 'cbi-input-text',
+				'placeholder': _('e.g. vpn.example.com or 198.51.100.1'),
+				'style': 'width: 100%;'
+			});
+
+			var protoFieldsContainer = E('div', { 'style': 'margin-top: 12px;' });
+			var connectImmediatelyCheck = E('input', { 'type': 'checkbox' });
+
+			function updateProtoFields() {
+				dom.content(protoFieldsContainer, []);
+				var p = protoSelect.value;
+
+				if (p === 'ikev2') {
+					var userInput = E('input', { 'type': 'text', 'class': 'cbi-input-text', 'placeholder': _('Enter username') });
+					var passInput = E('input', {
+						'type': 'password',
+						'class': 'cbi-input-text',
+						'placeholder': _('Enter password'),
+						'autocomplete': 'new-password'
+					});
+					var remoteIdInput = E('input', {
+						'type': 'text',
+						'class': 'cbi-input-text',
+						'placeholder': _('Defaults to Server Hostname if left empty')
+					});
+					var caInput = E('input', {
+						'type': 'text',
+						'class': 'cbi-input-text',
+						'value': 'geovpn-isrg-x1.pem'
+					});
+					var dpdInput = E('input', {
+						'type': 'number',
+						'class': 'cbi-input-text',
+						'value': '30',
+						'min': '0',
+						'max': '3600'
+					});
+
+					var credOptions = [ E('option', { 'value': '' }, [ _('None (use direct username/password)') ]) ];
+					credData.forEach(function(c) {
+						if (c.has_auth) {
+							credOptions.push(E('option', { 'value': c.id }, [ c.id + ' (User/Pass)' ]));
+						}
+					});
+					var credSelect = E('select', { 'class': 'cbi-input-select' }, credOptions);
+
+					protoFieldsContainer._fields = {
+						userInput: userInput,
+						passInput: passInput,
+						remoteIdInput: remoteIdInput,
+						caInput: caInput,
+						dpdInput: dpdInput,
+						credSelect: credSelect
+					};
+
+					dom.append(protoFieldsContainer, E('div', { 'class': 'cbi-value' }, [
+						E('label', { 'class': 'cbi-value-title', 'style': 'font-weight: 600;' }, [ _('Username') ]),
+						E('div', { 'class': 'cbi-value-field' }, [ userInput ])
+					]));
+					dom.append(protoFieldsContainer, E('div', { 'class': 'cbi-value' }, [
+						E('label', { 'class': 'cbi-value-title', 'style': 'font-weight: 600;' }, [ _('Password') ]),
+						E('div', { 'class': 'cbi-value-field' }, [
+							passInput,
+							E('div', { 'style': 'font-size: 0.78rem; opacity: 0.75; margin-top: 4px;' }, [
+								_('Write-only: password is saved securely with 0600 permissions.')
+							])
+						])
+					]));
+					dom.append(protoFieldsContainer, E('div', { 'class': 'cbi-value' }, [
+						E('label', { 'class': 'cbi-value-title' }, [ _('Remote Identity (ID)') ]),
+						E('div', { 'class': 'cbi-value-field' }, [
+							remoteIdInput,
+							E('div', { 'style': 'font-size: 0.78rem; opacity: 0.75; margin-top: 4px;' }, [
+								_('Defaults to Server Hostname if left empty')
+							])
+						])
+					]));
+					dom.append(protoFieldsContainer, E('div', { 'class': 'cbi-value' }, [
+						E('label', { 'class': 'cbi-value-title' }, [ _('CA Certificate File') ]),
+						E('div', { 'class': 'cbi-value-field' }, [ caInput ])
+					]));
+					dom.append(protoFieldsContainer, E('div', { 'class': 'cbi-value' }, [
+						E('label', { 'class': 'cbi-value-title' }, [ _('Dead Peer Detection (s)') ]),
+						E('div', { 'class': 'cbi-value-field' }, [ dpdInput ])
+					]));
+					if (credOptions.length > 1) {
+						dom.append(protoFieldsContainer, E('div', { 'class': 'cbi-value' }, [
+							E('label', { 'class': 'cbi-value-title' }, [ _('Shared Credential Set') ]),
+							E('div', { 'class': 'cbi-value-field' }, [ credSelect ])
+						]));
+					}
+				} else if (p === 'wireguard') {
+					var portInput = E('input', { 'type': 'number', 'class': 'cbi-input-text', 'value': '51820', 'min': '1', 'max': '65535' });
+					var pubKeyInput = E('input', { 'type': 'text', 'class': 'cbi-input-text', 'placeholder': _('Server base64 public key') });
+					var privKeyInput = E('input', {
+						'type': 'password',
+						'class': 'cbi-input-text',
+						'placeholder': _('Client private key'),
+						'autocomplete': 'new-password'
+					});
+					var pskInput = E('input', {
+						'type': 'password',
+						'class': 'cbi-input-text',
+						'placeholder': _('Preshared key (optional)'),
+						'autocomplete': 'new-password'
+					});
+					var addrInput = E('input', { 'type': 'text', 'class': 'cbi-input-text', 'placeholder': '10.0.0.2/32' });
+					var allowedIpsInput = E('input', { 'type': 'text', 'class': 'cbi-input-text', 'value': '0.0.0.0/0' });
+
+					protoFieldsContainer._fields = {
+						portInput: portInput,
+						pubKeyInput: pubKeyInput,
+						privKeyInput: privKeyInput,
+						pskInput: pskInput,
+						addrInput: addrInput,
+						allowedIpsInput: allowedIpsInput
+					};
+
+					dom.append(protoFieldsContainer, E('div', { 'class': 'cbi-value' }, [
+						E('label', { 'class': 'cbi-value-title' }, [ _('Endpoint Port') ]),
+						E('div', { 'class': 'cbi-value-field' }, [ portInput ])
+					]));
+					dom.append(protoFieldsContainer, E('div', { 'class': 'cbi-value' }, [
+						E('label', { 'class': 'cbi-value-title' }, [ _('Server Public Key') ]),
+						E('div', { 'class': 'cbi-value-field' }, [ pubKeyInput ])
+					]));
+					dom.append(protoFieldsContainer, E('div', { 'class': 'cbi-value' }, [
+						E('label', { 'class': 'cbi-value-title' }, [ _('Client Private Key') ]),
+						E('div', { 'class': 'cbi-value-field' }, [
+							privKeyInput,
+							E('div', { 'style': 'font-size: 0.78rem; opacity: 0.75; margin-top: 4px;' }, [
+								_('Write-only: client private key is saved securely with 0600 permissions.')
+							])
+						])
+					]));
+					dom.append(protoFieldsContainer, E('div', { 'class': 'cbi-value' }, [
+						E('label', { 'class': 'cbi-value-title' }, [ _('Preshared Key (Optional)') ]),
+						E('div', { 'class': 'cbi-value-field' }, [ pskInput ])
+					]));
+					dom.append(protoFieldsContainer, E('div', { 'class': 'cbi-value' }, [
+						E('label', { 'class': 'cbi-value-title' }, [ _('Interface Address') ]),
+						E('div', { 'class': 'cbi-value-field' }, [ addrInput ])
+					]));
+					dom.append(protoFieldsContainer, E('div', { 'class': 'cbi-value' }, [
+						E('label', { 'class': 'cbi-value-title' }, [ _('Allowed IPs') ]),
+						E('div', { 'class': 'cbi-value-field' }, [ allowedIpsInput ])
+					]));
+				} else {
+					// OpenVPN
+					var portInput = E('input', { 'type': 'number', 'class': 'cbi-input-text', 'value': '1194', 'min': '1', 'max': '65535' });
+					var protoModeSelect = E('select', { 'class': 'cbi-input-select' }, [
+						E('option', { 'value': 'udp', 'selected': 'selected' }, [ 'UDP' ]),
+						E('option', { 'value': 'tcp' }, [ 'TCP' ])
+					]);
+					var userInput = E('input', { 'type': 'text', 'class': 'cbi-input-text', 'placeholder': _('Enter username') });
+					var passInput = E('input', {
+						'type': 'password',
+						'class': 'cbi-input-text',
+						'placeholder': _('Enter password'),
+						'autocomplete': 'new-password'
+					});
+
+					protoFieldsContainer._fields = {
+						portInput: portInput,
+						protoModeSelect: protoModeSelect,
+						userInput: userInput,
+						passInput: passInput
+					};
+
+					dom.append(protoFieldsContainer, E('div', { 'class': 'cbi-value' }, [
+						E('label', { 'class': 'cbi-value-title' }, [ _('Server Port & Protocol') ]),
+						E('div', { 'class': 'cbi-value-field', 'style': 'display: flex; gap: 8px;' }, [
+							portInput, protoModeSelect
+						])
+					]));
+					dom.append(protoFieldsContainer, E('div', { 'class': 'cbi-value' }, [
+						E('label', { 'class': 'cbi-value-title' }, [ _('Username') ]),
+						E('div', { 'class': 'cbi-value-field' }, [ userInput ])
+					]));
+					dom.append(protoFieldsContainer, E('div', { 'class': 'cbi-value' }, [
+						E('label', { 'class': 'cbi-value-title' }, [ _('Password') ]),
+						E('div', { 'class': 'cbi-value-field' }, [
+							passInput,
+							E('div', { 'style': 'font-size: 0.78rem; opacity: 0.75; margin-top: 4px;' }, [
+								_('Write-only: password is saved securely with 0600 permissions.')
+							])
+						])
+					]));
+				}
+			}
+
+			protoSelect.addEventListener('change', updateProtoFields);
+			updateProtoFields();
+
+			dom.append(modalBody, E('div', { 'class': 'cbi-value', 'style': 'margin-bottom: 12px;' }, [
+				E('label', { 'class': 'cbi-value-title', 'style': 'font-weight: 600;' }, [ _('Protocol') ]),
+				E('div', { 'class': 'cbi-value-field' }, [ protoSelect ])
+			]));
+
+			dom.append(modalBody, E('div', { 'class': 'cbi-value', 'style': 'margin-bottom: 12px;' }, [
+				E('label', { 'class': 'cbi-value-title', 'style': 'font-weight: 600;' }, [ _('Profile Name') ]),
+				E('div', { 'class': 'cbi-value-field' }, [ nameInput ])
+			]));
+
+			dom.append(modalBody, E('div', { 'class': 'cbi-value', 'style': 'margin-bottom: 12px;' }, [
+				E('label', { 'class': 'cbi-value-title', 'style': 'font-weight: 600;' }, [ _('Server Hostname / IP') ]),
+				E('div', { 'class': 'cbi-value-field' }, [ hostInput ])
+			]));
+
+			dom.append(modalBody, protoFieldsContainer);
+
+			dom.append(modalBody, E('div', { 'class': 'cbi-value', 'style': 'margin-top: 14px;' }, [
+				E('label', { 'class': 'cbi-value-title' }, [ _('Connect Immediately') ]),
+				E('div', { 'class': 'cbi-value-field' }, [
+					connectImmediatelyCheck,
+					E('span', { 'style': 'margin-inline-start: 8px; font-size: 0.85rem;' }, [
+						_('Connect to this profile immediately after creation')
+					])
+				])
+			]));
+
+			var addBtn = E('button', {
+				'class': 'cbi-button cbi-button-positive',
+				'click': function() {
+					var hostVal = hostInput.value.trim();
+					if (!hostVal) {
+						ui.addNotification(null, E('p', {}, [ _('Server Hostname / IP is required') ]), 'error');
+						return;
+					}
+
+					var protoVal = protoSelect.value;
+					var nameVal = nameInput.value.trim() || hostVal;
+					var fields = protoFieldsContainer._fields || {};
+
+					var extra = {};
+					if (protoVal === 'ikev2') {
+						extra.username = fields.userInput ? fields.userInput.value.trim() : '';
+						extra.password = fields.passInput ? fields.passInput.value.trim() : '';
+						extra.remote_id = fields.remoteIdInput ? fields.remoteIdInput.value.trim() : '';
+						extra.ca = fields.caInput ? fields.caInput.value.trim() : 'geovpn-isrg-x1.pem';
+						extra.dpd = fields.dpdInput ? fields.dpdInput.value.trim() : 30;
+						extra.cred = fields.credSelect ? fields.credSelect.value : '';
+
+						if (!extra.username) {
+							ui.addNotification(null, E('p', {}, [ _('Username is required for IKEv2') ]), 'error');
+							return;
+						}
+					} else if (protoVal === 'wireguard') {
+						extra.port = fields.portInput ? fields.portInput.value.trim() : 51820;
+						extra.public_key = fields.pubKeyInput ? fields.pubKeyInput.value.trim() : '';
+						extra.private_key = fields.privKeyInput ? fields.privKeyInput.value.trim() : '';
+						extra.preshared_key = fields.pskInput ? fields.pskInput.value.trim() : '';
+						extra.address = fields.addrInput ? fields.addrInput.value.trim().split(',').map(function(s){return s.trim();}).filter(Boolean) : [];
+						extra.allowed_ips = fields.allowedIpsInput ? fields.allowedIpsInput.value.trim().split(',').map(function(s){return s.trim();}).filter(Boolean) : ['0.0.0.0/0'];
+					} else {
+						extra.port = fields.portInput ? fields.portInput.value.trim() : 1194;
+						extra.ovpn_proto = fields.protoModeSelect ? fields.protoModeSelect.value : 'udp';
+						extra.username = fields.userInput ? fields.userInput.value.trim() : '';
+						extra.password = fields.passInput ? fields.passInput.value.trim() : '';
+					}
+
+					ui.showIndicator();
+					api.addProfile(nameVal, protoVal, hostVal, extra.username || '', extra.password || '', extra).then(function(res) {
+						if (!res || !res.ok) {
+							ui.hideIndicator();
+							ui.addNotification(null, E('p', {}, [ _('Failed to add profile: ') + ((res && res.message) || _('Unknown error')) ]), 'error');
+							return;
+						}
+
+						var newId = res.id;
+						if (connectImmediatelyCheck.checked && newId) {
+							uci.set('geovpn', 'main', 'active_profile', newId);
+							uci.save();
+							uci.apply().then(function() {
+								api.callService('restart').then(function() {
+									ui.hideIndicator();
+									ui.hideModal();
+									location.reload();
+								});
+							});
+						} else {
+							ui.hideIndicator();
+							ui.hideModal();
+							ui.addNotification(null, E('p', {}, [ _('Profile created successfully.') ]), 'info');
+							location.reload();
+						}
+					}).catch(function(err) {
+						ui.hideIndicator();
+						ui.addNotification(null, E('p', {}, [ _('Error creating profile: ') + err ]), 'error');
+					});
+				}
+			}, [ _('Add Profile') ]);
+
+			dom.append(modalBody, E('div', { 'style': 'display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px;' }, [
+				E('button', { 'class': 'cbi-button', 'click': ui.hideModal }, [ _('Cancel') ]),
+				addBtn
+			]));
+
+			ui.showModal(_('Add VPN Profile'), [ modalBody ]);
+		}
+
 		// Action buttons in section title
 		var headerActions = E('div', { 'style': 'display: flex; gap: 8px; align-items: center;' }, [
+			E('button', {
+				'class': 'cbi-button cbi-button-positive',
+				'style': 'font-weight: 600;',
+				'click': showAddProfileModal
+			}, [ _('+ Add Profile') ]),
 			E('a', {
 				'class': 'cbi-button cbi-button-action',
 				'href': L.url('admin/vpn/geovpn/importer')

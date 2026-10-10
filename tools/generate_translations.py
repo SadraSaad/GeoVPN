@@ -284,19 +284,105 @@ TRANSLATIONS = {
     'e.g. Living-room TV or Laptop': 'مثلاً تلویزیون هوشمند یا لپ‌تاپ',
     'e.g. aa:bb:cc:dd:ee:ff or 192.168.1.20': 'مثلاً aa:bb:cc:dd:ee:ff یا 192.168.1.20',
     'e.g. digikala.com or 1.1.1.1': 'مثلاً digikala.com یا 1.1.1.1',
-    'e.g. wiki.corp.example or 203.0.113.0/24': 'مثلاً wiki.corp.example یا 203.0.113.0/24'
+    'e.g. wiki.corp.example or 203.0.113.0/24': 'مثلاً wiki.corp.example یا 203.0.113.0/24',
+    '+ Add Profile': '+ افزودن پروفایل',
+    'Add Profile': 'افزودن پروفایل',
+    'Add VPN Profile': 'افزودن پروفایل VPN',
+    'Apply Language': 'اعمال زبان',
+    'Automatic (System)': 'خودکار (سیستم)',
+    'Check Releases': 'بررسی نسخه‌های منتشرشده',
+    'Check for Updates': 'بررسی بروزرسانی',
+    'Checking for updates from GitHub...': 'در حال بررسی بروزرسانی از گیت‌هاب...',
+    'Choose interface display language. Page will reload and update layout direction (LTR / RTL).': 'انتخاب زبان نمایش رابط کاربری. صفحه مجدداً بارگذاری شده و جهت چیدمان (راست‌به‌چپ / چپ‌به‌راست) اعمال خواهد شد.',
+    'Click "Check for Updates" to query latest releases from GitHub.': 'برای بررسی آخرین نسخه‌های منتشرشده از گیت‌هاب روی «بررسی بروزرسانی» کلیک کنید.',
+    'Client Private Key': 'کلید خصوصی کلاینت',
+    'Client private key': 'کلید خصوصی کلاینت',
+    'Connect Immediately': 'اتصال فوری',
+    'Connect to this profile immediately after creation': 'اتصال به این پروفایل بلافاصله پس از ایجاد',
+    'Could not retrieve update information from GitHub: ': 'امکان دریافت اطلاعات بروزرسانی از گیت‌هاب میسر نشد: ',
+    'Create a new VPN connection profile directly by specifying endpoint and credentials.': 'ایجاد مستقیم یک پروفایل اتصال VPN با تعیین آدرس سرور و اطلاعات ورود.',
+    'Defaults to Server Hostname if left empty': 'در صورت خالی بودن، برابر با آدرس سرور در نظر گرفته می‌شود',
+    'Display Language': 'زبان نمایش',
+    'Downloading and installing packages from GitHub Releases...': 'در حال دانلود و نصب بسته‌ها از انتشارهای گیت‌هاب...',
+    'Enter password': 'ورود رمز عبور',
+    'Error creating profile: ': 'خطا در ایجاد پروفایل: ',
+    'Failed to add profile: ': 'خطا در افزودن پروفایل: ',
+    'Failed to check for updates: ': 'خطا در بررسی بروزرسانی: ',
+    'Failed to switch language: ': 'خطا در تغییر زبان: ',
+    'GeoVPN OpenWrt Package Suite': 'مجموعه بسته‌های GeoVPN برای OpenWrt',
+    'GeoVPN updated successfully! Reloading in 3 seconds...': 'برنامه GeoVPN با موفقیت به‌روزرسانی شد! در حال بارگذاری مجدد ظرف ۳ ثانیه...',
+    'GeoVPN updated successfully! Reloading...': 'برنامه GeoVPN با موفقیت به‌روزرسانی شد! در حال بارگذاری مجدد...',
+    'GitHub Repository': 'مخزن گیت‌هاب',
+    'IKEv2 / IPsec (strongSwan)': 'IKEv2 / IPsec (strongSwan)',
+    'Installed Version': 'نسخه نصب‌شده',
+    'Interface Language': 'زبان رابط کاربری',
+    'No VPN profiles configured. Create an IKEv2 profile directly or import .ovpn / .conf files.': 'هیچ پروفایل VPN پیکربندی نشده است. یک پروفایل IKEv2 ایجاد کرده یا فایل‌های .ovpn / .conf را وارد کنید.',
+    'No release data found.': 'اطلاعات انتشاری یافت نشد.',
+    'None (use direct username/password)': 'هیچ‌کدام (استفاده مستقیم از نام‌کاربری/رمز عبور)',
+    'Official open-source repository, release tags, and issue tracker.': 'مخزن رسمی متن‌باز، برچسب‌های انتشار و سامانه ثبت مشکلات.',
+    'OpenVPN': 'OpenVPN',
+    'Preshared key (optional)': 'کلید اشتراکی (اختیاری)',
+    'Profile created successfully.': 'پروفایل با موفقیت ایجاد شد.',
+    'Server Hostname / IP': 'آدرس سرور یا هاست‌نیم',
+    'Server Hostname / IP is required': 'آدرس سرور یا هاست‌نیم الزامی است',
+    'Server Port & Protocol': 'پورت و پروتکل سرور',
+    'Server base64 public key': 'کلید عمومی سرور (base64)',
+    'Unknown error': 'خطای ناشناخته',
+    'Update Available: %s': 'نسخه جدید موجود است: %s',
+    'Update Now': 'به‌روزرسانی خودکار',
+    'Update check error: ': 'خطا در بررسی بروزرسانی: ',
+    'Update failed: ': 'خطا در به‌روزرسانی: ',
+    'Updates & Version': 'به‌روزرسانی و نسخه',
+    'Upgrade GeoVPN to %s now? Downloaded packages will be installed and services restarted.': 'آیا مایلید GeoVPN را به نسخه %s ارتقا دهید؟ بسته‌های دانلودشده نصب و سرویس‌ها راه‌اندازی مجدد خواهند شد.',
+    'Username is required for IKEv2': 'نام کاربری برای IKEv2 الزامی است',
+    'View on GitHub': 'مشاهده در گیت‌هاب',
+    'WireGuard': 'WireGuard',
+    'Write-only: client private key is saved securely with 0600 permissions.': 'فقط نوشتن: کلید خصوصی کلاینت به صورت امن با سطح دسترسی 0600 ذخیره می‌شود.',
+    'Write-only: password is saved securely with 0600 permissions.': 'فقط نوشتن: رمز عبور به صورت امن با سطح دسترسی 0600 ذخیره می‌شود.',
+    'You are running the latest version (%s).': 'شما از آخرین نسخه (%s) استفاده می‌کنید.',
+    'e.g. Frankfurt Server': 'مثلاً سرور فرانکفورت',
+    'e.g. vpn.example.com or 198.51.100.1': 'مثلاً vpn.example.com یا 198.51.100.1'
 }
 
 def escape_str(s):
     return s.replace('\\', '\\\\').replace('"', '\\"').replace('\n', '\\n')
 
 def main():
+    # 0. Load existing translations from git HEAD or current PO file
+    existing_translations = {}
+    try:
+        import subprocess
+        proc = subprocess.run(['git', 'show', 'HEAD:openwrt/luci-app-geovpn/po/fa/geovpn.po'], capture_output=True, text=True)
+        if proc.returncode == 0 and proc.stdout:
+            for k, v in re.findall(r'msgid "((?:[^"\\]|\\.)*)"\s+msgstr "((?:[^"\\]|\\.)*)"', proc.stdout):
+                if k and v:
+                    clean_k = k.replace(r'\"', '"').replace(r'\\', '\\')
+                    clean_v = v.replace(r'\"', '"').replace(r'\\', '\\')
+                    existing_translations[clean_k] = clean_v
+    except Exception:
+        pass
+
+    if os.path.exists(PO_PATH):
+        try:
+            curr_content = open(PO_PATH, encoding='utf-8').read()
+            for k, v in re.findall(r'msgid "((?:[^"\\]|\\.)*)"\s+msgstr "((?:[^"\\]|\\.)*)"', curr_content):
+                if k and v:
+                    clean_k = k.replace(r'\"', '"').replace(r'\\', '\\')
+                    clean_v = v.replace(r'\"', '"').replace(r'\\', '\\')
+                    if clean_k not in existing_translations:
+                        existing_translations[clean_k] = clean_v
+        except Exception:
+            pass
+
+    all_translations = dict(existing_translations)
+    all_translations.update(TRANSLATIONS)
+
     # 1. Collect all strings from codebase
     strings = set()
     for path in glob.glob(os.path.join(REPO_ROOT, 'openwrt/luci-app-geovpn/htdocs/**/*.js'), recursive=True):
         content = open(path, encoding='utf-8').read()
-        for m in re.findall(r'_\([\'\"](.*?)[\'\"]\)', content):
-            strings.add(m)
+        for m in re.finditer(r'_\(\s*([\"\'])(.*?)\1\s*\)', content, re.DOTALL):
+            strings.add(m.group(2))
 
     for path in glob.glob(os.path.join(REPO_ROOT, 'openwrt/luci-app-geovpn/root/**/*.json'), recursive=True):
         try:
@@ -342,10 +428,10 @@ def main():
         f.write('"Plural-Forms: nplurals=2; plural=(n > 1);\\n"\n\n')
 
         for s in sorted_strings:
-            translation = TRANSLATIONS.get(s)
+            translation = all_translations.get(s)
             if not translation:
                 missing.append(s)
-                translation = s  # fallback to untranslated if missing
+                translation = s
 
             f.write(f'msgid "{escape_str(s)}"\n')
             f.write(f'msgstr "{escape_str(translation)}"\n\n')

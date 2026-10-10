@@ -197,6 +197,39 @@ var callHealthTick = rpc.declare({
 	expect: { '': {} }
 });
 
+var callProfileAddRpc = rpc.declare({
+	object: 'luci.geovpn',
+	method: 'profile_add',
+	expect: { '': {} }
+});
+
+var callProfileAdd = function(name, proto, host, username, password, extra) {
+	var payload = Object.assign({}, extra || {});
+	if (typeof name === 'object' && name !== null) {
+		payload = Object.assign(payload, name);
+	} else {
+		if (name != null) payload.name = name;
+		if (proto != null) payload.proto = proto;
+		if (host != null) payload.host = host;
+		if (username != null) payload.username = username;
+		if (password != null) payload.password = password;
+	}
+	return callProfileAddRpc(payload);
+};
+
+var callCheckUpdate = rpc.declare({
+	object: 'luci.geovpn',
+	method: 'check_update',
+	expect: { '': {} }
+});
+
+var callApplyUpdate = rpc.declare({
+	object: 'luci.geovpn',
+	method: 'apply_update',
+	params: [ 'version', 'assets' ],
+	expect: { '': {} }
+});
+
 return baseclass.extend({
 	getStatus: callStatus,
 	getLogs: callLogs,
@@ -207,6 +240,8 @@ return baseclass.extend({
 	import_batch: callImportBatch,
 	getProfile: callProfileGet,
 	saveProfileRaw: callProfileSaveRaw,
+	addProfile: callProfileAdd,
+	profile_add: callProfileAdd,
 	setCredentials: callSetCredentials,
 	putMaterial: callPutMaterial,
 	deleteProfile: callDeleteProfile,
@@ -215,6 +250,10 @@ return baseclass.extend({
 	getCatalog: callCatalog,
 	startUpdate: callUpdate,
 	getUpdateStatus: callUpdateStatus,
+	checkUpdate: callCheckUpdate,
+	check_update: callCheckUpdate,
+	applyUpdate: callApplyUpdate,
+	apply_update: callApplyUpdate,
 	testTarget: callTestTarget,
 	getDiag: callDiag,
 	testStart: callTestStart,
